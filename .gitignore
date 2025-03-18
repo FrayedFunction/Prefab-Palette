@@ -1,3 +1,4 @@
-# Don't want to track prefab collection folder.
-/[Cc]ollections/
-/[Cc]ollections.meta
+# Don't track prefab collection folder or collections name enum.
+[Cc]ollections/
+[Cc]ollections.meta
+Scripts/CollectionNames.cs
