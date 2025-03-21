@@ -21,7 +21,7 @@ namespace PrefabPalette
 
         private void OnGUI()
         {
-            GUILayout.Label($"{targetObject.Type}", EditorStyles.whiteLargeLabel);
+            GUILayout.Label($"{targetObject.Name}", EditorStyles.whiteLargeLabel);
             if (editorInstance != null)
             {
                 editorInstance.OnInspectorGUI();

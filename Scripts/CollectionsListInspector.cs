@@ -17,6 +17,7 @@ namespace PrefabPalette
         public static void OpenWindow(CollectionsList cl, PrefabPaletteTool t)
         {
             CollectionsListInspector window = GetWindow<CollectionsListInspector>("Collections Inspector");
+            cl.SyncListWithEnum();
             window.collectionsList = cl;
             window.tool = t;
             window.editorInstance = Editor.CreateEditor(cl);
@@ -32,7 +33,7 @@ namespace PrefabPalette
                 editorInstance.OnInspectorGUI();
             }
 
-            // Disable button if AssetDatabase is reloading (compiling/updating)
+            // Disable button if AssetDatabase is reloading
             GUI.enabled = !EditorApplication.isCompiling && !EditorApplication.isUpdating;
 
             if (GUILayout.Button(GUI.enabled ? "Save" : "Saving..."))
@@ -42,7 +43,11 @@ namespace PrefabPalette
             }
         }
 
-        // Remove collections no longer in the list.
+        /// <summary>
+        /// Delete PrefabCollection objects no longer in the list.
+        /// </summary>
+        /// <param name="collectionsInFolder"></param>
+        /// <param name="collectionsList"></param>
         private void CleanupCollectionsFolder(List<PrefabCollection> collectionsInFolder, CollectionsList collectionsList)
         {
             // Convert collectionNames to HashSet for quick lookup
@@ -52,7 +57,7 @@ namespace PrefabPalette
 
             // Collect assets that need to be deleted
             List<PrefabCollection> toDelete = collectionsInFolder
-                .Where(collection => !validCollections.Contains(collection.Type.ToString().ToLower()))
+                .Where(collection => !validCollections.Contains(collection.Name.ToString().ToLower()))
                 .ToList();
 
             // Delete each asset

@@ -53,14 +53,16 @@ namespace PrefabPalette
         float placerRadius = 0.2f;
         bool isNameDropdownActive = true;
 
-        // List to track spawned fence segments (so we don’t spawn more than needed)
+        // List to track spawned fence segments
         private List<GameObject> spawnedFences = new List<GameObject>();
 
+        /// <summary>
+        /// Returns a list of all saved prefab collections.
+        /// </summary>
         public List<PrefabCollection> GetAllCollectionsInFolder =>
-            AssetDatabase.FindAssets("t:PrefabCollection", new[] { PathDr.GetCollectionsFolder })
+            AssetDatabase.FindAssets($"t:{nameof(PrefabCollection)}", new[] { PathDr.GetCollectionsFolder })
             .Select(guid => AssetDatabase.LoadAssetAtPath<PrefabCollection>(AssetDatabase.GUIDToAssetPath(guid)))
             .ToList();
-
 
         [MenuItem(toolWindowPath)]
         public static void OnShowToolWindow()
@@ -93,22 +95,19 @@ namespace PrefabPalette
             {
                 if (collectionsList == null)
                 {
-                    // Try to find an existing asset first
-                    string[] guids = AssetDatabase.FindAssets("t:CollectionsList", new[] { PathDr.GetCollectionsFolder });
-                    foreach (string guid in guids)
-                    {
-                        string path = AssetDatabase.GUIDToAssetPath(guid);
-                        CollectionsList collection = AssetDatabase.LoadAssetAtPath<CollectionsList>(path);
+                    collectionsList = AssetDatabase.FindAssets($"t:{nameof(CollectionsList)}", new[] { PathDr.GetCollectionsFolder })
+                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid)) // Convert GUID to path
+                        .Select(path => AssetDatabase.LoadAssetAtPath<CollectionsList>(path)) // Load asset
+                        .FirstOrDefault(asset => asset != null);
 
-                        if (collection != null)
-                        {
-                            collectionsList = collection;
-                            CollectionsListInspector.OpenWindow(collectionsList, this);
-                            return;
-                        }
+                    if (collectionsList != null)
+                    {
+                        // Open the list inspector window if found
+                        CollectionsListInspector.OpenWindow(collectionsList, this);
+                        return;
                     }
 
-                    // If none exist, create a new asset
+                    // Create a new asset if it doesn't exist
                     CollectionsList asset = ScriptableObject.CreateInstance<CollectionsList>();
                     string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/CollectionNamesList.asset");
                     CreateScriptableObject(asset, assetPath);
@@ -125,14 +124,6 @@ namespace PrefabPalette
                     // Open window immediately if an asset already exists
                     CollectionsListInspector.OpenWindow(collectionsList, this);
                 }
-
-                // Ensure the enum and list is synced
-                var namesList = collectionsList.collectionNames;
-                namesList.Clear();
-                namesList.AddRange(Enum.GetValues(typeof(CollectionName))
-                          .Cast<CollectionName>()
-                          .Where(e => e != CollectionName.None) // Exclude None
-                          .Select(e => e.ToString())); // Convert enums to strings
             }
 
             // if the enum only contains .None
@@ -288,14 +279,14 @@ namespace PrefabPalette
         {
             if (name == CollectionName.None) return null;
 
-            if (currentPrefabCollection != null && currentPrefabCollection.Type == name)
+            if (currentPrefabCollection != null && currentPrefabCollection.Name == name)
                 return currentPrefabCollection;
 
             selectedPrefab = null;
 
             foreach (var collection in GetAllCollectionsInFolder)
             {
-                if (collection != null && collection.Type == name) // Now comparing based on string, not integer
+                if (collection != null && collection.Name == name) // Now comparing based on string, not integer
                 {
                     return collection;
                 }
@@ -303,15 +294,13 @@ namespace PrefabPalette
 
             // If no matching collection is found, create a new one
             PrefabCollection asset = ScriptableObject.CreateInstance<PrefabCollection>();
-            asset.Type = name; // Assigns string-based enum reference
+            asset.Name = name; // Assigns string-based enum reference
 
             string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/{name}_PrefabCollection.asset");
             CreateScriptableObject(asset, assetPath);
 
             return asset;
         }
-
-
 
         private static void CreateScriptableObject(ScriptableObject so, string assetPath)
         {
