@@ -6,7 +6,7 @@ using UnityEngine;
 namespace PrefabPalette
 {
     /// <summary>
-    /// Maintains valid paths to the tools root and collections folder.
+    /// Maintains valid paths to the tools root and collections folder, Saves current path to Editor Prefs.
     /// </summary>
     [InitializeOnLoad]
     public static class PathDr

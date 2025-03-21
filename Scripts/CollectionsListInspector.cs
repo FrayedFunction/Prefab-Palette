@@ -8,6 +8,9 @@ using System;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Inspector window for the collections list object.
+    /// </summary>
     public class CollectionsListInspector : EditorWindow
     {
         private CollectionsList collectionsList;

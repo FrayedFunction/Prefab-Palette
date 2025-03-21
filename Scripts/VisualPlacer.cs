@@ -3,6 +3,9 @@ using UnityEditor;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Scene GUI visual placer.
+    /// </summary>
     [InitializeOnLoad]
     public class VisualPlacer
     {
@@ -27,13 +30,13 @@ namespace PrefabPalette
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 previewPosition = hit.point;
-                DrawTargetIndicator(previewPosition, hit.normal);
+                DrawPlacer(previewPosition, hit.normal);
             }
 
             sceneView.Repaint();
         }
 
-        private static void DrawTargetIndicator(Vector3 position, Vector3 normal)
+        private static void DrawPlacer(Vector3 position, Vector3 normal)
         {
             // Ignore colours alpha and force to 1.
             Handles.color = new Color(color.r, color.g, color.b, 1f);
@@ -46,50 +49,17 @@ namespace PrefabPalette
             Handles.DrawSolidDisc(position, normal, targetRadius * 0.3f);
         }
 
-/*        private static void DrawWireMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale)
-        {
-            if (wireMaterial == null)
-            {
-                wireMaterial = new Material(Shader.Find("Hidden/Internal-Colored"));
-                wireMaterial.hideFlags = HideFlags.HideAndDontSave;
-                wireMaterial.SetInt("_ZWrite", 1);
-                wireMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
-                wireMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
-            }
-
-            wireMaterial.SetPass(0);
-            wireMaterial.color = color;
-
-            GL.wireframe = true;
-            Graphics.DrawMeshNow(mesh, Matrix4x4.TRS(position, rotation, scale));
-            GL.wireframe = false;
-        }
-
-        public static void SetPreviewPrefab(GameObject prefab)
-        {
-            if (prefab == null)
-            {
-                StopPreview();
-                return;
-            }
-
-            MeshFilter meshFilter = prefab.GetComponentInChildren<MeshFilter>();
-            if (meshFilter != null)
-            {
-                previewMesh = meshFilter.sharedMesh;
-                isActive = true;
-            }
-            else
-            {
-                Debug.LogWarning("Prefab does not contain a MeshFilter!");
-                StopPreview();
-            }
-        }*/
-
+        /// <summary>
+        /// Start rendering the placer
+        /// </summary>
         public static void Start()
         {
             isActive = true;
         }
+
+        /// <summary>
+        /// Stop rendering the placer
+        /// </summary>
         public static void Stop()
         {
             isActive = false;
@@ -97,15 +67,23 @@ namespace PrefabPalette
             SceneView.RepaintAll();
         }
 
+        /// <summary>
+        /// Set the placers color to <paramref name="color"/>
+        /// </summary>
+        /// <param name="color"></param>
         public static void SetColor(Color color)
         {
             VisualPlacer.color = color;
             SceneView.RepaintAll();
         }
 
-        public static void SetTargetRadius(float radius)
+        /// <summary>
+        /// Set the placers radius to <paramref name="r"/>
+        /// </summary>
+        /// <param name="r"></param>
+        public static void SetRadius(float r)
         {
-            targetRadius = Mathf.Max(0.1f, radius); // Prevents zero or negative values
+            targetRadius = Mathf.Max(0.1f, r);
             SceneView.RepaintAll();
         }
     }

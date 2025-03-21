@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Inspector window for editing prefab collections.
+    /// </summary>
     public class PrefabCollectionInspector : EditorWindow
     {
         private PrefabCollection targetObject;

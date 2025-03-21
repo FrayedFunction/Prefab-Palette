@@ -16,6 +16,9 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Main tool window.
+    /// </summary>
     public class PrefabPaletteTool : EditorWindow
     {
         const string toolWindowPath = "Window/Prefab Palette";
@@ -141,7 +144,7 @@ namespace PrefabPalette
             {
                 windowScrollPosition = GUILayout.BeginScrollView(windowScrollPosition);
 
-                PropPlacerGUI();
+                PaletteGUI();
                 GUILayout.Space(20);
                 FencePlacerGUI();
 
@@ -150,7 +153,7 @@ namespace PrefabPalette
             GUILayout.Space(20);
         }
 
-        void PropPlacerGUI()
+        void PaletteGUI()
         {
             GUILayout.Label("Palette", EditorStyles.boldLabel);
 
@@ -275,6 +278,9 @@ namespace PrefabPalette
             GUILayout.EndScrollView(); // End Scroll View
         }
 
+        /// <summary>
+        /// Returns prefab collection object by name except for CollectionName.None
+        /// </summary>
         private PrefabCollection GetPrefabCollection(CollectionName name)
         {
             if (name == CollectionName.None) return null;
@@ -302,6 +308,9 @@ namespace PrefabPalette
             return asset;
         }
 
+        /// <summary>
+        /// Creates an instance of <paramref name="so"/> at <paramref name="assetPath"/> and adds it to the Asset Database
+        /// </summary>
         private static void CreateScriptableObject(ScriptableObject so, string assetPath)
         {
             AssetDatabase.CreateAsset(so, assetPath);
@@ -364,7 +373,7 @@ namespace PrefabPalette
                 if (!isRotating)
                 {
                     VisualPlacer.SetColor(previewColor);
-                    VisualPlacer.SetTargetRadius(placerRadius);
+                    VisualPlacer.SetRadius(placerRadius);
                     VisualPlacer.Start();
                 }
                 else
