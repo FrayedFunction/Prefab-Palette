@@ -11,7 +11,6 @@ using UnityEngine;
  * - Show line while editing
  * 
  * Prop Placer:
- * - Visual feedback is needed for placement.
  */
 
 namespace PrefabPalette
@@ -29,6 +28,7 @@ namespace PrefabPalette
         static CollectionsList collectionsList;
 
         GameObject selectedPrefab;
+        GameObject currentPlacedObject;
         GameObject fencePrefab;
         List<Vector3> fencePoints = new List<Vector3>();
         bool isPlacingFence = false;
@@ -46,7 +46,6 @@ namespace PrefabPalette
         GameObject fenceParentObject;
         bool isRotating = false;
         float rotationSpeed = 2f;
-        GameObject currentPlacedObject;
         float minPaletteScale = 50f;
         float maxPaletteScale = 300f;
         bool showPaletteSettings = false;
@@ -55,6 +54,9 @@ namespace PrefabPalette
         Color previewColor = Color.white;
         float placerRadius = 0.2f;
         bool isNameDropdownActive = true;
+        bool alignWithSurface = false;
+        Vector3 lastSurfaceNormal;
+
 
         // List to track spawned fence segments
         private List<GameObject> spawnedFences = new List<GameObject>();
@@ -147,7 +149,7 @@ namespace PrefabPalette
                 PaletteGUI();
                 GUILayout.Space(20);
                 FencePlacerGUI();
-
+                
                 GUILayout.EndScrollView();
             }
             GUILayout.Space(20);
@@ -179,6 +181,7 @@ namespace PrefabPalette
                 placerRadius = Mathf.Max( 0.01f, EditorGUILayout.FloatField("Placer Visual Radius", placerRadius));
                 rotationSpeed = EditorGUILayout.Slider("Rotation Speed", rotationSpeed, 0.1f, 5);
                 placementOffset = EditorGUILayout.Vector3Field("Placement Offset", placementOffset);
+                alignWithSurface = EditorGUILayout.Toggle("Align with surface?", alignWithSurface);
             }
 
             var prefabList = currentPrefabCollection.prefabList;
@@ -404,7 +407,10 @@ namespace PrefabPalette
                 Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit))
                 {
+                    lastSurfaceNormal = hit.normal;
+
                     currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
+                    currentPlacedObject.transform.rotation = alignWithSurface ? Quaternion.FromToRotation(Vector3.up, hit.normal) : Quaternion.identity;
                     currentPlacedObject.transform.position = hit.point + placementOffset;
                     Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
                 }
@@ -419,11 +425,9 @@ namespace PrefabPalette
                     isRotating = true;
                 }
 
-                // Calculate rotation based on mouse x position
-                Vector3 rotationAxis = Vector3.up;
                 float angle = e.delta.x * rotationSpeed;
-
-                currentPlacedObject.transform.Rotate(rotationAxis, angle, Space.World);
+                Vector3 axis = alignWithSurface ? lastSurfaceNormal : Vector3.up;
+                currentPlacedObject.transform.Rotate(axis, angle, Space.World);
                 e.Use();
             }
 
@@ -535,7 +539,7 @@ namespace PrefabPalette
             }
         }
 
-        // Helper: Returns an offset vector along the bisector for a corner point.
+        // Returns an offset vector along the bisector for a corner point.
         private Vector3 GetCornerOffset(Vector3 prevPoint, Vector3 cornerPoint, Vector3 nextPoint, float offset)
         {
             Vector3 dir1 = (cornerPoint - prevPoint).normalized;
