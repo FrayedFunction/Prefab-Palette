@@ -132,8 +132,8 @@ namespace PrefabPalette
             // if the enum only contains .None
             if (!Enum.GetValues(typeof(CollectionName))
                      .Cast<CollectionName>()
-                     .Any(c => c != CollectionName.None))
-            {
+                     .Any(c => c != CollectionName.None)) {
+
                 EditorGUILayout.HelpBox("Use the button to edit the collections list", MessageType.Warning);
                 return;
             }
@@ -292,7 +292,7 @@ namespace PrefabPalette
 
             foreach (var collection in GetAllCollectionsInFolder)
             {
-                if (collection != null && collection.Name == name) // Now comparing based on string, not integer
+                if (collection != null && collection.Name == name)
                 {
                     return collection;
                 }

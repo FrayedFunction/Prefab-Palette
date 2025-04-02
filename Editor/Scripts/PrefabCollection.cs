@@ -10,7 +10,8 @@ namespace PrefabPalette
     /// </summary>
     public class PrefabCollection : ScriptableObject
     {
-        private string nameAsString;
+        // Needs to be seralised otherwise it will not persist
+        [SerializeField] private string nameAsString;
 
         /// <summary>
         /// User set name of collection.

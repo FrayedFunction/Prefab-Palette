@@ -12,39 +12,43 @@ namespace PrefabPalette
     public static class PathDr
     {
         // Keys for editor prefs
-        private const string ToolRootPathKey = "PrefabPalette/PathDr_ToolRootPath";
+        private const string ToolPathKey = "PrefabPalette/PathDr_ToolPath";
         private const string CollectionsPathKey = "PrefabPalette/PathDr_CollectionsPath";
 
-        private static string toolRootPath;
+        private static string toolPath;
         private static string collectionsPath;
 
         static PathDr()
         {
-            toolRootPath = EditorPrefs.GetString(ToolRootPathKey, string.Empty);
+            toolPath = EditorPrefs.GetString(ToolPathKey, string.Empty);
             collectionsPath = EditorPrefs.GetString(CollectionsPathKey, string.Empty);
         }
 
         /// <returns>
-        /// Path to the tools root folder.
+        /// Path to /PrefabPalette/Editor
         /// </returns>
-        public static string GetToolRootPath
+        public static string GetToolPath
         {
             get
             {
                 // If the path for the tools root folder isn't set or the directory no longer
                 // exists, look for it in th asset database.
-                if (string.IsNullOrEmpty(toolRootPath) || !Directory.Exists(toolRootPath))
+                if (string.IsNullOrEmpty(toolPath) || !Directory.Exists(toolPath))
                 {
-                    toolRootPath = FindFolder("PrefabPalette");
-
+                    var root = FindFolder("PrefabPalette");
+                    toolPath = Path.Combine(root, "Editor");
                     // If the path's found, save it to editor prefs.
-                    if (!string.IsNullOrEmpty(toolRootPath))
+                    if (!string.IsNullOrEmpty(toolPath))
                     {
-                        EditorPrefs.SetString(ToolRootPathKey, toolRootPath);
+                        EditorPrefs.SetString(ToolPathKey, toolPath);
+                    }
+                    else
+                    {
+                        Debug.LogError($"PrefabPalette/{nameof(PathDr)}Can't find editor folder");
                     }
                 }
 
-                return toolRootPath;
+                return toolPath;
             }
         }
 
@@ -63,13 +67,13 @@ namespace PrefabPalette
                 // either find it or create a new one in the tools root directory.
                 if (string.IsNullOrEmpty(collectionsPath) || !Directory.Exists(collectionsPath))
                 {
-                    string newPath = Path.Combine(GetToolRootPath, "Collections");
+                    string newPath = Path.Combine(GetToolPath, "Collections");
 
                     if (!Directory.Exists(newPath))
                     {
                         // Create the folder if it dosen't exist
                         Debug.Log($"PrefabPalette/{nameof(PathDr)}: Collections folder not found at {newPath}, creating...");
-                        string newFolderGUID = AssetDatabase.CreateFolder(GetToolRootPath, "Collections");
+                        string newFolderGUID = AssetDatabase.CreateFolder(GetToolPath, "Collections");
 
                         if (string.IsNullOrEmpty(newFolderGUID))
                         {
@@ -107,6 +111,6 @@ namespace PrefabPalette
             string[] guids = AssetDatabase.FindAssets($"t:Folder {folderName}");
             return guids.Select(AssetDatabase.GUIDToAssetPath)
                         .FirstOrDefault(path => path.EndsWith(folderName));
-        }    
+        }
     }
 }

@@ -10,12 +10,12 @@ using UnityEngine;
 namespace PrefabPalette 
 {
     /// <summary>
-    /// Scriptable object that holds the editable list of collection names
+    /// Scriptable object that holds the editable list of collection names.
     /// </summary>
     public class CollectionsList : ScriptableObject
     {
         /// <summary>
-        /// Editable list of collection names exposed in CollectionsListInspector
+        /// Editable list of collection names exposed in CollectionsListInspector.
         /// </summary>
         public List<string> collectionNames = new List<string>();
 
@@ -33,11 +33,11 @@ namespace PrefabPalette
         }
 
         /// <summary>
-        /// Writes collection names list to a file as an enum
+        /// Writes collection names list to a file as an enum.
         /// </summary>
         public void GenerateEnum()
         {
-            string filePath = Path.Combine(PathDr.GetToolRootPath, "Scripts/CollectionNames.cs");
+            string filePath = Path.Combine(PathDr.GetToolPath, "Scripts", "CollectionNames.cs");
 
             // Name validation
             List<string> validNames = collectionNames
@@ -65,7 +65,7 @@ namespace PrefabPalette
         /// </summary>
         private string SanitiseEnumName(string name)
         {
-            // Remove invalid characters, replace spaces with underscores
+            // Remove invalid characters & replace spaces with underscores
             name = Regex.Replace(name, @"[^a-zA-Z0-9_]", "_");
 
             // Ensure it doesn't start with a number
