@@ -24,33 +24,18 @@ namespace PrefabPalette
     {
         const string toolWindowPath = "Window/Prefab Palette";
 
+        public ToolSettings Settings { get; private set; }
+
         PrefabCollection currentPrefabCollection;
-        CollectionName collectionNameDropdown;
 
         GUIContent[] toolbarButtons;
 
         static CollectionsList collectionsList;
 
-        GameObject selectedPrefab;
-        GameObject currentPlacedObject;
+        public GameObject selectedPrefab;
         Vector2 paletteScrollPosition;
         Vector2 windowScrollPosition;
-        int gridColumns = 4;
         float dynamicPrefabIconSize;
-
-        bool isRotating = false;
-        float rotationSpeed = 2f;
-        float minPaletteScale = 50f;
-        float maxPaletteScale = 300f;
-        bool showPaletteSettings = false;
-        bool showPlacementSettings = false;
-        Vector3 placementOffset = Vector3.zero;
-        Color previewColor = Color.white;
-        float placerRadius = 0.2f;
-        bool isNameDropdownActive = true;
-        bool alignWithSurface = false;
-        Vector3 lastSurfaceNormal;
-        bool showHeader = true;
 
         /// <summary>
         /// Returns a list of all saved prefab collections.
@@ -69,48 +54,19 @@ namespace PrefabPalette
         void OnGUI()
         {
             GUILayout.Label("Prefab Palette", EditorStyles.largeLabel);
+            
+            if (Settings == null)
+                Settings = LoadOrCreateAsset<ToolSettings>(PathDr.GetToolPath, "ToolSettings.asset", out string assetPath);
 
-            showHeader = EditorGUILayout.Toggle("Show Header", showHeader);
+            Settings.showHeader = EditorGUILayout.Toggle("Show Settings", Settings.showHeader);
 
-            if (showHeader)
+            if (Settings.showHeader)
             {
-                GUI.enabled = isNameDropdownActive;
-                // Select collection to show.
-                collectionNameDropdown = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", collectionNameDropdown);
-
-                // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
-                if (HasOpenInstances<CollectionsListInspector>())
-                {
-                    collectionNameDropdown = CollectionName.None;
-                    isNameDropdownActive = false;
-                    EditorGUILayout.HelpBox("Close the Collections Inspector window to choose a collection", MessageType.Warning);
-                    return;
-                }
-                else
-                {
-                    isNameDropdownActive = true;
-                }
-
-                if (GUILayout.Button("Edit List"))
+                if (GUILayout.Button("Manage Collections"))
                 {
                     if (collectionsList == null)
                     {
-                        collectionsList = AssetDatabase.FindAssets($"t:{nameof(CollectionsList)}", new[] { PathDr.GetCollectionsFolder })
-                            .Select(guid => AssetDatabase.GUIDToAssetPath(guid)) // Convert GUID to path
-                            .Select(path => AssetDatabase.LoadAssetAtPath<CollectionsList>(path)) // Load asset
-                            .FirstOrDefault(asset => asset != null);
-
-                        if (collectionsList != null)
-                        {
-                            // Open the list inspector window if found
-                            CollectionsListInspector.OpenWindow(collectionsList, this);
-                            return;
-                        }
-
-                        // Create a new asset if it doesn't exist
-                        CollectionsList asset = ScriptableObject.CreateInstance<CollectionsList>();
-                        string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/CollectionNamesList.asset");
-                        CreateScriptableObject(asset, assetPath);
+                        collectionsList = LoadOrCreateAsset<CollectionsList>(PathDr.GetCollectionsFolder, "CollectionNamesList.asset", out string assetPath);
 
                         // Delay the window opening until after the asset database refresh
                         EditorApplication.delayCall += () =>
@@ -136,31 +92,48 @@ namespace PrefabPalette
                     return;
                 }
 
-                currentPrefabCollection = GetPrefabCollection(collectionNameDropdown);
-
                 // Create a foldout for "Palette Settings"
-                showPaletteSettings = EditorGUILayout.Foldout(showPaletteSettings, "Palette Settings");
+                Settings.showPaletteSettings = EditorGUILayout.Foldout(Settings.showPaletteSettings, "Palette Settings");
 
                 // If the foldout is expanded, display the settings
-                if (showPaletteSettings)
+                if (Settings.showPaletteSettings)
                 {
-                    gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", gridColumns));
-                    minPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", minPaletteScale), 50f, maxPaletteScale);
-                    maxPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", maxPaletteScale), minPaletteScale, 500f);
+                    Settings.gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", Settings.gridColumns));
+                    Settings.minPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", Settings.minPaletteScale), 50f, Settings.maxPaletteScale);
+                    Settings.maxPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", Settings.maxPaletteScale), Settings.minPaletteScale, 500f);
                 }
 
                 GUILayout.Space(2);
 
-                showPlacementSettings = EditorGUILayout.Foldout(showPlacementSettings, "Placement Settings");
+                Settings.showPlacementSettings = EditorGUILayout.Foldout(Settings.showPlacementSettings, "Placement Settings");
 
-                if (showPlacementSettings)
+                if (Settings.showPlacementSettings)
                 {
-                    previewColor = EditorGUILayout.ColorField("Placer Color", previewColor);
-                    placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", placerRadius));
-                    rotationSpeed = EditorGUILayout.Slider("Rotation Speed", rotationSpeed, 0.1f, 5);
-                    placementOffset = EditorGUILayout.Vector3Field("Placement Offset", placementOffset);
-                    alignWithSurface = EditorGUILayout.Toggle("Align with surface?", alignWithSurface);
+                    Settings.previewColor = EditorGUILayout.ColorField("Placer Color", Settings.previewColor);
+                    Settings.placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", Settings.placerRadius));
+                    Settings.rotationSpeed = EditorGUILayout.Slider("Rotation Speed", Settings.rotationSpeed, 0.1f, 5);
+                    Settings.placementOffset = EditorGUILayout.Vector3Field("Placement Offset", Settings.placementOffset);
+                    Settings.alignWithSurface = EditorGUILayout.Toggle("Align with surface?", Settings.alignWithSurface);
                 }
+            }
+
+            GUI.enabled = Settings.isNameDropdownActive;
+
+            // Select collection to show.
+            Settings.collectionNameDropdown = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.collectionNameDropdown);
+            currentPrefabCollection = GetPrefabCollection(Settings.collectionNameDropdown);
+
+            // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
+            if (HasOpenInstances<CollectionsListInspector>())
+            {
+                Settings.collectionNameDropdown = CollectionName.None;
+                Settings.isNameDropdownActive = false;
+                EditorGUILayout.HelpBox("Close the Collections Inspector window to choose a collection", MessageType.Warning);
+                return;
+            }
+            else
+            {
+                Settings.isNameDropdownActive = true;
             }
 
             if (currentPrefabCollection != null)
@@ -203,15 +176,15 @@ namespace PrefabPalette
 
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 
-            dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / gridColumns - 10, 40), minPaletteScale, maxPaletteScale);
+            dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / Settings.gridColumns - 10, 40), Settings.minPaletteScale, Settings.maxPaletteScale);
 
             // Start Scroll View
             paletteScrollPosition = GUILayout.BeginScrollView(paletteScrollPosition); // Set max visible height
 
-            int rowCount = Mathf.CeilToInt((float)prefabList.Count / gridColumns);
+            int rowCount = Mathf.CeilToInt((float)prefabList.Count / Settings.gridColumns);
 
             // Calculate the total width of the grid (based on the number of columns and button size)
-            float gridWidth = gridColumns * dynamicPrefabIconSize;
+            float gridWidth = Settings.gridColumns * dynamicPrefabIconSize;
 
             // Calculate the left padding required to center the grid
             float gridPadding = Mathf.Max((windowWidth - gridWidth) * 0.2f, 0);
@@ -221,9 +194,9 @@ namespace PrefabPalette
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(gridPadding);
 
-                for (int col = 0; col < gridColumns; col++)
+                for (int col = 0; col < Settings.gridColumns; col++)
                 {
-                    int index = row * gridColumns + col;
+                    int index = row * Settings.gridColumns + col;
                     if (index >= prefabList.Count) break;
 
                     GameObject prefab = prefabList[index];
@@ -283,8 +256,11 @@ namespace PrefabPalette
         }
 
         /// <summary>
-        /// Returns prefab collection object by name except for CollectionName.None
+        /// Returns prefab collection object by name, creates it if it doesn't exist
         /// </summary>
+        /// <remarks>
+        /// Note: CollectionName.None returns null.
+        /// </remarks>
         private PrefabCollection GetPrefabCollection(CollectionName name)
         {
             if (name == CollectionName.None) return null;
@@ -312,6 +288,31 @@ namespace PrefabPalette
             return asset;
         }
 
+        private static T LoadOrCreateAsset<T>(string folderPath, string assetName, out string assetPath) where T : ScriptableObject
+        {
+            // Find existing asset
+            T asset = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { folderPath })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<T>)
+                .FirstOrDefault();
+
+            if (asset != null)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset);
+                return asset;
+            }
+
+            // Create new asset
+            asset = ScriptableObject.CreateInstance<T>();
+            assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/{assetName}");
+            AssetDatabase.CreateAsset(asset, assetPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            return AssetDatabase.LoadAssetAtPath<T>(assetPath);
+        }
+
+
         /// <summary>
         /// Creates an instance of <paramref name="so"/> at <paramref name="assetPath"/> and adds it to the Asset Database
         /// </summary>
@@ -326,61 +327,29 @@ namespace PrefabPalette
         {
             if (selectedPrefab != null)
             {
-                if (!isRotating)
+                switch (SceneRaycastHelper.CurrentPlacementMode)
                 {
-                    VisualPlacer.Show(previewColor, placerRadius);
-                }
-                else
-                {
-                    VisualPlacer.Stop();
-                }
+                    case SceneRaycastHelper.PlacementMode.Free or SceneRaycastHelper.PlacementMode.Snap:
+                        if (!PrefabPlacement.IsRotating)
+                        {
+                            VisualPlacer.Show(Settings.previewColor, Settings.placerRadius);
+                        }
+                        else
+                        {
+                            VisualPlacer.Stop();
+                        }
 
-                HandlePrefabPlacement();
+                        PrefabPlacement.HandleSinglePrefabPlacement(this);
+                    break;
+
+                    case SceneRaycastHelper.PlacementMode.Line:
+
+                    break;
+                }
             }
             else
             {
                 VisualPlacer.Stop();
-            }
-        }
-
-        private void HandlePrefabPlacement()
-        {
-            if (SceneRaycastHelper.CurrentPlacementMode == SceneRaycastHelper.PlacementMode.Line) 
-                return;
-
-            Event e = Event.current;
-
-            // Place object on left click
-            if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
-            {
-                lastSurfaceNormal = SceneRaycastHelper.SurfaceNormal;
-
-                currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
-                currentPlacedObject.transform.SetPositionAndRotation(SceneRaycastHelper.Position + placementOffset, alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
-                Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
-
-                e.Use();
-            }
-
-            // Rotate while holding the mouse button
-            if (e.type == EventType.MouseDrag && e.button == 0 && !e.alt && currentPlacedObject != null)
-            {
-                if (!isRotating)
-                {
-                    isRotating = true;
-                }
-
-                float angle = e.delta.x * rotationSpeed;
-                Vector3 axis = alignWithSurface ? lastSurfaceNormal : Vector3.up;
-                currentPlacedObject.transform.Rotate(axis, angle, Space.World);
-                e.Use();
-            }
-
-            // Stop rotating on mouse release
-            if (e.type == EventType.MouseUp && e.button == 0 && isRotating)
-            {
-                isRotating = false;
-                currentPlacedObject = null;
             }
         }
 
