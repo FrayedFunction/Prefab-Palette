@@ -12,22 +12,27 @@ namespace PrefabPalette
     public class PrefabCollectionInspector : EditorWindow
     {
         private PrefabCollection targetObject;
-        private Editor editorInstance;
+        private SerializedObject serializedObject;
+        private SerializedProperty listProperty;
 
         public static void OpenEditWindow(PrefabCollection obj)
         {
             PrefabCollectionInspector window = GetWindow<PrefabCollectionInspector>("Collection Editor");
             window.targetObject = obj;
-            window.editorInstance = Editor.CreateEditor(obj);
+            window.serializedObject = new SerializedObject(obj);
+            window.listProperty = window.serializedObject.FindProperty("prefabList");
             window.Show();
         }
 
         private void OnGUI()
         {
             GUILayout.Label($"{targetObject.Name}", EditorStyles.whiteLargeLabel);
-            if (editorInstance != null)
+
+            if (serializedObject != null)
             {
-                editorInstance.OnInspectorGUI();
+                serializedObject.Update();
+                EditorGUILayout.PropertyField(listProperty, true); // Only show the list
+                serializedObject.ApplyModifiedProperties();
             }
         }
     }
