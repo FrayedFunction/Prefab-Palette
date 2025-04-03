@@ -52,6 +52,16 @@ namespace PrefabPalette
             }
         }
 
+        public static string GetGeneratedFolderPath
+        {
+            get
+            {
+                var path = Path.Combine(GetToolPath, "Generated");
+                Directory.CreateDirectory(path);
+                return path;
+            }
+        }
+
         /// <summary>
         /// Returns the path to the folder where prefab collections are generated.
         /// </summary>
@@ -63,17 +73,17 @@ namespace PrefabPalette
         {
             get
             {
-                // If the path to the Collections folder isn't set or the directory dosen't exists,
+                // If the path to the Collections folder isn't set or the directory dosen't exist,
                 // either find it or create a new one in the tools root directory.
                 if (string.IsNullOrEmpty(collectionsPath) || !Directory.Exists(collectionsPath))
                 {
-                    string newPath = Path.Combine(GetToolPath, "Collections");
+                    string newPath = Path.Combine(GetGeneratedFolderPath, "Collections");
 
                     if (!Directory.Exists(newPath))
                     {
                         // Create the folder if it dosen't exist
                         Debug.Log($"PrefabPalette/{nameof(PathDr)}: Collections folder not found at {newPath}, creating...");
-                        string newFolderGUID = AssetDatabase.CreateFolder(GetToolPath, "Collections");
+                        string newFolderGUID = AssetDatabase.CreateFolder(GetGeneratedFolderPath, "Collections");
 
                         if (string.IsNullOrEmpty(newFolderGUID))
                         {
