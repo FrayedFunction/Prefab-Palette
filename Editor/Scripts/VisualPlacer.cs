@@ -24,14 +24,8 @@ namespace PrefabPalette
         {
             if (!isActive) return;
 
-            Event e = Event.current;
-            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                previewPosition = hit.point;
-                DrawPlacer(previewPosition, hit.normal);
-            }
+            previewPosition = SceneRaycastHelper.Position;
+            DrawPlacer(previewPosition, SceneRaycastHelper.SurfaceNormal);
 
             sceneView.Repaint();
         }

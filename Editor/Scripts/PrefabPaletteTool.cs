@@ -16,12 +16,6 @@ using UnityEngine;
 namespace PrefabPalette
 {
     [Serializable]
-    public enum PlacementMode
-    {
-        Free,
-        Snap,
-        Line,
-    }
 
     /// <summary>
     /// Main tool window.
@@ -32,8 +26,6 @@ namespace PrefabPalette
 
         PrefabCollection currentPrefabCollection;
         CollectionName collectionNameDropdown;
-
-        PlacementMode currentPlacementMode = PlacementMode.Free;
 
         GUIContent[] toolbarButtons;
 
@@ -190,11 +182,11 @@ namespace PrefabPalette
             }
 
             // Placement mode toolbar
-            int selectedIndex = (int)currentPlacementMode;
+            int selectedIndex = (int)SceneRaycastHelper.CurrentPlacementMode;
 
             selectedIndex = GUILayout.Toolbar(selectedIndex, toolbarButtons, GUILayout.Height(30));
 
-            currentPlacementMode = (PlacementMode)selectedIndex;
+            SceneRaycastHelper.CurrentPlacementMode = (SceneRaycastHelper.PlacementMode)selectedIndex;
 
             if (selectedPrefab != null)
             {
@@ -355,15 +347,11 @@ namespace PrefabPalette
             // Place object on left click
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
             {
-                Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit))
-                {
-                    lastSurfaceNormal = hit.normal;
+                lastSurfaceNormal = SceneRaycastHelper.SurfaceNormal;
 
-                    currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
-                    currentPlacedObject.transform.SetPositionAndRotation(hit.point + placementOffset, alignWithSurface ? Quaternion.FromToRotation(Vector3.up, hit.normal) : Quaternion.identity);
-                    Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
-                }
+                currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
+                currentPlacedObject.transform.SetPositionAndRotation(SceneRaycastHelper.Position + placementOffset, alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
+                Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
 
                 e.Use();
             }
@@ -396,9 +384,10 @@ namespace PrefabPalette
 
             toolbarButtons = new GUIContent[]
             {
-                    new GUIContent(EditorGUIUtility.IconContent("d_Toolbar Plus").image, "Add"),
-                    new GUIContent(EditorGUIUtility.IconContent("d_Toolbar Minus").image, "Remove"),
-                    new GUIContent(EditorGUIUtility.IconContent("d_TerrainInspector.TerrainToolSplat").image, "Paint"),
+                    new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Free Mode"),
+                    new GUIContent(EditorGUIUtility.IconContent("SceneViewSnap").image, "Snapping Mode"),
+                    new GUIContent(EditorGUIUtility.IconContent("d_Profiler.NetworkOperations").image, "Line Mode")
+
             };
         }
 
