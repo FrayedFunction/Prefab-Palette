@@ -32,24 +32,15 @@ namespace PrefabPalette
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 SurfaceNormal = hit.normal;
-                
-                switch (CurrentPlacementMode)
-                {
-                    case PlacementMode.Free:
-                        Position = hit.point;
-                    break;
-                    case PlacementMode.Snap:
-                        Position = SnapToGrid(hit.point);
-                    break;
-                }
 
-                
+                Position = CurrentPlacementMode == PlacementMode.Snap ? SnapToGrid(hit.point) : hit.point;  
             }
         }
 
         private static Vector3 SnapToGrid(Vector3 position)
         {
-            float gridSize = UnityEditor.EditorSnapSettings.move.x; // Use Unity's snap settings
+            // Use unitys built in scene grid
+            float gridSize = UnityEditor.EditorSnapSettings.move.x;
             position.x = Mathf.Round(position.x / gridSize) * gridSize;
             position.y = Mathf.Round(position.y / gridSize) * gridSize;
             position.z = Mathf.Round(position.z / gridSize) * gridSize;

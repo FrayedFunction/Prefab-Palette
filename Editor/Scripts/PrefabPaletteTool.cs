@@ -37,7 +37,6 @@ namespace PrefabPalette
         Vector2 windowScrollPosition;
         int gridColumns = 4;
         float dynamicPrefabIconSize;
-        float paletteHeight = 250;
 
         bool isRotating = false;
         float rotationSpeed = 2f;
@@ -51,6 +50,7 @@ namespace PrefabPalette
         bool isNameDropdownActive = true;
         bool alignWithSurface = false;
         Vector3 lastSurfaceNormal;
+        bool showHeader = true;
 
         /// <summary>
         /// Returns a list of all saved prefab collections.
@@ -70,68 +70,98 @@ namespace PrefabPalette
         {
             GUILayout.Label("Prefab Palette", EditorStyles.largeLabel);
 
-            GUI.enabled = isNameDropdownActive;
-            // Select collection to show.
-            collectionNameDropdown = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", collectionNameDropdown);
+            showHeader = EditorGUILayout.Toggle("Show Header", showHeader);
 
-            // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
-            if (HasOpenInstances<CollectionsListInspector>())
+            if (showHeader)
             {
-                collectionNameDropdown = CollectionName.None;
-                isNameDropdownActive = false;
-                EditorGUILayout.HelpBox("Close the Collections Inspector window to choose a collection", MessageType.Warning);
-                return;
-            }
-            else
-            {
-                isNameDropdownActive = true;
-            }
+                GUI.enabled = isNameDropdownActive;
+                // Select collection to show.
+                collectionNameDropdown = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", collectionNameDropdown);
 
-            if (GUILayout.Button("Edit List"))
-            {
-                if (collectionsList == null)
+                // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
+                if (HasOpenInstances<CollectionsListInspector>())
                 {
-                    collectionsList = AssetDatabase.FindAssets($"t:{nameof(CollectionsList)}", new[] { PathDr.GetCollectionsFolder })
-                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid)) // Convert GUID to path
-                        .Select(path => AssetDatabase.LoadAssetAtPath<CollectionsList>(path)) // Load asset
-                        .FirstOrDefault(asset => asset != null);
-
-                    if (collectionsList != null)
-                    {
-                        // Open the list inspector window if found
-                        CollectionsListInspector.OpenWindow(collectionsList, this);
-                        return;
-                    }
-
-                    // Create a new asset if it doesn't exist
-                    CollectionsList asset = ScriptableObject.CreateInstance<CollectionsList>();
-                    string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/CollectionNamesList.asset");
-                    CreateScriptableObject(asset, assetPath);
-
-                    // Delay the window opening until after the asset database refresh
-                    EditorApplication.delayCall += () =>
-                    {
-                        collectionsList = AssetDatabase.LoadAssetAtPath<CollectionsList>(assetPath);
-                        CollectionsListInspector.OpenWindow(collectionsList, this);
-                    };
+                    collectionNameDropdown = CollectionName.None;
+                    isNameDropdownActive = false;
+                    EditorGUILayout.HelpBox("Close the Collections Inspector window to choose a collection", MessageType.Warning);
+                    return;
                 }
                 else
                 {
-                    // Open window immediately if an asset already exists
-                    CollectionsListInspector.OpenWindow(collectionsList, this);
+                    isNameDropdownActive = true;
+                }
+
+                if (GUILayout.Button("Edit List"))
+                {
+                    if (collectionsList == null)
+                    {
+                        collectionsList = AssetDatabase.FindAssets($"t:{nameof(CollectionsList)}", new[] { PathDr.GetCollectionsFolder })
+                            .Select(guid => AssetDatabase.GUIDToAssetPath(guid)) // Convert GUID to path
+                            .Select(path => AssetDatabase.LoadAssetAtPath<CollectionsList>(path)) // Load asset
+                            .FirstOrDefault(asset => asset != null);
+
+                        if (collectionsList != null)
+                        {
+                            // Open the list inspector window if found
+                            CollectionsListInspector.OpenWindow(collectionsList, this);
+                            return;
+                        }
+
+                        // Create a new asset if it doesn't exist
+                        CollectionsList asset = ScriptableObject.CreateInstance<CollectionsList>();
+                        string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/CollectionNamesList.asset");
+                        CreateScriptableObject(asset, assetPath);
+
+                        // Delay the window opening until after the asset database refresh
+                        EditorApplication.delayCall += () =>
+                        {
+                            collectionsList = AssetDatabase.LoadAssetAtPath<CollectionsList>(assetPath);
+                            CollectionsListInspector.OpenWindow(collectionsList, this);
+                        };
+                    }
+                    else
+                    {
+                        // Open window immediately if an asset already exists
+                        CollectionsListInspector.OpenWindow(collectionsList, this);
+                    }
+                }
+
+                // if the enum only contains .None
+                if (!Enum.GetValues(typeof(CollectionName))
+                         .Cast<CollectionName>()
+                         .Any(c => c != CollectionName.None))
+                {
+
+                    EditorGUILayout.HelpBox("Use the above button to edit the collections list", MessageType.Warning);
+                    return;
+                }
+
+                currentPrefabCollection = GetPrefabCollection(collectionNameDropdown);
+
+                // Create a foldout for "Palette Settings"
+                showPaletteSettings = EditorGUILayout.Foldout(showPaletteSettings, "Palette Settings");
+
+                // If the foldout is expanded, display the settings
+                if (showPaletteSettings)
+                {
+                    gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", gridColumns));
+                    minPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", minPaletteScale), 50f, maxPaletteScale);
+                    maxPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", maxPaletteScale), minPaletteScale, 500f);
+                }
+
+                GUILayout.Space(2);
+
+                showPlacementSettings = EditorGUILayout.Foldout(showPlacementSettings, "Placement Settings");
+
+                if (showPlacementSettings)
+                {
+                    previewColor = EditorGUILayout.ColorField("Placer Color", previewColor);
+                    placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", placerRadius));
+                    rotationSpeed = EditorGUILayout.Slider("Rotation Speed", rotationSpeed, 0.1f, 5);
+                    placementOffset = EditorGUILayout.Vector3Field("Placement Offset", placementOffset);
+                    alignWithSurface = EditorGUILayout.Toggle("Align with surface?", alignWithSurface);
                 }
             }
-
-            // if the enum only contains .None
-            if (!Enum.GetValues(typeof(CollectionName))
-                     .Cast<CollectionName>()
-                     .Any(c => c != CollectionName.None)) {
-
-                EditorGUILayout.HelpBox("Use the button to edit the collections list", MessageType.Warning);
-                return;
-            }
-
-            currentPrefabCollection = GetPrefabCollection(collectionNameDropdown);
 
             if (currentPrefabCollection != null)
             {
@@ -146,32 +176,7 @@ namespace PrefabPalette
 
         void PaletteGUI()
         {
-            GUILayout.Label("Palette", EditorStyles.boldLabel);
-
-            // Create a foldout for "Palette Settings"
-            showPaletteSettings = EditorGUILayout.Foldout(showPaletteSettings, "Palette Settings");
-
-            // If the foldout is expanded, display the settings
-            if (showPaletteSettings)
-            {
-                gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", gridColumns)); // Ensure at least 1 column
-                paletteHeight = Mathf.Max(100, EditorGUILayout.FloatField("Palette Height", paletteHeight));
-                minPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", minPaletteScale), 50f, maxPaletteScale);
-                maxPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", maxPaletteScale), minPaletteScale, 500f);
-            }
-
-            GUILayout.Space(2);
-
-            showPlacementSettings = EditorGUILayout.Foldout(showPlacementSettings, "Placement Settings");
-
-            if (showPlacementSettings) 
-            {
-                previewColor = EditorGUILayout.ColorField("Placer Color", previewColor);
-                placerRadius = Mathf.Max( 0.01f, EditorGUILayout.FloatField("Placer Visual Radius", placerRadius));
-                rotationSpeed = EditorGUILayout.Slider("Rotation Speed", rotationSpeed, 0.1f, 5);
-                placementOffset = EditorGUILayout.Vector3Field("Placement Offset", placementOffset);
-                alignWithSurface = EditorGUILayout.Toggle("Align with surface?", alignWithSurface);
-            }
+            GUILayout.Label($"Palette - {currentPrefabCollection.Name}", EditorStyles.boldLabel);
 
             var prefabList = currentPrefabCollection.prefabList;
 
@@ -323,9 +328,7 @@ namespace PrefabPalette
             {
                 if (!isRotating)
                 {
-                    VisualPlacer.SetColor(previewColor);
-                    VisualPlacer.SetRadius(placerRadius);
-                    VisualPlacer.Start();
+                    VisualPlacer.Show(previewColor, placerRadius);
                 }
                 else
                 {
@@ -342,6 +345,9 @@ namespace PrefabPalette
 
         private void HandlePrefabPlacement()
         {
+            if (SceneRaycastHelper.CurrentPlacementMode == SceneRaycastHelper.PlacementMode.Line) 
+                return;
+
             Event e = Event.current;
 
             // Place object on left click
@@ -386,7 +392,7 @@ namespace PrefabPalette
             {
                     new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Free Mode"),
                     new GUIContent(EditorGUIUtility.IconContent("SceneViewSnap").image, "Snapping Mode"),
-                    new GUIContent(EditorGUIUtility.IconContent("d_Profiler.NetworkOperations").image, "Line Mode")
+                    new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
 
             };
         }
