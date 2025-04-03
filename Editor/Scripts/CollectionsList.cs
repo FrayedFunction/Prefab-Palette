@@ -37,7 +37,7 @@ namespace PrefabPalette
         /// </summary>
         public void GenerateEnum()
         {
-            string filePath = Path.Combine(PathDr.GetToolPath, "Scripts", "CollectionNames.cs");
+            string filePath = Path.Combine(PathDr.GetToolPath, "Scripts", "CollectionNames.cs"); // Add a folder called "Generated"
 
             // Name validation
             List<string> validNames = collectionNames
