@@ -56,7 +56,7 @@ namespace PrefabPalette
             GUILayout.Label("Prefab Palette", EditorStyles.largeLabel);
             
             if (Settings == null)
-                Settings = LoadOrCreateAsset<ToolSettings>(PathDr.GetToolPath, "ToolSettings.asset", out string assetPath);
+                Settings = LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
 
             Settings.showHeader = EditorGUILayout.Toggle("Show Settings", Settings.showHeader);
 
