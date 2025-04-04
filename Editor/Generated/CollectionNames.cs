@@ -3,6 +3,5 @@
 namespace PrefabPalette {
     public enum CollectionName {
         None,
-        ANOTHER_COOL_COLLECTION,
     }
 }

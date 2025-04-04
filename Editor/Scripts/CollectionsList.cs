@@ -37,8 +37,6 @@ namespace PrefabPalette
         /// </summary>
         public void GenerateEnum()
         {
-            string filePath = Path.Combine(PathDr.GetToolPath, "Scripts", "CollectionNames.cs");
-
             // Name validation
             List<string> validNames = collectionNames
                 .Where(i => !string.IsNullOrWhiteSpace(i))
@@ -56,7 +54,9 @@ namespace PrefabPalette
             }
             content += "    }\n}";
 
-            File.WriteAllText(filePath, content);
+            var path = Path.Combine(PathDr.GetGeneratedFolderPath, "CollectionNames.cs");
+            File.WriteAllText(path, content);
+
             AssetDatabase.Refresh();
         }
 

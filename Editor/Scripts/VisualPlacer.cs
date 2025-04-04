@@ -24,14 +24,8 @@ namespace PrefabPalette
         {
             if (!isActive) return;
 
-            Event e = Event.current;
-            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                previewPosition = hit.point;
-                DrawPlacer(previewPosition, hit.normal);
-            }
+            previewPosition = SceneRaycastHelper.Position;
+            DrawPlacer(previewPosition, SceneRaycastHelper.SurfaceNormal);
 
             sceneView.Repaint();
         }
@@ -52,9 +46,12 @@ namespace PrefabPalette
         /// <summary>
         /// Start rendering the placer
         /// </summary>
-        public static void Start()
+        public static void Show(Color color, float radius)
         {
             isActive = true;
+            VisualPlacer.color = color;
+            targetRadius = Mathf.Max(0.1f, radius);
+
         }
 
         /// <summary>
@@ -63,28 +60,6 @@ namespace PrefabPalette
         public static void Stop()
         {
             isActive = false;
-
-            SceneView.RepaintAll();
-        }
-
-        /// <summary>
-        /// Set the placers color to <paramref name="color"/>
-        /// </summary>
-        /// <param name="color"></param>
-        public static void SetColor(Color color)
-        {
-            VisualPlacer.color = color;
-            SceneView.RepaintAll();
-        }
-
-        /// <summary>
-        /// Set the placers radius to <paramref name="r"/>
-        /// </summary>
-        /// <param name="r"></param>
-        public static void SetRadius(float r)
-        {
-            targetRadius = Mathf.Max(0.1f, r);
-            SceneView.RepaintAll();
         }
     }
 }

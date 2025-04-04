@@ -1,4 +1,3 @@
-# Don't track prefab collection folder or collections name enum.
-[Cc]ollections/
-[Cc]ollections.meta
-Scripts/CollectionNames.cs
+# Don't track any changes to the Generated folder
+/Editor/Generated/*
+Editor/Generated/CollectionNames.cs
