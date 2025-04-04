@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using UnityEditor;
 using UnityEngine;
 
@@ -57,10 +59,29 @@ namespace PrefabPalette
             get
             {
                 var path = Path.Combine(GetToolPath, "Generated");
-                Directory.CreateDirectory(path);
+
+                if (!Directory.Exists(path))
+                {
+                    string newGUID = AssetDatabase.CreateFolder(GetToolPath, "Generated");
+                    
+                    if (string.IsNullOrEmpty(newGUID))
+                    {
+                        // Creation failed
+                        Debug.LogError($"PrefabPalette/{nameof(PathDr)}: Failed to create Generated folder!");
+                        return string.Empty;
+                    }
+
+                    // Folder Created
+                    path = AssetDatabase.GUIDToAssetPath(newGUID);
+
+                    Debug.Log($"PrefabPalette/{nameof(PathDr)}: Collections folder created successfully at {collectionsPath}. Refreshing AssetDatabase...");
+                    AssetDatabase.Refresh();
+                }
+
                 return path;
             }
         }
+
 
         /// <summary>
         /// Returns the path to the folder where prefab collections are generated.
