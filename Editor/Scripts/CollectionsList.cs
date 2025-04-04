@@ -29,6 +29,7 @@ namespace PrefabPalette
             collectionNames.AddRange(Enum.GetValues(typeof(CollectionName))
                       .Cast<CollectionName>()
                       .Where(e => e != CollectionName.None) // Exclude None
+                      .Where(e => e != CollectionName.None) // Exclude .None
                       .Select(e => e.ToString())); // Convert enums to strings
         }
 
@@ -39,9 +40,10 @@ namespace PrefabPalette
         {
             // Name validation
             List<string> validNames = collectionNames
-                .Where(i => !string.IsNullOrWhiteSpace(i))
-                .Select(SanitiseEnumName)
-                .ToList();
+                .Where(i => !string.IsNullOrWhiteSpace(i)) // Ensure not empty
+                .Distinct() // Ensure is unique
+                .Select(SanitiseEnumName) // Enure valid enum name
+                .ToList(); // Create new list
 
             // File creation
             string content = "// *!DO NOT MANUALLY EDIT OR DELETE!*\n";
