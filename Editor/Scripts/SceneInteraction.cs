@@ -1,24 +1,16 @@
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace PrefabPalette
 {
     [InitializeOnLoad]
-    public class SceneRaycastHelper
+    public class SceneInteraction
     {
-        static SceneRaycastHelper()
+        static SceneInteraction()
         {
             SceneView.duringSceneGui += UpdateRaycast;
         }
-
-        public enum PlacementMode
-        {
-            Free,
-            Snap,
-            Line,
-        }
-
-        public static PlacementMode CurrentPlacementMode {  get; set; }
 
         public static Vector3 Position { get; private set; }
         public static Vector3 SurfaceNormal { get; private set; }
@@ -33,7 +25,7 @@ namespace PrefabPalette
             {
                 SurfaceNormal = hit.normal;
 
-                Position = CurrentPlacementMode == PlacementMode.Snap ? SnapToGrid(hit.point) : hit.point;  
+                Position = PlacementModeManager.CurrentType == PlacementModeManager.ModeType.Snap ? SnapToGrid(hit.point) : hit.point;  
             }
         }
 

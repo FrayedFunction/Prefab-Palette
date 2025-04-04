@@ -1,85 +1,49 @@
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class FencePlacerOG : Editor
+    public class PrefabLineGenerator : PlacementMode
     {
-        GameObject fencePrefab;
-        List<Vector3> fencePoints = new List<Vector3>();
-        bool isPlacingFence = false;
-        float fenceSpacing = 1;
-        float fenceCornerOffset = 0.5f;
-        GameObject brokenFencePrefab;
-        bool randomBrokenFences = true;
-        float brokenProbability = 0.5f;
-        int brokenInterval = 4;
-        GameObject fenceParentObject;
-        private List<GameObject> spawnedFences = new List<GameObject>();
+        static List<Vector3> fencePoints = new List<Vector3>();
+        static float fenceSpacing = 1;
+        static float fenceCornerOffset = 0.5f;
+        static GameObject brokenFencePrefab;
+        static bool randomBrokenFences = true;
+        static float brokenProbability = 0.5f;
+        static int brokenInterval = 4;
+        static GameObject fenceParentObject;
 
-        void FencePlacerGUI()
+        private static List<GameObject> spawnedFences = new List<GameObject>();
+
+        public override void OnEnter()
         {
-            GUILayout.Label("Fence Placer - BETA", EditorStyles.boldLabel);
-            fencePrefab = (GameObject)EditorGUILayout.ObjectField("Fence Prefab", fencePrefab, typeof(GameObject), false);
-            fenceSpacing = EditorGUILayout.FloatField("Spacing", fenceSpacing);
-            fenceCornerOffset = EditorGUILayout.FloatField("Corner Offset", fenceCornerOffset);
-            brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
-
-            if (brokenFencePrefab)
-            {
-                randomBrokenFences = EditorGUILayout.Toggle("Random Broken Fences?", randomBrokenFences);
-
-                if (randomBrokenFences)
-                {
-                    brokenProbability = EditorGUILayout.Slider("Broken Probability", brokenProbability, 0, 1);
-                }
-                else
-                {
-                    brokenInterval = EditorGUILayout.IntField("Interval", brokenInterval);
-                }
-            }
-
-            if (GUILayout.Button(isPlacingFence ? "Stop Placing Fence" : "Start Placing Fence"))
-            {
-                isPlacingFence = !isPlacingFence;
-                if (!isPlacingFence)
-                {
-                    fencePoints.Clear();
-                    spawnedFences.Clear();
-
-                    // Destroy empty if no fences spawned
-                    if (fenceParentObject != null && fenceParentObject.transform.childCount < 1)
-                        DestroyImmediate(fenceParentObject);
-
-                    fenceParentObject = null;
-                }
-                else
-                {
-                    fenceParentObject = new GameObject("Fence");
-                }
-            }
-
-            if (isPlacingFence)
-            {
-                GUILayout.Label("Click to add fence points");
-            }
         }
-        private void HandleFencePlacement()
+
+        public override void OnActive(PrefabPaletteTool tool)
         {
+            if (tool.selectedPrefab == null)
+            {
+                VisualPlacer.Stop();
+                OnExit();
+                return;
+            }
+
+            VisualPlacer.ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
             Event e = Event.current;
+
+            if (fenceParentObject == null)
+                fenceParentObject = new GameObject("Fence");
 
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt) // Left click
             {
-                Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit))
-                {
-                    fencePoints.Add(hit.point);
-                    // Whenever points change, re-spawn the fence segments
-                    ClearSpawnedFences();
-                    CreateFenceSegments();
-                    SceneView.RepaintAll();
-                }
+                fencePoints.Add(SceneInteraction.Position);
+
+                // Whenever points change, re-spawn the fence segments
+                ClearSpawnedFences();
+                CreateFenceSegments(tool.selectedPrefab);
+                SceneView.RepaintAll();
 
                 e.Use();
             }
@@ -90,7 +54,20 @@ namespace PrefabPalette
                 Handles.DrawLine(fencePoints[i], fencePoints[i + 1]);
             }
         }
-        private void CreateFenceSegments()
+
+        public override void OnExit()
+        {
+            fencePoints.Clear();
+            spawnedFences.Clear();
+
+            // Destroy empty if no fences spawned
+            if (fenceParentObject != null && fenceParentObject.transform.childCount < 1)
+                Editor.DestroyImmediate(fenceParentObject);
+
+            fenceParentObject = null;
+        }
+
+        private static void CreateFenceSegments(GameObject segment)
         {
             // For each segment between fence points...
             for (int i = 0; i < fencePoints.Count - 1; i++)
@@ -138,7 +115,7 @@ namespace PrefabPalette
                         }
                     }
 
-                    GameObject prefabToSpawn = fencePrefab;
+                    GameObject prefabToSpawn = segment;
                     // If broken fence is desired and we have a broken prefab, use it;
                     // if no broken prefab is assigned, use the fence prefab.
                     if (spawnBroken && brokenFencePrefab != null)
@@ -166,7 +143,7 @@ namespace PrefabPalette
         }
 
         // Returns an offset vector along the bisector for a corner point.
-        private Vector3 GetCornerOffset(Vector3 prevPoint, Vector3 cornerPoint, Vector3 nextPoint, float offset)
+        private static Vector3 GetCornerOffset(Vector3 prevPoint, Vector3 cornerPoint, Vector3 nextPoint, float offset)
         {
             Vector3 dir1 = (cornerPoint - prevPoint).normalized;
             Vector3 dir2 = (nextPoint - cornerPoint).normalized;
@@ -176,7 +153,7 @@ namespace PrefabPalette
         }
 
         // Clears previously spawned fence segments.
-        private void ClearSpawnedFences()
+        private static void ClearSpawnedFences()
         {
             foreach (GameObject fence in spawnedFences)
             {
@@ -188,11 +165,32 @@ namespace PrefabPalette
             spawnedFences.Clear();
         }
 
-        private void OnSceneGUI()
+        public override void SettingsGUI()
         {
-            if (isPlacingFence && fencePrefab != null)
+            fenceSpacing = EditorGUILayout.FloatField("Spacing", fenceSpacing);
+            fenceCornerOffset = EditorGUILayout.FloatField("Corner Offset", fenceCornerOffset);
+            brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
+
+            if (brokenFencePrefab)
             {
-                HandleFencePlacement();
+                randomBrokenFences = EditorGUILayout.Toggle("Random Broken Fences?", randomBrokenFences);
+
+                if (randomBrokenFences)
+                {
+                    brokenProbability = EditorGUILayout.Slider("Broken Probability", brokenProbability, 0, 1);
+                }
+                else
+                {
+                    brokenInterval = EditorGUILayout.IntField("Interval", brokenInterval);
+                }
+            }
+
+            if (fencePoints.Count > 1)
+            {
+                if (GUILayout.Button("Place Line", GUILayout.Height(25)))
+                {
+                    OnExit();
+                }
             }
         }
     }

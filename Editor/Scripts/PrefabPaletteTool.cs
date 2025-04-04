@@ -28,8 +28,6 @@ namespace PrefabPalette
 
         PrefabCollection currentPrefabCollection;
 
-        GUIContent[] toolbarButtons;
-
         static CollectionsList collectionsList;
 
         public GameObject selectedPrefab;
@@ -54,9 +52,6 @@ namespace PrefabPalette
         void OnGUI()
         {
             GUILayout.Label("Prefab Palette", EditorStyles.largeLabel);
-            
-            if (Settings == null)
-                Settings = LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
 
             Settings.showHeader = EditorGUILayout.Toggle("Show Settings", Settings.showHeader);
 
@@ -109,7 +104,7 @@ namespace PrefabPalette
 
                 if (Settings.showPlacementSettings)
                 {
-                    Settings.previewColor = EditorGUILayout.ColorField("Placer Color", Settings.previewColor);
+                    Settings.placerColor = EditorGUILayout.ColorField("Placer Color", Settings.placerColor);
                     Settings.placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", Settings.placerRadius));
                     Settings.rotationSpeed = EditorGUILayout.Slider("Rotation Speed", Settings.rotationSpeed, 0.1f, 5);
                     Settings.placementOffset = EditorGUILayout.Vector3Field("Placement Offset", Settings.placementOffset);
@@ -159,13 +154,6 @@ namespace PrefabPalette
                 PrefabCollectionInspector.OpenEditWindow(currentPrefabCollection);
             }
 
-            // Placement mode toolbar
-            int selectedIndex = (int)SceneRaycastHelper.CurrentPlacementMode;
-
-            selectedIndex = GUILayout.Toolbar(selectedIndex, toolbarButtons, GUILayout.Height(30));
-
-            SceneRaycastHelper.CurrentPlacementMode = (SceneRaycastHelper.PlacementMode)selectedIndex;
-
             if (selectedPrefab != null)
             {
                 if (GUILayout.Button("Stop Placing Prefabs", GUILayout.Height(50)))
@@ -173,6 +161,11 @@ namespace PrefabPalette
                     selectedPrefab = null;
                 }
             }
+
+            // Placement mode toolbar
+            PlacementModeManager.ToolbarGUI();
+
+            PlacementModeManager.CurrentMode.SettingsGUI();
 
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 
@@ -312,7 +305,6 @@ namespace PrefabPalette
             return AssetDatabase.LoadAssetAtPath<T>(assetPath);
         }
 
-
         /// <summary>
         /// Creates an instance of <paramref name="so"/> at <paramref name="assetPath"/> and adds it to the Asset Database
         /// </summary>
@@ -325,45 +317,15 @@ namespace PrefabPalette
 
         void OnSceneGUI(SceneView sceneView)
         {
-            if (selectedPrefab != null)
-            {
-                switch (SceneRaycastHelper.CurrentPlacementMode)
-                {
-                    case SceneRaycastHelper.PlacementMode.Free or SceneRaycastHelper.PlacementMode.Snap:
-                        if (!PrefabPlacement.IsRotating)
-                        {
-                            VisualPlacer.Show(Settings.previewColor, Settings.placerRadius);
-                        }
-                        else
-                        {
-                            VisualPlacer.Stop();
-                        }
-
-                        PrefabPlacement.HandleSinglePrefabPlacement(this);
-                    break;
-
-                    case SceneRaycastHelper.PlacementMode.Line:
-
-                    break;
-                }
-            }
-            else
-            {
-                VisualPlacer.Stop();
-            }
+            PlacementModeManager.CurrentMode.OnActive(this);
         }
 
         private void OnEnable()
         {
+            if (Settings == null)
+                Settings = LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
+
             SceneView.duringSceneGui += OnSceneGUI;
-
-            toolbarButtons = new GUIContent[]
-            {
-                    new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Free Mode"),
-                    new GUIContent(EditorGUIUtility.IconContent("SceneViewSnap").image, "Snapping Mode"),
-                    new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
-
-            };
         }
 
         private void OnDisable()

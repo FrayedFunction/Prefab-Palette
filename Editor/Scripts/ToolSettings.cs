@@ -17,7 +17,7 @@ namespace PrefabPalette
         public bool showPaletteSettings = false;
         public bool showPlacementSettings = false;
         public int gridColumns = 4;
-        public Color previewColor = Color.white;
+        public Color placerColor = Color.white;
         public float placerRadius = 0.2f;
         public bool isNameDropdownActive = true;
         public bool showHeader = true;
