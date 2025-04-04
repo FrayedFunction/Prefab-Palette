@@ -1,4 +1,2 @@
-# Don't track anything in the Generated folder
+# Don't track any changes to the Generated folder
 /Editor/Generated/*
-Editor/Generated.meta
-/Editor/Generated
