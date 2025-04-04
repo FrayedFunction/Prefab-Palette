@@ -1,2 +1,3 @@
 # Don't track any changes to the Generated folder
 /Editor/Generated/*
+Editor/Generated/CollectionNames.cs
