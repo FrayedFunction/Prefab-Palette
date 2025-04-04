@@ -54,7 +54,9 @@ namespace PrefabPalette
             }
             content += "    }\n}";
 
-            File.WriteAllText(PathDr.GetGeneratedFolderPath, content);
+            var path = Path.Combine(PathDr.GetGeneratedFolderPath, "CollectionNames.cs");
+            File.WriteAllText(path, content);
+
             AssetDatabase.Refresh();
         }
 
