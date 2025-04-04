@@ -66,7 +66,7 @@ namespace PrefabPalette
                 {
                     if (collectionsList == null)
                     {
-                        collectionsList = LoadOrCreateAsset<CollectionsList>(PathDr.GetCollectionsFolder, "CollectionNamesList.asset", out string assetPath);
+                        collectionsList = LoadOrCreateAsset<CollectionsList>(PathDr.GetGeneratedFolderPath, "CollectionNamesList.asset", out string assetPath);
 
                         // Delay the window opening until after the asset database refresh
                         EditorApplication.delayCall += () =>
