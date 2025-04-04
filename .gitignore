@@ -1,7 +1,3 @@
 # Don't track prefab collection folder or collections name enum.
-[Cc]ollections/
-[Cc]ollections.meta
-Editor/Scripts/CollectionNames.cs
-Editor/Scripts/CollectionNames.cs.meta
-Editor/ToolSettings.asset
-Editor/ToolSettings.asset.meta
+Generated/
+Generated.meta
