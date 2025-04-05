@@ -6,28 +6,38 @@ namespace PrefabPalette
     /// <summary>
     /// Scene GUI visual placer.
     /// </summary>
-    [InitializeOnLoad]
-    public class VisualPlacer
+    public static class VisualPlacer
     {
         private static Vector3 previewPosition;
         private static bool isActive = false;
         private static float targetRadius = 1.0f;
-
+        private static Vector3 lastPreviewPosition;
         private static Color color;
 
-        static VisualPlacer()
+        public static void OnEnable()
         {
             SceneView.duringSceneGui += OnSceneGUI;
+        }
+
+        public static void OnDisable() 
+        {
+            Stop();
+            SceneView.duringSceneGui -= OnSceneGUI;
         }
 
         private static void OnSceneGUI(SceneView sceneView)
         {
             if (!isActive) return;
 
-            previewPosition = SceneInteraction.Position;
-            DrawPlacer(previewPosition, SceneInteraction.SurfaceNormal);
+            Vector3 newPosition = SceneInteraction.Position;
+            if (newPosition != lastPreviewPosition)
+            {
+                previewPosition = newPosition;
+                lastPreviewPosition = newPosition;
+                sceneView.Repaint();
+            }
 
-            sceneView.Repaint();
+            DrawPlacer(previewPosition, SceneInteraction.SurfaceNormal);
         }
 
         private static void DrawPlacer(Vector3 position, Vector3 normal)
@@ -51,7 +61,6 @@ namespace PrefabPalette
             isActive = true;
             VisualPlacer.color = color;
             targetRadius = Mathf.Max(0.1f, radius);
-
         }
 
         /// <summary>
@@ -61,5 +70,7 @@ namespace PrefabPalette
         {
             isActive = false;
         }
+
+        
     }
 }

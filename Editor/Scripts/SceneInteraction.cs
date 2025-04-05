@@ -4,12 +4,16 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    [InitializeOnLoad]
-    public class SceneInteraction
+    public static class SceneInteraction
     {
-        static SceneInteraction()
+        public static void OnEnable()
         {
             SceneView.duringSceneGui += UpdateRaycast;
+        }
+
+        public static void OnDisable()
+        {
+            SceneView.duringSceneGui -= UpdateRaycast;
         }
 
         public static Vector3 Position { get; private set; }

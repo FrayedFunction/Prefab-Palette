@@ -326,12 +326,15 @@ namespace PrefabPalette
                 Settings = LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
 
             SceneView.duringSceneGui += OnSceneGUI;
+            VisualPlacer.OnEnable();
+            SceneInteraction.OnEnable();
         }
 
         private void OnDisable()
         {
             SceneView.duringSceneGui -= OnSceneGUI;
-            VisualPlacer.Stop();
+            VisualPlacer.OnDisable();
+            SceneInteraction.OnDisable();
         }
     }
 }
