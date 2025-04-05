@@ -6,21 +6,20 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    [InitializeOnLoad]
-    public class PlacementModeManager
+    public static class PlacementModeManager
     {
         static GUIContent[] toolbarButtons;
-        static Dictionary<ModeType, PlacementMode> modes;
+        static Dictionary<ModeType, IPlacementMode> modes;
 
-        public static PlacementMode CurrentMode
+        public static IPlacementMode CurrentMode
         {
             get
             {
                 if (modes != null)
                     return modes[CurrentType];
-                
+
                 return null;
-            } 
+            }
         }
 
         static PlacementModeManager()
@@ -32,7 +31,7 @@ namespace PrefabPalette
                 new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
             };
 
-            modes = new Dictionary<ModeType, PlacementMode>()
+            modes = new Dictionary<ModeType, IPlacementMode>()
             {
                 { ModeType.Line, new PrefabLineGenerator() },
                 { ModeType.Free, new PrefabPlacement() },
@@ -51,7 +50,7 @@ namespace PrefabPalette
 
         public static ModeType CurrentType { get; private set; }
 
-        public static void ToolbarGUI()
+        public static void ToolbarGUI(PrefabPaletteTool tool)
         {
             int selectedIndex = (int)CurrentType;
 
@@ -60,8 +59,8 @@ namespace PrefabPalette
 
             if (asModeType != CurrentType)
             {
-                modes[CurrentType].OnExit();
-                modes[asModeType].OnEnter();
+                modes[CurrentType].OnExit(tool);
+                modes[asModeType].OnEnter(tool);
             }
 
             CurrentType = asModeType;

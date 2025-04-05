@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class PrefabPlacement : PlacementMode
+    public class PrefabPlacement : IPlacementMode
     {
         public static bool IsRotating => isRotating;
 
@@ -11,11 +11,11 @@ namespace PrefabPalette
         static GameObject currentPlacedObject;
         static bool isRotating = false;
 
-        public override void OnEnter()
+        public void OnEnter(PrefabPaletteTool tool)
         {
         }
 
-        public override void OnActive(PrefabPaletteTool tool)
+        public void OnActive(PrefabPaletteTool tool)
         {
             Event e = Event.current;
             
@@ -63,11 +63,11 @@ namespace PrefabPalette
             }
         }
 
-        public override void OnExit()
+        public void OnExit(PrefabPaletteTool tool)
         {
         }
 
-        public override void SettingsGUI()
+        public void SettingsGUI(PrefabPaletteTool tool)
         {
         }
     }

@@ -163,9 +163,9 @@ namespace PrefabPalette
             }
 
             // Placement mode toolbar
-            PlacementModeManager.ToolbarGUI();
+            PlacementModeManager.ToolbarGUI(this);
 
-            PlacementModeManager.CurrentMode.SettingsGUI();
+            PlacementModeManager.CurrentMode.SettingsGUI(this);
 
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 

@@ -21,6 +21,11 @@ namespace PrefabPalette
         public float placerRadius = 0.2f;
         public bool isNameDropdownActive = true;
         public bool showHeader = true;
+        public float fenceSpacing = 1;
+        public float fenceCornerOffset = 0.5f;
+        public bool randomBrokenFences = true;
+        public float brokenProbability = 0.5f;
+        public int brokenInterval = 4;
 
         // Marked dirty on disable so Unity knows to save it
         private void OnDisable()
