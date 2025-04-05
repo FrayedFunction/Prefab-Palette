@@ -106,9 +106,6 @@ namespace PrefabPalette
                 {
                     Settings.placerColor = EditorGUILayout.ColorField("Placer Color", Settings.placerColor);
                     Settings.placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", Settings.placerRadius));
-                    Settings.rotationSpeed = EditorGUILayout.Slider("Rotation Speed", Settings.rotationSpeed, 0.1f, 5);
-                    Settings.placementOffset = EditorGUILayout.Vector3Field("Placement Offset", Settings.placementOffset);
-                    Settings.alignWithSurface = EditorGUILayout.Toggle("Align with surface?", Settings.alignWithSurface);
                 }
             }
 
@@ -164,8 +161,11 @@ namespace PrefabPalette
 
             // Placement mode toolbar
             PlacementModeManager.ToolbarGUI(this);
-
+            GUILayout.Space(5);
+            GUILayout.Label($"{PlacementModeManager.CurrentType} Mode Settings", EditorStyles.largeLabel);
+            GUILayout.Space(5);
             PlacementModeManager.CurrentMode.SettingsGUI(this);
+            GUILayout.Space(20);
 
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 
