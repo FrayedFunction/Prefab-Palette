@@ -69,9 +69,18 @@ namespace PrefabPalette
 
         public void SettingsGUI(PrefabPaletteTool tool)
         {
-            tool.Settings.rotationSpeed = EditorGUILayout.Slider("Rotation Speed", tool.Settings.rotationSpeed, 0.1f, 5);
-            tool.Settings.placementOffset = EditorGUILayout.Vector3Field("Placement Offset", tool.Settings.placementOffset);
-            tool.Settings.alignWithSurface = EditorGUILayout.Toggle("Align with surface?", tool.Settings.alignWithSurface);
+            tool.Settings.showModeSettings = EditorGUILayout.Foldout(tool.Settings.showModeSettings, "Settings");
+            if (tool.Settings.showModeSettings)
+            {
+                EditorGUI.indentLevel++;
+
+                tool.Settings.rotationSpeed = EditorGUILayout.Slider("Rotation Speed", tool.Settings.rotationSpeed, 0.1f, 5);
+                tool.Settings.placementOffset = EditorGUILayout.Vector3Field("Placement Offset", tool.Settings.placementOffset);
+                tool.Settings.alignWithSurface = EditorGUILayout.Toggle("Align with surface?", tool.Settings.alignWithSurface);
+
+                GUILayout.Space(15);
+                EditorGUI.indentLevel--;
+            }
         }
     }
 }

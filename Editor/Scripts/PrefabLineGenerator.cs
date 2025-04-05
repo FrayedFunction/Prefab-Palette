@@ -164,23 +164,34 @@ namespace PrefabPalette
 
         public void SettingsGUI(PrefabPaletteTool tool)
         {
-            tool.Settings.fenceSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.fenceSpacing);
-            tool.Settings.fenceCornerOffset = EditorGUILayout.FloatField("Corner Offset", tool.Settings.fenceCornerOffset);
-            brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
 
-            if (brokenFencePrefab)
+            tool.Settings.showModeSettings = EditorGUILayout.Foldout(tool.Settings.showModeSettings, "Settings");
+            if (tool.Settings.showModeSettings)
             {
-                tool.Settings.randomBrokenFences = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.randomBrokenFences);
+                EditorGUI.indentLevel++;
 
-                if (tool.Settings.randomBrokenFences)
+                tool.Settings.fenceSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.fenceSpacing);
+                tool.Settings.fenceCornerOffset = EditorGUILayout.FloatField("Corner Offset", tool.Settings.fenceCornerOffset);
+                brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
+
+                if (brokenFencePrefab)
                 {
-                    tool.Settings.brokenProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.brokenProbability, 0, 1);
+                    tool.Settings.randomBrokenFences = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.randomBrokenFences);
+
+                    if (tool.Settings.randomBrokenFences)
+                    {
+                        tool.Settings.brokenProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.brokenProbability, 0, 1);
+                    }
+                    else
+                    {
+                        tool.Settings.brokenInterval = EditorGUILayout.IntField("Interval", tool.Settings.brokenInterval);
+                    }
                 }
-                else
-                {
-                    tool.Settings.brokenInterval = EditorGUILayout.IntField("Interval", tool.Settings.brokenInterval);
-                }
+                GUILayout.Space(15);
+                
+                EditorGUI.indentLevel--;
             }
+
 
             if (fencePoints.Count > 1)
             {
