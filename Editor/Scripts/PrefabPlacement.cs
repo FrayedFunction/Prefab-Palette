@@ -3,25 +3,39 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class PrefabPlacement
+    public class PrefabPlacement : PlacementMode
     {
         public static bool IsRotating => isRotating;
 
         static Vector3 lastSurfaceNormal;
         static GameObject currentPlacedObject;
         static bool isRotating = false;
-        
-        public static void HandleSinglePrefabPlacement(PrefabPaletteTool tool)
+
+        public override void OnEnter()
+        {
+        }
+
+        public override void OnActive(PrefabPaletteTool tool)
         {
             Event e = Event.current;
+            
+            if (tool.selectedPrefab == null || isRotating)
+            {
+                VisualPlacer.Stop();
+            }
+
+            if (tool.selectedPrefab == null) 
+                return;
+
+            VisualPlacer.ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
 
             // Place object on left click
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
             {
-                lastSurfaceNormal = SceneRaycastHelper.SurfaceNormal;
+                lastSurfaceNormal = SceneInteraction.SurfaceNormal;
 
                 currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(tool.selectedPrefab);
-                currentPlacedObject.transform.SetPositionAndRotation(SceneRaycastHelper.Position + tool.Settings.placementOffset, tool.Settings.alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
+                currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + tool.Settings.placementOffset, tool.Settings.alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
                 Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
 
                 e.Use();
@@ -47,6 +61,14 @@ namespace PrefabPalette
                 isRotating = false;
                 currentPlacedObject = null;
             }
+        }
+
+        public override void OnExit()
+        {
+        }
+
+        public override void SettingsGUI()
+        {
         }
     }
 }

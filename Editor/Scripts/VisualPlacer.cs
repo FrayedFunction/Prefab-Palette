@@ -24,8 +24,8 @@ namespace PrefabPalette
         {
             if (!isActive) return;
 
-            previewPosition = SceneRaycastHelper.Position;
-            DrawPlacer(previewPosition, SceneRaycastHelper.SurfaceNormal);
+            previewPosition = SceneInteraction.Position;
+            DrawPlacer(previewPosition, SceneInteraction.SurfaceNormal);
 
             sceneView.Repaint();
         }
@@ -46,7 +46,7 @@ namespace PrefabPalette
         /// <summary>
         /// Start rendering the placer
         /// </summary>
-        public static void Show(Color color, float radius)
+        public static void ShowTarget(Color color, float radius)
         {
             isActive = true;
             VisualPlacer.color = color;

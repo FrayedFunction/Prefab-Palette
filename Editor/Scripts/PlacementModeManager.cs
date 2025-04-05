@@ -1,0 +1,70 @@
+using System;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+
+namespace PrefabPalette
+{
+    [InitializeOnLoad]
+    public class PlacementModeManager
+    {
+        static GUIContent[] toolbarButtons;
+        static Dictionary<ModeType, PlacementMode> modes;
+
+        public static PlacementMode CurrentMode
+        {
+            get
+            {
+                if (modes != null)
+                    return modes[CurrentType];
+                
+                return null;
+            } 
+        }
+
+        static PlacementModeManager()
+        {
+            toolbarButtons = new GUIContent[]
+            {
+                new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Free Mode"),
+                new GUIContent(EditorGUIUtility.IconContent("SceneViewSnap").image, "Snapping Mode"),
+                new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
+            };
+
+            modes = new Dictionary<ModeType, PlacementMode>()
+            {
+                { ModeType.Line, new PrefabLineGenerator() },
+                { ModeType.Free, new PrefabPlacement() },
+                { ModeType.Snap, new PrefabPlacement() },
+            };
+
+            CurrentType = ModeType.Free;
+        }
+
+        public enum ModeType
+        {
+            Free,
+            Snap,
+            Line
+        }
+
+        public static ModeType CurrentType { get; private set; }
+
+        public static void ToolbarGUI()
+        {
+            int selectedIndex = (int)CurrentType;
+
+            selectedIndex = GUILayout.Toolbar(selectedIndex, toolbarButtons, GUILayout.Height(30));
+            ModeType asModeType = (ModeType)selectedIndex;
+
+            if (asModeType != CurrentType)
+            {
+                modes[CurrentType].OnExit();
+                modes[asModeType].OnEnter();
+            }
+
+            CurrentType = asModeType;
+        }
+    }
+}
