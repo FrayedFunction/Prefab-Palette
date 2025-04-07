@@ -20,7 +20,7 @@ namespace PrefabPalette
         public List<string> collectionNames = new List<string>();
 
         private static PrefabCollectionList instance; 
-        
+
         public static PrefabCollectionList Instance 
         { 
             get 
@@ -74,6 +74,7 @@ namespace PrefabPalette
             File.WriteAllText(path, content);
 
             AssetDatabase.Refresh();
+            UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
         }
 
         /// <summary>
