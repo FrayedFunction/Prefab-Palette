@@ -18,10 +18,10 @@ namespace PrefabPalette
     {
         static CreateCollectionFromFolder()
         {
-            EditorApplication.delayCall += X;
+            EditorApplication.delayCall += CreateAndPopulateCollection;
         }
 
-        private static void X()
+        private static void CreateAndPopulateCollection()
         {
             if (EditorPrefs.HasKey("PendingPrefabCollectionName"))
             {
@@ -81,14 +81,12 @@ namespace PrefabPalette
             CreateCollectionWindow.Show(collectionName =>
             {
                 var sanitisedName = PrefabCollectionList.SanitiseEnumName(collectionName);
-
-                PrefabCollectionList.Instance.collectionNames.Add(sanitisedName);
-                PrefabCollectionList.Instance.GenerateEnum();
-
                 EditorPrefs.SetString("PendingPrefabCollectionName", sanitisedName);
 
-                AssetDatabase.Refresh();
-                UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+                PrefabCollectionList.Instance.collectionNames.Add(sanitisedName);
+                EditorUtility.SetDirty(PrefabCollectionList.Instance);
+                AssetDatabase.SaveAssets();
+                PrefabCollectionList.Instance.GenerateEnum();
             });
         }
 
