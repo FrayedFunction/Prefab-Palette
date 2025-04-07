@@ -28,8 +28,6 @@ namespace PrefabPalette
 
         PrefabCollection currentPrefabCollection;
 
-        static CollectionsList collectionsList;
-
         public GameObject selectedPrefab;
         Vector2 paletteScrollPosition;
         Vector2 windowScrollPosition;
@@ -70,22 +68,7 @@ namespace PrefabPalette
 
             if (GUILayout.Button("Manage Collections"))
             {
-                if (collectionsList == null)
-                {
-                    collectionsList = LoadOrCreateAsset<CollectionsList>(PathDr.GetGeneratedFolderPath, "CollectionNamesList.asset", out string assetPath);
-
-                    // Delay the window opening until after the asset database refresh
-                    EditorApplication.delayCall += () =>
-                    {
-                        collectionsList = AssetDatabase.LoadAssetAtPath<CollectionsList>(assetPath);
-                        CollectionsListInspector.OpenWindow(collectionsList, this);
-                    };
-                }
-                else
-                {
-                    // Open window immediately if an asset already exists
-                    CollectionsListInspector.OpenWindow(collectionsList, this);
-                }
+                CollectionsListInspector.OpenWindow(this);
             }
 
             EditorGUILayout.Space(5);
@@ -299,17 +282,10 @@ namespace PrefabPalette
                 }
             }
 
-            // If no matching collection is found, create a new one
-            PrefabCollection asset = ScriptableObject.CreateInstance<PrefabCollection>();
-            asset.Name = name; // Assigns string-based enum reference
-
-            string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/{name}_PrefabCollection.asset");
-            CreateScriptableObject(asset, assetPath);
-
-            return asset;
+            return PrefabCollection.CreateNewCollection(name);
         }
 
-        private static T LoadOrCreateAsset<T>(string folderPath, string assetName, out string assetPath) where T : ScriptableObject
+        public static T LoadOrCreateAsset<T>(string folderPath, string assetName, out string assetPath) where T : ScriptableObject
         {
             // Find existing asset
             T asset = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { folderPath })
@@ -331,16 +307,6 @@ namespace PrefabPalette
             AssetDatabase.Refresh();
 
             return AssetDatabase.LoadAssetAtPath<T>(assetPath);
-        }
-
-        /// <summary>
-        /// Creates an instance of <paramref name="so"/> at <paramref name="assetPath"/> and adds it to the Asset Database
-        /// </summary>
-        private static void CreateScriptableObject(ScriptableObject so, string assetPath)
-        {
-            AssetDatabase.CreateAsset(so, assetPath);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
         }
 
         void OnSceneGUI(SceneView sceneView)

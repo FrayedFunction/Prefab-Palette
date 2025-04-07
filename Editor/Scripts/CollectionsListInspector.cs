@@ -13,17 +13,17 @@ namespace PrefabPalette
     /// </summary>
     public class CollectionsListInspector : EditorWindow
     {
-        private CollectionsList collectionsList;
+        private PrefabCollectionList collectionsList;
         private PrefabPaletteTool tool;
         private Editor editorInstance;
 
-        public static void OpenWindow(CollectionsList cl, PrefabPaletteTool t)
+        public static void OpenWindow(PrefabPaletteTool t)
         {
             CollectionsListInspector window = GetWindow<CollectionsListInspector>("Collections Inspector");
-            cl.SyncListWithEnum();
-            window.collectionsList = cl;
+            window.collectionsList = PrefabCollectionList.Instance;
+            window.collectionsList.SyncListWithEnum();
             window.tool = t;
-            window.editorInstance = Editor.CreateEditor(cl);
+            window.editorInstance = Editor.CreateEditor(window.collectionsList);
             window.Show();
         }
 
@@ -51,7 +51,7 @@ namespace PrefabPalette
         /// </summary>
         /// <param name="collectionsInFolder"></param>
         /// <param name="collectionsList"></param>
-        private void CleanupCollectionsFolder(List<PrefabCollection> collectionsInFolder, CollectionsList collectionsList)
+        private void CleanupCollectionsFolder(List<PrefabCollection> collectionsInFolder, PrefabCollectionList collectionsList)
         {
             // Convert collectionNames to HashSet for quick lookup
             HashSet<string> validCollections = new HashSet<string>(

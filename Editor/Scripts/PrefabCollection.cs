@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace PrefabPalette
@@ -29,5 +30,20 @@ namespace PrefabPalette
         /// List of prefabs in this collection.
         /// </summary>
         public List<GameObject> prefabList = new List<GameObject>();
+
+        public static PrefabCollection CreateNewCollection(CollectionName name)
+        {
+            // If no matching collection is found, create a new one
+            PrefabCollection asset = ScriptableObject.CreateInstance<PrefabCollection>();
+            asset.Name = name; // Assigns string-based enum reference
+
+            string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/{name}_PrefabCollection.asset");
+
+            AssetDatabase.CreateAsset(asset, assetPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            return asset;
+        }
     }
 }
