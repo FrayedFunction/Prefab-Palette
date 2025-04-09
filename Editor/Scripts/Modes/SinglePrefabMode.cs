@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class PrefabPlacement : IPlacementMode
+    public class SinglePrefabMode : IPlacementMode
     {
         public static bool IsRotating => isRotating;
 
