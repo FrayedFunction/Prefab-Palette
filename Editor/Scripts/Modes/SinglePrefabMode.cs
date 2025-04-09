@@ -5,33 +5,21 @@ namespace PrefabPalette
 {
     public class SinglePrefabMode : IPlacementMode
     {
-        public static bool IsRotating => isRotating;
-
         static Vector3 lastSurfaceNormal;
         static GameObject currentPlacedObject;
-        static bool isRotating = false;
-
-        public void OnEnter(PrefabPaletteTool tool)
-        {
-        }
 
         public void OnActive(PrefabPaletteTool tool)
         {
             Event e = Event.current;
-            
-            if (tool.selectedPrefab == null || isRotating)
-            {
-                VisualPlacer.Stop();
-            }
 
             if (tool.selectedPrefab == null) 
                 return;
 
-            VisualPlacer.ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
-
             // Place object on left click
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
             {
+                VisualPlacer.Stop();
+
                 lastSurfaceNormal = SceneInteraction.SurfaceNormal;
 
                 currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(tool.selectedPrefab);
@@ -44,10 +32,6 @@ namespace PrefabPalette
             // Rotate while holding the mouse button
             if (e.type == EventType.MouseDrag && e.button == 0 && !e.alt && currentPlacedObject != null)
             {
-                if (!isRotating)
-                {
-                    isRotating = true;
-                }
 
                 float angle = e.delta.x * tool.Settings.rotationSpeed;
                 Vector3 axis = tool.Settings.alignWithSurface ? lastSurfaceNormal : Vector3.up;
@@ -56,11 +40,15 @@ namespace PrefabPalette
             }
 
             // Stop rotating on mouse release
-            if (e.type == EventType.MouseUp && e.button == 0 && isRotating)
+            if (e.type == EventType.MouseUp && e.button == 0)
             {
-                isRotating = false;
+                VisualPlacer.ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
                 currentPlacedObject = null;
             }
+        }
+
+        public void OnEnter(PrefabPaletteTool tool)
+        {
         }
 
         public void OnExit(PrefabPaletteTool tool)
