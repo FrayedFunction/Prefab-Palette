@@ -160,6 +160,7 @@ namespace PrefabPalette
             {
                 if (GUILayout.Button("Stop Placing Prefabs", GUILayout.Height(50)))
                 {
+                    PlacementModeManager.CurrentMode.OnExit(this);
                     selectedPrefab = null;
                 }
             }
@@ -175,14 +176,8 @@ namespace PrefabPalette
             if (Settings.showModeSettings)
             {
                 EditorGUI.indentLevel++;
-                
-                Settings.enableGridSnap = GUILayout.Toggle(Settings.enableGridSnap, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
-                if (Settings.enableGridSnap) 
-                {
-                    SceneInteraction.Snap = true;
-                }
-                else
-                    SceneInteraction.Snap = false;
+
+                SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
 
                 PlacementModeManager.CurrentMode.SettingsGUI(this);
                 GUILayout.Space(15);
@@ -313,8 +308,9 @@ namespace PrefabPalette
                 Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
 
             SceneView.duringSceneGui += OnSceneGUI;
-            VisualPlacer.OnEnable();
+            VisualPlacer.OnEnable(this);
             SceneInteraction.OnEnable();
+            PlacementModeManager.CurrentMode.OnEnter(this);
         }
 
         private void OnDisable()
@@ -322,6 +318,7 @@ namespace PrefabPalette
             SceneView.duringSceneGui -= OnSceneGUI;
             VisualPlacer.OnDisable();
             SceneInteraction.OnDisable();
+            PlacementModeManager.CurrentMode.OnExit(this);
         }
     }
 }
