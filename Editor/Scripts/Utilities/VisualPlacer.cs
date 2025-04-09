@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Runtime.CompilerServices;
 
 namespace PrefabPalette
 {
@@ -13,12 +14,13 @@ namespace PrefabPalette
         private static float targetRadius = 1.0f;
         private static Vector3 lastPreviewPosition;
         private static Color color;
+        static ToolSettings settings;
 
         public static void OnEnable(PrefabPaletteTool tool)
         {            
             SceneView.duringSceneGui += OnSceneGUI;
-            ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
-
+            settings = tool.Settings;
+            ShowTarget(settings.placerColor, settings.placerRadius);
         }
 
         public static void OnDisable()
@@ -41,9 +43,10 @@ namespace PrefabPalette
                 // Force a repaint when position changes
                 sceneView.Repaint();
             }
+            var normal = settings.alignWithSurface ? SceneInteraction.SurfaceNormal : Vector3.up;
 
             // Draw the visual placer (outer and inner circles)
-            DrawPlacer(previewPosition, SceneInteraction.SurfaceNormal);
+            DrawPlacer(previewPosition, normal);
         }
 
         private static void DrawPlacer(Vector3 position, Vector3 normal)
