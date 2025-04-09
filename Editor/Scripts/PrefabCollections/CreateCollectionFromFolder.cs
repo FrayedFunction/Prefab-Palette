@@ -80,7 +80,7 @@ namespace PrefabPalette
 
             CreateCollectionWindow.Show(collectionName =>
             {
-                var sanitisedName = PrefabCollectionList.SanitiseEnumName(collectionName);
+                var sanitisedName = Helpers.SanitiseEnumName(collectionName);
                 EditorPrefs.SetString("PendingPrefabCollectionName", sanitisedName);
 
                 PrefabCollectionList.Instance.collectionNames.Add(sanitisedName);
