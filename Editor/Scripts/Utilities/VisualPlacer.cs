@@ -14,12 +14,14 @@ namespace PrefabPalette
         private static Vector3 lastPreviewPosition;
         private static Color color;
 
-        public static void OnEnable()
-        {
+        public static void OnEnable(PrefabPaletteTool tool)
+        {            
             SceneView.duringSceneGui += OnSceneGUI;
+            ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
+
         }
 
-        public static void OnDisable() 
+        public static void OnDisable()
         {
             Stop();
             SceneView.duringSceneGui -= OnSceneGUI;
@@ -29,48 +31,72 @@ namespace PrefabPalette
         {
             if (!isActive) return;
 
+            // Get the new position and update only if it's different
             Vector3 newPosition = SceneInteraction.Position;
             if (newPosition != lastPreviewPosition)
             {
                 previewPosition = newPosition;
                 lastPreviewPosition = newPosition;
+
+                // Force a repaint when position changes
                 sceneView.Repaint();
             }
 
+            // Draw the visual placer (outer and inner circles)
             DrawPlacer(previewPosition, SceneInteraction.SurfaceNormal);
         }
 
         private static void DrawPlacer(Vector3 position, Vector3 normal)
         {
-            // Ignore colours alpha and force to 1.
+            // Outer circle - full opacity
             Handles.color = new Color(color.r, color.g, color.b, 1f);
-
-            // Draw outer circle
             Handles.DrawWireDisc(position, normal, targetRadius);
 
-            // Draw inner solid circle (30% of targetRadius)
+            // Inner circle - semi-transparent
             Handles.color = new Color(color.r, color.g, color.b, 0.25f);
             Handles.DrawSolidDisc(position, normal, targetRadius * 0.3f);
         }
 
         /// <summary>
-        /// Start rendering the placer
+        /// Start rendering the visual placer
         /// </summary>
-        public static void ShowTarget(Color color, float radius)
+        public static void ShowTarget(Color newColor, float radius)
         {
+            if (isActive)
+            {
+                // If already active, just update the color and radius
+                color = newColor;
+                targetRadius = Mathf.Max(0.1f, radius);
+                return;
+            }
+
+            // If not active, initialize the placer and set initial values
             isActive = true;
-            VisualPlacer.color = color;
+            color = newColor;
             targetRadius = Mathf.Max(0.1f, radius);
+
+            // Clear previous position to prevent old data from interfering
+            lastPreviewPosition = Vector3.zero;
+
+            // Force SceneView to repaint immediately when enabling
+            SceneView.RepaintAll();
         }
 
         /// <summary>
-        /// Stop rendering the placer
         /// </summary>
         public static void Stop()
         {
-            isActive = false;
-        }
+            if (!isActive) return;
 
-        
+            // Disable the visual placer
+            isActive = false;
+
+            // Clear position data when stopping
+            lastPreviewPosition = Vector3.zero;
+
+            // Force SceneView to repaint immediately when disabling
+            SceneView.RepaintAll();
+        }
     }
+
 }
