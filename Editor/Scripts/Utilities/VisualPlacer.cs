@@ -16,11 +16,11 @@ namespace PrefabPalette
         private static Color color;
         static ToolSettings settings;
 
-        public static void OnEnable(PrefabPaletteTool tool)
+        public static void OnEnable(ToolSettings settings)
         {            
             SceneView.duringSceneGui += OnSceneGUI;
-            settings = tool.Settings;
-            ShowTarget(settings.placerColor, settings.placerRadius);
+            VisualPlacer.settings = settings;
+            ShowTarget(VisualPlacer.settings.placerColor, VisualPlacer.settings.placerRadius);
         }
 
         public static void OnDisable()
@@ -67,6 +67,7 @@ namespace PrefabPalette
         {
             if (isActive)
             {
+                Debug.Log("SUP whiney bitch");
                 // If already active, just update the color and radius
                 color = newColor;
                 targetRadius = Mathf.Max(0.1f, radius);

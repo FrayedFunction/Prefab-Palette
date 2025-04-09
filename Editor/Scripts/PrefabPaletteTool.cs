@@ -117,14 +117,15 @@ namespace PrefabPalette
 
                 GUILayout.Space(5);
             }
-
             GUILayout.Space(7.5f);
+
             Helpers.DrawLine(Color.grey);
             GUILayout.Space(7.5f);
-
+            
             GUI.enabled = canInteractWithCollectionDropdown;
             // Select collection
             Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.collectionName);
+            GUILayout.Space(5);
             currentPrefabCollection = GetPrefabCollection(Settings.collectionName);
 
             if (Settings.collectionName == CollectionName.None)
@@ -136,10 +137,6 @@ namespace PrefabPalette
                 PrefabCollectionInspector.OpenEditWindow(currentPrefabCollection);
             }
             EditorGUILayout.Space(5);
-
-            GUILayout.Label($"Palette - {currentPrefabCollection.Name}", EditorStyles.boldLabel);
-
-            GUILayout.Space(5);
 
             if (currentPrefabCollection != null)
             {
@@ -185,7 +182,8 @@ namespace PrefabPalette
             }
 
             GUILayout.Space(5);
-
+            GUILayout.Label($"Palette - {currentPrefabCollection.Name}", EditorStyles.boldLabel);
+            GUILayout.Space(5);
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 
             dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / Settings.gridColumns - 10, 40), Settings.minPaletteScale, Settings.maxPaletteScale);
@@ -308,7 +306,7 @@ namespace PrefabPalette
                 Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
 
             SceneView.duringSceneGui += OnSceneGUI;
-            VisualPlacer.OnEnable(this);
+            VisualPlacer.OnEnable(Settings);
             SceneInteraction.OnEnable();
             PlacementModeManager.CurrentMode.OnEnter(this);
         }
