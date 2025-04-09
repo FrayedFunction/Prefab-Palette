@@ -26,6 +26,7 @@ namespace PrefabPalette
         public float brokenProbability = 0.5f;
         public int brokenInterval = 4;
         public bool showModeSettings;
+        public bool enableGridSnap = false;
 
         // Marked dirty on disable so Unity knows to save it
         private void OnDisable()
