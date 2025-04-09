@@ -27,7 +27,6 @@ namespace PrefabPalette
             toolbarButtons = new GUIContent[]
             {
                 new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Free Mode"),
-                new GUIContent(EditorGUIUtility.IconContent("SceneViewSnap").image, "Snapping Mode"),
                 new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
             };
 
@@ -35,7 +34,6 @@ namespace PrefabPalette
             {
                 { ModeType.Line, new LineMode() },
                 { ModeType.Free, new PrefabPlacement() },
-                { ModeType.Snap, new PrefabPlacement() },
             };
 
             CurrentType = ModeType.Free;
@@ -44,7 +42,6 @@ namespace PrefabPalette
         public enum ModeType
         {
             Free,
-            Snap,
             Line
         }
 
