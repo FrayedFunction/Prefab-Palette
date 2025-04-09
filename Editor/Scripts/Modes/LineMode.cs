@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class PrefabLineGenerator : IPlacementMode
+    public class LineMode : IPlacementMode
     {
         static List<Vector3> fencePoints = new List<Vector3>();
 

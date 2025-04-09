@@ -33,7 +33,7 @@ namespace PrefabPalette
 
             modes = new Dictionary<ModeType, IPlacementMode>()
             {
-                { ModeType.Line, new PrefabLineGenerator() },
+                { ModeType.Line, new LineMode() },
                 { ModeType.Free, new PrefabPlacement() },
                 { ModeType.Snap, new PrefabPlacement() },
             };
