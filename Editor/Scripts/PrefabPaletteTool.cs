@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GridBrushBase;
 
 /* TODO:
  * Fence Placer: 
@@ -118,7 +119,7 @@ namespace PrefabPalette
             }
 
             GUILayout.Space(7.5f);
-            DrawLine(Color.grey);
+            Helpers.DrawLine(Color.grey);
             GUILayout.Space(7.5f);
 
             GUI.enabled = canInteractWithCollectionDropdown;
@@ -169,8 +170,24 @@ namespace PrefabPalette
             // Placement mode toolbar
             PlacementModeManager.ToolbarGUI(this);
             GUILayout.Space(5);
+            
+            Settings.showModeSettings = EditorGUILayout.Foldout(Settings.showModeSettings, "Settings");
+            if (Settings.showModeSettings)
+            {
+                EditorGUI.indentLevel++;
+                
+                Settings.enableGridSnap = GUILayout.Toggle(Settings.enableGridSnap, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
+                if (Settings.enableGridSnap) 
+                {
+                    SceneInteraction.Snap = true;
+                }
+                else
+                    SceneInteraction.Snap = false;
 
-            PlacementModeManager.CurrentMode.SettingsGUI(this);
+                PlacementModeManager.CurrentMode.SettingsGUI(this);
+                GUILayout.Space(15);
+                EditorGUI.indentLevel--;
+            }
 
             GUILayout.Space(5);
 
@@ -285,30 +302,6 @@ namespace PrefabPalette
             return PrefabCollection.CreateNewCollection(name);
         }
 
-        public static T LoadOrCreateAsset<T>(string folderPath, string assetName, out string assetPath) where T : ScriptableObject
-        {
-            // Find existing asset
-            T asset = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { folderPath })
-                .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<T>)
-                .FirstOrDefault();
-
-            if (asset != null)
-            {
-                assetPath = AssetDatabase.GetAssetPath(asset);
-                return asset;
-            }
-
-            // Create new asset
-            asset = ScriptableObject.CreateInstance<T>();
-            assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/{assetName}");
-            AssetDatabase.CreateAsset(asset, assetPath);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            return AssetDatabase.LoadAssetAtPath<T>(assetPath);
-        }
-
         void OnSceneGUI(SceneView sceneView)
         {
             PlacementModeManager.CurrentMode.OnActive(this);
@@ -317,7 +310,7 @@ namespace PrefabPalette
         private void OnEnable()
         {
             if (Settings == null)
-                Settings = LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
+                Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
 
             SceneView.duringSceneGui += OnSceneGUI;
             VisualPlacer.OnEnable();
@@ -329,16 +322,6 @@ namespace PrefabPalette
             SceneView.duringSceneGui -= OnSceneGUI;
             VisualPlacer.OnDisable();
             SceneInteraction.OnDisable();
-        }
-
-        private static void DrawLine(Color color, int thickness = 1, int padding = 10)
-        {
-            Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
-            r.height = thickness;
-            r.y += padding / 2;
-            r.x -= 2;
-            r.width += 6;
-            EditorGUI.DrawRect(r, color);
         }
     }
 }
