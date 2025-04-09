@@ -27,7 +27,7 @@ namespace PrefabPalette
             {
                 if (instance == null)
                 {
-                    instance = PrefabPaletteTool.LoadOrCreateAsset<PrefabCollectionList>(PathDr.GetGeneratedFolderPath, "CollectionNamesList.asset", out string assetPath);
+                    instance = Helpers.LoadOrCreateAsset<PrefabCollectionList>(PathDr.GetGeneratedFolderPath, "CollectionNamesList.asset", out string assetPath);
                 }
 
                 return instance;
@@ -56,7 +56,7 @@ namespace PrefabPalette
             List<string> validNames = PrefabCollectionList.instance.collectionNames
                 .Where(i => !string.IsNullOrWhiteSpace(i)) // Ensure not empty
                 .Distinct() // Ensure is unique
-                .Select(SanitiseEnumName) // Enure valid enum name
+                .Select(Helpers.SanitiseEnumName) // Enure valid enum name
                 .ToList(); // Create new list
 
             // File creation
@@ -75,23 +75,6 @@ namespace PrefabPalette
 
             AssetDatabase.Refresh();
             UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
-        }
-
-        /// <summary>
-        /// Ensures correct syntax for compatibility with enums.
-        /// </summary>
-        public static string SanitiseEnumName(string name)
-        {
-            // Remove invalid characters & replace spaces with underscores
-            name = Regex.Replace(name, @"[^a-zA-Z0-9_]", "_");
-
-            // Ensure it doesn't start with a number
-            if (char.IsDigit(name[0]))
-            {
-                name = "_" + name;
-            }
-
-            return name;
         }
     }
 }
