@@ -6,7 +6,7 @@ namespace PrefabPalette
 {
     public static class SceneInteraction
     {
-        public static bool Snap { get; set; }
+        public static bool SnapToGrid { get; set; }
 
         public static void OnEnable()
         {
@@ -31,7 +31,7 @@ namespace PrefabPalette
             {
                 SurfaceNormal = hit.normal;
 
-                Position = Snap ? Helpers.SnapToGrid(hit.point) : hit.point;  
+                Position = SnapToGrid ? Helpers.SnapToGrid(hit.point) : hit.point;  
             }
         }
     }
