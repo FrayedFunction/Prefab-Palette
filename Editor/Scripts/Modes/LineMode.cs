@@ -20,14 +20,6 @@ namespace PrefabPalette
 
         public void OnActive(PrefabPaletteTool tool)
         {
-            if (tool.selectedPrefab == null)
-            {
-                VisualPlacer.Stop();
-                OnExit(tool);
-                return;
-            }
-
-            VisualPlacer.ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
             Event e = Event.current;
 
             if (fenceParentObject == null)
