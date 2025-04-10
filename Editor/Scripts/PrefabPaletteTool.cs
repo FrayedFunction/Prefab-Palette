@@ -129,7 +129,10 @@ namespace PrefabPalette
             currentPrefabCollection = GetPrefabCollection(Settings.collectionName);
 
             if (Settings.collectionName == CollectionName.None)
+            {
+                selectedPrefab = null;
                 return;
+            }
 
             if (GUILayout.Button("Edit Prefab Collection"))
             {
@@ -277,7 +280,8 @@ namespace PrefabPalette
         /// </remarks>
         private PrefabCollection GetPrefabCollection(CollectionName name)
         {
-            if (name == CollectionName.None) return null;
+            if (name == CollectionName.None) 
+                return null;
 
             if (currentPrefabCollection != null && currentPrefabCollection.Name == name)
                 return currentPrefabCollection;
@@ -297,7 +301,16 @@ namespace PrefabPalette
 
         void OnSceneGUI(SceneView sceneView)
         {
-            PlacementModeManager.CurrentMode.OnActive(this);
+            if (selectedPrefab != null)
+            {
+                PlacementModeManager.CurrentMode.OnActive(this);
+                VisualPlacer.ShowTarget();
+            }
+            else
+            {
+                PlacementModeManager.CurrentMode.OnExit(this);
+                VisualPlacer.Stop();
+            }
         }
 
         private void OnEnable()
