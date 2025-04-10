@@ -67,7 +67,6 @@ namespace PrefabPalette
         {
             if (isActive)
             {
-                Debug.Log("SUP whiney bitch");
                 // If already active, just update the color and radius
                 color = newColor;
                 targetRadius = Mathf.Max(0.1f, radius);
