@@ -32,7 +32,6 @@ namespace PrefabPalette
             // Rotate while holding the mouse button
             if (e.type == EventType.MouseDrag && e.button == 0 && !e.alt && currentPlacedObject != null)
             {
-
                 float angle = e.delta.x * tool.Settings.rotationSpeed;
                 Vector3 axis = tool.Settings.alignWithSurface ? lastSurfaceNormal : Vector3.up;
                 currentPlacedObject.transform.Rotate(axis, angle, Space.World);
@@ -42,7 +41,7 @@ namespace PrefabPalette
             // Stop rotating on mouse release
             if (e.type == EventType.MouseUp && e.button == 0)
             {
-                VisualPlacer.ShowTarget(tool.Settings.placerColor, tool.Settings.placerRadius);
+                VisualPlacer.ShowTarget();
                 currentPlacedObject = null;
             }
         }
