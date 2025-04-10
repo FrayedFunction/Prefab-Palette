@@ -20,7 +20,7 @@ namespace PrefabPalette
         {            
             SceneView.duringSceneGui += OnSceneGUI;
             VisualPlacer.settings = settings;
-            ShowTarget(VisualPlacer.settings.placerColor, VisualPlacer.settings.placerRadius);
+            ShowTarget();
         }
 
         public static void OnDisable()
@@ -63,20 +63,15 @@ namespace PrefabPalette
         /// <summary>
         /// Start rendering the visual placer
         /// </summary>
-        public static void ShowTarget(Color newColor, float radius)
+        public static void ShowTarget()
         {
-            if (isActive)
-            {
-                // If already active, just update the color and radius
-                color = newColor;
-                targetRadius = Mathf.Max(0.1f, radius);
-                return;
-            }
+            color = settings.placerColor;
+            targetRadius = Mathf.Max(0.1f, settings.placerRadius);
 
-            // If not active, initialize the placer and set initial values
+            if (isActive)
+                return;
+
             isActive = true;
-            color = newColor;
-            targetRadius = Mathf.Max(0.1f, radius);
 
             // Clear previous position to prevent old data from interfering
             lastPreviewPosition = Vector3.zero;
