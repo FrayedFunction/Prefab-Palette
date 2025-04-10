@@ -1,39 +1,18 @@
-using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using System.Linq;
 using static UnityEngine.GridBrushBase;
-
-/* TODO:
- * Fence Placer: 
- * - Show line while editing
- * 
- * Prop Placer:
- */
 
 namespace PrefabPalette
 {
-    [Serializable]
-
-    /// <summary>
-    /// Main tool window.
-    /// </summary>
-    public class PrefabPaletteTool : EditorWindow
+    public class PrefabPaletteTool
     {
-        const string toolWindowPath = "Window/Prefab Palette";
-
         public ToolSettings Settings { get; private set; }
 
-        PrefabCollection currentPrefabCollection;
+        public PrefabCollection CurrentPrefabCollection { get; set; }
 
-        public GameObject selectedPrefab;
-        Vector2 paletteScrollPosition;
-        Vector2 windowScrollPosition;
-        float dynamicPrefabIconSize;
-        bool canInteractWithCollectionDropdown = true;
+        public GameObject SelectedPrefab { get; set; }
 
         /// <summary>
         /// Returns a list of all saved prefab collections.
@@ -43,250 +22,19 @@ namespace PrefabPalette
             .Select(guid => AssetDatabase.LoadAssetAtPath<PrefabCollection>(AssetDatabase.GUIDToAssetPath(guid)))
             .ToList();
 
-        [MenuItem(toolWindowPath)]
-        public static void OnShowToolWindow()
-        {
-            GetWindow<PrefabPaletteTool>("Prefab Palette");
-        }
-
-        void OnGUI()
-        {
-            GUILayout.Label("Prefab Palette", EditorStyles.largeLabel);
-            
-            // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
-            if (HasOpenInstances<CollectionsListInspector>())
-            {
-                Settings.collectionName = CollectionName.None;
-                canInteractWithCollectionDropdown = false;
-                EditorGUILayout.HelpBox("Collections Inspector window is open, close it when you're finished editing", MessageType.Warning);
-                return;
-            }
-            else
-            {
-                canInteractWithCollectionDropdown = true;
-            }
-
-
-            if (GUILayout.Button("Manage Collections"))
-            {
-                CollectionsListInspector.OpenWindow(this);
-            }
-
-            EditorGUILayout.Space(5);
-
-            // if the enum only contains .None
-            if (!Enum.GetValues(typeof(CollectionName))
-                     .Cast<CollectionName>()
-                     .Any(c => c != CollectionName.None))
-            {
-                EditorGUILayout.HelpBox("You don't have any collections yet,\nAdd one by using the Manage Collections button", MessageType.Warning);
-                return;
-            }
-
-            // Header
-            Settings.showHeader = EditorGUILayout.Toggle("Show Settings", Settings.showHeader);
-
-            if (Settings.showHeader)
-            {
-                EditorGUI.indentLevel++;
-
-                // Palette Settings
-                Settings.showPaletteSettings = EditorGUILayout.Foldout(Settings.showPaletteSettings, "Palette Settings");
-                if (Settings.showPaletteSettings)
-                {
-                    EditorGUI.indentLevel++;
-                    Settings.gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", Settings.gridColumns));
-                    Settings.minPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", Settings.minPaletteScale), 50f, Settings.maxPaletteScale);
-                    Settings.maxPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", Settings.maxPaletteScale), Settings.minPaletteScale, 500f);
-                    EditorGUI.indentLevel--;
-                }
-
-                GUILayout.Space(2);
-
-                // Placer Setttings
-                Settings.showPlacerSettings = EditorGUILayout.Foldout(Settings.showPlacerSettings, "Placer Settings");
-                if (Settings.showPlacerSettings)
-                {
-                    EditorGUI.indentLevel++;
-                    Settings.placerColor = EditorGUILayout.ColorField("Placer Color", Settings.placerColor);
-                    Settings.placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", Settings.placerRadius));
-                    EditorGUI.indentLevel--;
-                }
-
-                EditorGUI.indentLevel--;
-
-                GUILayout.Space(5);
-            }
-            GUILayout.Space(7.5f);
-
-            Helpers.DrawLine(Color.grey);
-            GUILayout.Space(7.5f);
-            
-            GUI.enabled = canInteractWithCollectionDropdown;
-            // Select collection
-            Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.collectionName);
-            GUILayout.Space(5);
-            currentPrefabCollection = GetPrefabCollection(Settings.collectionName);
-
-            if (Settings.collectionName == CollectionName.None)
-            {
-                selectedPrefab = null;
-                return;
-            }
-
-            if (GUILayout.Button("Edit Prefab Collection"))
-            {
-                // Inspect the currentPrefabCollection scriptable object
-                PrefabCollectionInspector.OpenEditWindow(currentPrefabCollection);
-            }
-            EditorGUILayout.Space(5);
-
-            if (currentPrefabCollection != null)
-            {
-                windowScrollPosition = GUILayout.BeginScrollView(windowScrollPosition);
-
-                PaletteGUI();
-                GUILayout.EndScrollView();
-            }
-
-            GUILayout.Space(20);
-        }
-
-        void PaletteGUI()
-        {
-            var prefabList = currentPrefabCollection.prefabList;
-
-            if (selectedPrefab != null)
-            {
-                if (GUILayout.Button("Stop Placing Prefabs", GUILayout.Height(50)))
-                {
-                    PlacementModeManager.CurrentMode.OnExit(this);
-                    selectedPrefab = null;
-                }
-            }
-
-            GUILayout.Label($"{PlacementModeManager.CurrentType} Mode", EditorStyles.largeLabel);
-            GUILayout.Space(2.5f);
-
-            // Placement mode toolbar
-            PlacementModeManager.ToolbarGUI(this);
-            GUILayout.Space(5);
-            
-            Settings.showModeSettings = EditorGUILayout.Foldout(Settings.showModeSettings, "Settings");
-            if (Settings.showModeSettings)
-            {
-                EditorGUI.indentLevel++;
-
-                SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
-
-                PlacementModeManager.CurrentMode.SettingsGUI(this);
-                GUILayout.Space(15);
-                EditorGUI.indentLevel--;
-            }
-
-            GUILayout.Space(5);
-            GUILayout.Label($"Palette - {currentPrefabCollection.Name}", EditorStyles.boldLabel);
-            GUILayout.Space(5);
-            float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
-
-            dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / Settings.gridColumns - 10, 40), Settings.minPaletteScale, Settings.maxPaletteScale);
-
-            GUILayout.BeginVertical("box");
-
-            // Start Scroll View
-            paletteScrollPosition = GUILayout.BeginScrollView(paletteScrollPosition); // Set max visible height
-
-            int rowCount = Mathf.CeilToInt((float)prefabList.Count / Settings.gridColumns);
-
-            // Calculate the total width of the grid (based on the number of columns and button size)
-            float gridWidth = Settings.gridColumns * dynamicPrefabIconSize;
-
-            // Calculate the left padding required to center the grid
-            float gridPadding = Mathf.Max((windowWidth - gridWidth) * 0.2f, 0);
-
-            for (int row = 0; row < rowCount; row++)
-            {
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(gridPadding);
-
-                for (int col = 0; col < Settings.gridColumns; col++)
-                {
-                    int index = row * Settings.gridColumns + col;
-                    if (index >= prefabList.Count) break;
-
-                    GameObject prefab = prefabList[index];
-                    if (prefab != null)
-                    {
-                        Texture2D preview = AssetPreview.GetAssetPreview(prefab);
-                        float padding = dynamicPrefabIconSize * 0.1f; // Scale padding relative to button size
-                        float labelHeight = dynamicPrefabIconSize * 0.25f; // Label height scales with button size
-
-                        // Calculate the total clickable rect
-                        Rect totalRect = GUILayoutUtility.GetRect(dynamicPrefabIconSize, dynamicPrefabIconSize, GUILayout.Width(dynamicPrefabIconSize));
-
-                        // Calculate inner button rect to be properly centered inside totalRect
-                        Rect buttonRect = new Rect(
-                            totalRect.x + padding,
-                            totalRect.y + padding,
-                            totalRect.width - 2 * padding,
-                            totalRect.height - 2 * padding
-                        );
-
-                        bool isHovering = totalRect.Contains(Event.current.mousePosition);
-                        bool isSelected = selectedPrefab == prefab;
-
-                        // Draw selection background (centering it with button)
-                        if (isSelected)
-                        {
-                            EditorGUI.DrawRect(totalRect, new Color(0.1f, 0.5f, 1f, 1f)); // Blue highlight
-                        }
-
-                        // Draw the button manually instead of GUILayout (fixes scaling)
-                        GUI.DrawTexture(buttonRect, preview != null ? preview : EditorGUIUtility.IconContent("Prefab Icon").image, ScaleMode.ScaleToFit);
-
-                        // Handle selection logic
-                        if (GUI.Button(totalRect, GUIContent.none, GUIStyle.none))
-                        {
-                            selectedPrefab = prefab;
-                        }
-
-                        // Draw label on top when hovered or selected.
-                        if (isHovering || isSelected)
-                        {
-                            Rect labelRect = new Rect(totalRect.x, totalRect.yMax - labelHeight, totalRect.width, labelHeight);
-                            EditorGUI.DrawRect(labelRect, new Color(0, 0, 0, 0.6f));
-                            GUI.Label(labelRect, prefab.name, new GUIStyle(EditorStyles.whiteLabel) { alignment = TextAnchor.MiddleCenter });
-                        }
-                    }
-                    else
-                    {
-                        GUILayout.Space(dynamicPrefabIconSize);
-                    }
-                }
-
-                EditorGUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView(); // End Scroll View
-
-            GUILayout.EndVertical();
-        }
-
         /// <summary>
         /// Returns prefab collection object by name, creates it if it doesn't exist
         /// </summary>
         /// <remarks>
         /// Note: CollectionName.None returns null.
         /// </remarks>
-        private PrefabCollection GetPrefabCollection(CollectionName name)
+        public PrefabCollection GetPrefabCollection(CollectionName name)
         {
-            if (name == CollectionName.None) 
+            if (name == CollectionName.None)
                 return null;
-
-            if (currentPrefabCollection != null && currentPrefabCollection.Name == name)
-                return currentPrefabCollection;
-
-            selectedPrefab = null;
+            if (CurrentPrefabCollection != null && CurrentPrefabCollection.Name == name)
+                return CurrentPrefabCollection;
+            SelectedPrefab = null;
 
             foreach (var collection in GetAllCollectionsInFolder)
             {
@@ -299,37 +47,9 @@ namespace PrefabPalette
             return PrefabCollection.CreateNewCollection(name);
         }
 
-        void OnSceneGUI(SceneView sceneView)
+        public PrefabPaletteTool()
         {
-            if (selectedPrefab != null)
-            {
-                PlacementModeManager.CurrentMode.OnActive(this);
-                VisualPlacer.ShowTarget();
-            }
-            else
-            {
-                PlacementModeManager.CurrentMode.OnExit(this);
-                VisualPlacer.Stop();
-            }
-        }
-
-        private void OnEnable()
-        {
-            if (Settings == null)
-                Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
-
-            SceneView.duringSceneGui += OnSceneGUI;
-            VisualPlacer.OnEnable(Settings);
-            SceneInteraction.OnEnable();
-            PlacementModeManager.CurrentMode.OnEnter(this);
-        }
-
-        private void OnDisable()
-        {
-            SceneView.duringSceneGui -= OnSceneGUI;
-            VisualPlacer.OnDisable();
-            SceneInteraction.OnDisable();
-            PlacementModeManager.CurrentMode.OnExit(this);
+            Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
         }
     }
 }

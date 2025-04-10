@@ -12,7 +12,7 @@ namespace PrefabPalette
         {
             Event e = Event.current;
 
-            if (tool.selectedPrefab == null) 
+            if (tool.SelectedPrefab == null) 
                 return;
 
             // Place object on left click
@@ -22,7 +22,7 @@ namespace PrefabPalette
 
                 lastSurfaceNormal = SceneInteraction.SurfaceNormal;
 
-                currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(tool.selectedPrefab);
+                currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(tool.SelectedPrefab);
                 currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + tool.Settings.placementOffset, tool.Settings.alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
                 Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
 

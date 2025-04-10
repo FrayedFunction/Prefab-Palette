@@ -10,7 +10,6 @@ namespace PrefabPalette
     /// <summary>
     /// Maintains valid paths to the tools root and collections folder, Saves current path to Editor Prefs.
     /// </summary>
-    [InitializeOnLoad]
     public static class PathDr
     {
         // Keys for editor prefs
@@ -20,68 +19,55 @@ namespace PrefabPalette
         private static string toolPath;
         private static string collectionsPath;
 
-        static PathDr()
+        public static void Init()
         {
             toolPath = EditorPrefs.GetString(ToolPathKey, string.Empty);
             collectionsPath = EditorPrefs.GetString(CollectionsPathKey, string.Empty);
+
+            // If the path for the tools root folder isn't set or the directory no longer
+            // exists, look for it in th asset database.
+            if (string.IsNullOrEmpty(toolPath) || !Directory.Exists(toolPath))
+            {
+                var root = FindFolder("PrefabPalette");
+                toolPath = Path.Combine(root, "Editor");
+                // If the path's found, save it to editor prefs.
+                if (!string.IsNullOrEmpty(toolPath))
+                {
+                    EditorPrefs.SetString(ToolPathKey, toolPath);
+                }
+                else
+                {
+                    Debug.LogError($"PrefabPalette/{nameof(PathDr)}Can't find editor folder");
+                }
+            }
+
+            collectionsPath = Path.Combine(GetToolPath, "Generated");
+
+            if (!Directory.Exists(collectionsPath))
+            {
+                string newGUID = AssetDatabase.CreateFolder(GetToolPath, "Generated");
+
+                if (string.IsNullOrEmpty(newGUID))
+                {
+                    // Creation failed
+                    Debug.LogError($"PrefabPalette/{nameof(PathDr)}: Failed to create Generated folder!");
+                    return;
+                }
+
+                // Folder Created
+                collectionsPath = AssetDatabase.GUIDToAssetPath(newGUID);
+
+                Debug.Log($"PrefabPalette/{nameof(PathDr)}: Collections folder created successfully at {collectionsPath}. Refreshing AssetDatabase...");
+                AssetDatabase.Refresh();
+            }
         }
 
         /// <returns>
         /// Path to /PrefabPalette/Editor
         /// </returns>
-        public static string GetToolPath
-        {
-            get
-            {
-                // If the path for the tools root folder isn't set or the directory no longer
-                // exists, look for it in th asset database.
-                if (string.IsNullOrEmpty(toolPath) || !Directory.Exists(toolPath))
-                {
-                    var root = FindFolder("PrefabPalette");
-                    toolPath = Path.Combine(root, "Editor");
-                    // If the path's found, save it to editor prefs.
-                    if (!string.IsNullOrEmpty(toolPath))
-                    {
-                        EditorPrefs.SetString(ToolPathKey, toolPath);
-                    }
-                    else
-                    {
-                        Debug.LogError($"PrefabPalette/{nameof(PathDr)}Can't find editor folder");
-                    }
-                }
+        public static string GetToolPath => toolPath;
 
-                return toolPath;
-            }
-        }
-
-        public static string GetGeneratedFolderPath
-        {
-            get
-            {
-                var path = Path.Combine(GetToolPath, "Generated");
-
-                if (!Directory.Exists(path))
-                {
-                    string newGUID = AssetDatabase.CreateFolder(GetToolPath, "Generated");
-                    
-                    if (string.IsNullOrEmpty(newGUID))
-                    {
-                        // Creation failed
-                        Debug.LogError($"PrefabPalette/{nameof(PathDr)}: Failed to create Generated folder!");
-                        return string.Empty;
-                    }
-
-                    // Folder Created
-                    path = AssetDatabase.GUIDToAssetPath(newGUID);
-
-                    Debug.Log($"PrefabPalette/{nameof(PathDr)}: Collections folder created successfully at {collectionsPath}. Refreshing AssetDatabase...");
-                    AssetDatabase.Refresh();
-                }
-
-                return path;
-            }
-        }
-
+        public static string GetGeneratedFolderPath => collectionsPath;
 
         /// <summary>
         /// Returns the path to the folder where prefab collections are generated.

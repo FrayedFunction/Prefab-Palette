@@ -104,7 +104,7 @@ namespace PrefabPalette
                         }
                     }
 
-                    GameObject prefabToSpawn = tool.selectedPrefab;
+                    GameObject prefabToSpawn = tool.SelectedPrefab;
                     // If broken fence is desired and we have a broken prefab, use it;
                     // if no broken prefab is assigned, use the fence prefab.
                     if (spawnBroken && brokenFencePrefab != null)

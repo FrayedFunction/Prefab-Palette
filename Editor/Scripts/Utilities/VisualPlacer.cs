@@ -45,7 +45,7 @@ namespace PrefabPalette
             }
             var normal = settings.alignWithSurface ? SceneInteraction.SurfaceNormal : Vector3.up;
 
-            // Draw the visual placer (outer and inner circles)
+            // Draw the visual placer
             DrawPlacer(previewPosition, normal);
         }
 
