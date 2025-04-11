@@ -8,13 +8,13 @@ namespace PrefabPalette
     public class MainWindow : EditorWindow
     {
         static PrefabPaletteTool tool;
-        const string toolWindowPath = "Window/Prefab Palette/Main";
         bool canInteractWithCollectionDropdown = true;
         float buttonSpace = 2;
 
-        [MenuItem(toolWindowPath)]
+        [MenuItem("Window/Prefab Palette/Main")]
         public static void OpenMainWindow()
         {
+            tool = PrefabPaletteTool.Instance;
             GetWindow<MainWindow>("Prefab Palete: Main");
         }
 
@@ -22,15 +22,13 @@ namespace PrefabPalette
         public static void OpenPalette()
         {
             PathDr.Init();
-            tool ??= new();
-
+            tool = PrefabPaletteTool.Instance;
             PaletteWindow.OnShowToolWindow(tool);
         }
 
         private void OnEnable()
         {
             PathDr.Init();
-            tool = new();
         }
 
         private void OnGUI()

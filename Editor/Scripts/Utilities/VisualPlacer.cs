@@ -20,7 +20,6 @@ namespace PrefabPalette
         {            
             SceneView.duringSceneGui += OnSceneGUI;
             VisualPlacer.settings = settings;
-            ShowTarget();
         }
 
         public static void OnDisable()

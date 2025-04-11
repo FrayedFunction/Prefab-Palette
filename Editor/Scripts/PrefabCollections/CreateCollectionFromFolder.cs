@@ -139,6 +139,7 @@ namespace PrefabPalette
                 return null;
 
             string path = AssetDatabase.GetAssetPath(selected);
+
             return AssetDatabase.IsValidFolder(path) ? path : null;
         }
 

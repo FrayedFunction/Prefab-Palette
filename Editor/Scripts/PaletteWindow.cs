@@ -29,6 +29,20 @@ namespace PrefabPalette
             PlacementModeManager.CurrentMode.OnEnter(tool);
         }
 
+        private void OnEnable()
+        {
+            OnShowToolWindow(PrefabPaletteTool.Instance);
+            SceneView.duringSceneGui += OnSceneGUI;
+        }
+
+        private void OnDisable()
+        {
+            SceneView.duringSceneGui -= OnSceneGUI;
+            VisualPlacer.OnDisable();
+            SceneInteraction.OnDisable();
+            PlacementModeManager.CurrentMode.OnExit(tool);
+        }
+
         void OnGUI()
         {
             PaletteGUI();
@@ -82,16 +96,16 @@ namespace PrefabPalette
                 return;
             }
 
-            var prefabList = tool.CurrentPrefabCollection.prefabList;
-
             if (tool.SelectedPrefab != null)
             {
-                if (GUILayout.Button("Stop Placing Prefabs", GUILayout.Height(50)))
+                if (GUILayout.Button("Stop Placing Prefabs", GUILayout.Height(25)))
                 {
                     PlacementModeManager.CurrentMode.OnExit(tool);
                     tool.SelectedPrefab = null;
                 }
             }
+
+            SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
 
             // Placement mode toolbar
             PlacementModeManager.ToolbarGUI(tool);
@@ -104,8 +118,6 @@ namespace PrefabPalette
             {
                 EditorGUI.indentLevel++;
 
-                SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
-
                 PlacementModeManager.CurrentMode.SettingsGUI(tool);
                 GUILayout.Space(15);
                 EditorGUI.indentLevel--;
@@ -114,15 +126,16 @@ namespace PrefabPalette
             GUILayout.Space(5);
             GUILayout.Label($"Palette - {tool.CurrentPrefabCollection.Name}", EditorStyles.boldLabel);
             GUILayout.Space(5);
+            GUILayout.BeginVertical("box");
+
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 
             dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / tool.Settings.gridColumns - 10, 40), tool.Settings.minPaletteScale, tool.Settings.maxPaletteScale);
 
-            GUILayout.BeginVertical("box");
-
             // Start Scroll View
             paletteScrollPosition = GUILayout.BeginScrollView(paletteScrollPosition); // Set max visible height
 
+            var prefabList = tool.CurrentPrefabCollection.prefabList;
             int rowCount = Mathf.CeilToInt((float)prefabList.Count / tool.Settings.gridColumns);
 
             // Calculate the total width of the grid (based on the number of columns and button size)
@@ -211,19 +224,6 @@ namespace PrefabPalette
                 PlacementModeManager.CurrentMode.OnExit(tool);
                 VisualPlacer.Stop();
             }
-        }
-
-        private void OnEnable()
-        {
-            SceneView.duringSceneGui += OnSceneGUI;
-        }
-
-        private void OnDisable()
-        {
-            SceneView.duringSceneGui -= OnSceneGUI;
-            VisualPlacer.OnDisable();
-            SceneInteraction.OnDisable();
-            PlacementModeManager.CurrentMode.OnExit(tool);
         }
     }
 }
