@@ -82,7 +82,7 @@ namespace PrefabPalette
             if (GUILayout.Button("Edit Prefab Collection"))
             {
                 // Inspect the currentPrefabCollection scriptable object
-                PrefabCollectionInspector.OpenEditWindow(tool.CurrentPrefabCollection);
+                PrefabCollectionInspector.OpenWindow(tool.CurrentPrefabCollection);
             }
 
             GUILayout.Space(buttonSpace);

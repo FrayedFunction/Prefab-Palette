@@ -11,14 +11,15 @@ namespace PrefabPalette
     /// </summary>
     public class PrefabCollectionInspector : EditorWindow
     {
-        private PrefabCollection targetObject;
+        private PrefabCollection targetCollection;
         private SerializedObject serializedObject;
         private SerializedProperty listProperty;
+        private Vector2 scrollPos;
 
-        public static void OpenEditWindow(PrefabCollection obj)
+        public static void OpenWindow(PrefabCollection obj)
         {
             PrefabCollectionInspector window = GetWindow<PrefabCollectionInspector>("Collection Editor");
-            window.targetObject = obj;
+            window.targetCollection = obj;
             window.serializedObject = new SerializedObject(obj);
             window.listProperty = window.serializedObject.FindProperty("prefabList");
             window.Show();
@@ -26,13 +27,15 @@ namespace PrefabPalette
 
         private void OnGUI()
         {
-            GUILayout.Label($"{targetObject.Name}", EditorStyles.whiteLargeLabel);
+            GUILayout.Label($"{targetCollection.Name}", EditorStyles.whiteLargeLabel);
 
             if (serializedObject != null)
             {
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
                 serializedObject.Update();
                 EditorGUILayout.PropertyField(listProperty, true); // Only show the list
                 serializedObject.ApplyModifiedProperties();
+                EditorGUILayout.EndScrollView();
             }
         }
     }

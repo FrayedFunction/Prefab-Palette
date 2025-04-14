@@ -16,6 +16,7 @@ namespace PrefabPalette
         private PrefabCollectionList collectionsList;
         private PrefabPaletteTool tool;
         private Editor editorInstance;
+        private Vector2 scrollPos;
 
         public static void OpenWindow(PrefabPaletteTool t)
         {
@@ -33,7 +34,9 @@ namespace PrefabPalette
 
             if (editorInstance != null)
             {
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
                 editorInstance.OnInspectorGUI();
+                EditorGUILayout.EndScrollView();
             }
 
             // Disable button if AssetDatabase is reloading
@@ -44,6 +47,8 @@ namespace PrefabPalette
                 collectionsList.GenerateEnum();
                 CleanupCollectionsFolder(tool.GetAllCollectionsInFolder, collectionsList);
             }
+
+            EditorGUILayout.Space(10f);
         }
 
         /// <summary>
