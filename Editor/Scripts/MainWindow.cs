@@ -14,21 +14,19 @@ namespace PrefabPalette
         [MenuItem("Window/Prefab Palette/Main")]
         public static void OpenMainWindow()
         {
-            tool = PrefabPaletteTool.Instance;
             GetWindow<MainWindow>("Prefab Palete: Main");
         }
 
         [MenuItem("Window/Prefab Palette/Palette")]
         public static void OpenPalette()
         {
-            PathDr.Init();
             tool = PrefabPaletteTool.Instance;
             PaletteWindow.OnShowToolWindow(tool);
         }
 
         private void OnEnable()
         {
-            PathDr.Init();
+            tool = PrefabPaletteTool.Instance;
         }
 
         private void OnGUI()

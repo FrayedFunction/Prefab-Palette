@@ -5,15 +5,15 @@ namespace PrefabPalette
 {
     public class SinglePrefabMode : IPlacementMode
     {
+        GameObject currentPlacedObject;
+        Vector3 lastSurfaceNormal;
+
         public void OnActive(PrefabPaletteTool tool)
         {
             Event e = Event.current;
 
             if (tool.SelectedPrefab == null) 
                 return;
-
-            GameObject currentPlacedObject = null;
-            Vector3 lastSurfaceNormal = Vector3.up;
 
             // Place object on left click
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
@@ -43,6 +43,7 @@ namespace PrefabPalette
             {
                 VisualPlacer.ShowTarget();
                 currentPlacedObject = null;
+                e.Use();
             }
         }
 

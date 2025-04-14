@@ -53,7 +53,7 @@ namespace PrefabPalette
 
         PrefabPaletteTool()
         {
-            Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out string assetPath);
+            Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out _);
         }
     }
 }
