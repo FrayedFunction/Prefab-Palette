@@ -60,6 +60,8 @@ namespace PrefabPalette
                 GlobalSettingsWindow.OpenWindow(tool);
             }
 
+            Helpers.DrawLine(Color.grey);
+
             tool.Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.collectionName);
             tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.collectionName);
 
