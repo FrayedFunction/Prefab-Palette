@@ -35,7 +35,6 @@ namespace PrefabPalette
                     if (EditorPrefs.HasKey("PendingPrefabList"))
                     {
                         string json = EditorPrefs.GetString("PendingPrefabList");
-                        Debug.Log($"Loaded prefab list json: {json}");
 
                         var wrapper = JsonUtility.FromJson<PrefabListWrapper>(json);
                         EditorPrefs.DeleteKey("PendingPrefabList");
@@ -50,11 +49,11 @@ namespace PrefabPalette
                         AssetDatabase.SaveAssets();
                     }
 
-                    Debug.Log($"Prefab collection '{sanitizedName}' created after script reload.");
+                    Debug.Log($"PrefabPalette: Collection '{sanitizedName}' created after reload.");
                 }
                 else
                 {
-                    Debug.LogError($"Could not parse '{sanitizedName}' after reload. Enum might still be invalid.");
+                    Debug.LogError($"PrefabPalette: Could not parse '{sanitizedName}' after reload. Enum might still be invalid.");
                 }
             }
         }
@@ -62,32 +61,43 @@ namespace PrefabPalette
         [MenuItem("Assets/Prefab Palette: Generate Prefab Collection", false, 2000)]
         private static void Generate()
         {
-            List<string> prefabPaths;
+            var prefabPaths = new List<string>();
 
-            if (Selection.objects.Length > 0 && Selection.objects.All(o => AssetDatabase.GetAssetPath(o).EndsWith(".prefab")))
+            foreach (var obj in Selection.objects)
             {
-                // Selected prefabs directly
-                prefabPaths = Selection.objects
-                    .Select(o => AssetDatabase.GetAssetPath(o))
-                    .Where(path => !string.IsNullOrEmpty(path))
-                    .ToList();
+                string path = AssetDatabase.GetAssetPath(obj);
+
+                if (string.IsNullOrEmpty(path))
+                    continue;
+
+                if (AssetDatabase.IsValidFolder(path))
+                {
+                    prefabPaths.AddRange(GetPrefabPathsFromFolder(path));
+                }
+                else if (path.EndsWith(".prefab", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    string relativePath = path.Replace('\\', '/'); // Ensure forward slashes
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(relativePath);
+
+                    if (prefab != null)
+                    {
+                        Debug.Log($" - {prefab.name} ({relativePath})");
+                        prefabPaths.Add(relativePath);
+                    }
+                    else
+                    {
+                        Debug.LogError($"PrefabPalette: Failed to load prefab at {relativePath}.");
+                    }
+                }
             }
-            else
-            {
-                // Fall back to selected folder
-                string folderPath = GetSelectedFolderPath();
-                if (folderPath == null)
-                {
-                    Debug.LogWarning("Please select either prefabs or a folder.");
-                    return;
-                }
 
-                prefabPaths = GetPrefabPathsFromFolder(folderPath);
-                if (prefabPaths.Count == 0)
-                {
-                    Debug.LogWarning("No prefabs found in selected folder.");
-                    return;
-                }
+            // prevent duplicates
+            prefabPaths = prefabPaths.Distinct().ToList();
+
+            if (prefabPaths.Count == 0)
+            {
+                Debug.LogWarning("PrefabPalette: No prefabs found in selected assets or folders.");
+                return;
             }
 
             var wrapper = new PrefabListWrapper { prefabPaths = prefabPaths };
@@ -106,6 +116,7 @@ namespace PrefabPalette
             });
         }
 
+
         public static List<string> GetPrefabPathsFromFolder(string folderPath)
         {
             string absolutePath = Path.Combine(Directory.GetCurrentDirectory(), folderPath);
@@ -113,11 +124,11 @@ namespace PrefabPalette
 
             if (prefabFiles.Length == 0)
             {
-                Debug.LogWarning($"No prefabs found in {absolutePath}.");
+                Debug.LogWarning($"PrefabPalette: No prefabs found in {absolutePath}.");
                 return new List<string>();
             }
 
-            Debug.Log($"Found {prefabFiles.Length} prefabs in top-level folder:");
+            Debug.Log($"PrefabPalette: Found {prefabFiles.Length} prefabs in folder:");
 
             List<string> prefabPaths = new List<string>();
 
