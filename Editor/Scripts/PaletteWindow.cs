@@ -185,7 +185,15 @@ namespace PrefabPalette
                         // Handle selection logic
                         if (GUI.Button(totalRect, GUIContent.none, GUIStyle.none))
                         {
-                            tool.SelectedPrefab = prefab;
+                            if (tool.SelectedPrefab != null && tool.SelectedPrefab == prefab)
+                            {
+                                tool.SelectedPrefab = null;
+                            }
+                            else
+                            {
+                                tool.SelectedPrefab = prefab;
+
+                            }
                         }
 
                         // Draw label on top when hovered or selected.
