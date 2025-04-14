@@ -45,21 +45,6 @@ namespace PrefabPalette
 
         void OnGUI()
         {
-            PaletteGUI();
-
-            if (tool.CurrentPrefabCollection != null)
-            {
-                windowScrollPosition = GUILayout.BeginScrollView(windowScrollPosition);
-
-
-                GUILayout.EndScrollView();
-            }
-
-            GUILayout.Space(20);
-        }
-
-        void PaletteGUI()
-        {
             // Select collection
             tool.Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.collectionName);
             GUILayout.Space(5);
@@ -83,6 +68,18 @@ namespace PrefabPalette
                 return;
             }
 
+            if (tool.CurrentPrefabCollection != null)
+            {
+                windowScrollPosition = GUILayout.BeginScrollView(windowScrollPosition);
+                PaletteGUI();
+                GUILayout.EndScrollView();
+            }
+
+            GUILayout.Space(20);
+        }
+
+        void PaletteGUI()
+        {
             if (tool.Settings.collectionName == CollectionName.None)
             {
                 tool.SelectedPrefab = null;
