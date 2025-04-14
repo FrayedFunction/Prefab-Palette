@@ -62,19 +62,35 @@ namespace PrefabPalette
         [MenuItem("Assets/Prefab Palette: Generate Prefab Collection", false, 2000)]
         private static void Generate()
         {
-            string folderPath = GetSelectedFolderPath();
-            if (folderPath == null)
-                return;
+            List<string> prefabPaths;
 
-            List<string> prefabPaths = GetPrefabPathsFromFolder(folderPath);
-
-            if (prefabPaths.Count == 0)
+            if (Selection.objects.Length > 0 && Selection.objects.All(o => AssetDatabase.GetAssetPath(o).EndsWith(".prefab")))
             {
-                return;
+                // Selected prefabs directly
+                prefabPaths = Selection.objects
+                    .Select(o => AssetDatabase.GetAssetPath(o))
+                    .Where(path => !string.IsNullOrEmpty(path))
+                    .ToList();
+            }
+            else
+            {
+                // Fall back to selected folder
+                string folderPath = GetSelectedFolderPath();
+                if (folderPath == null)
+                {
+                    Debug.LogWarning("Please select either prefabs or a folder.");
+                    return;
+                }
+
+                prefabPaths = GetPrefabPathsFromFolder(folderPath);
+                if (prefabPaths.Count == 0)
+                {
+                    Debug.LogWarning("No prefabs found in selected folder.");
+                    return;
+                }
             }
 
             var wrapper = new PrefabListWrapper { prefabPaths = prefabPaths };
-
             string json = JsonUtility.ToJson(wrapper);
             EditorPrefs.SetString("PendingPrefabList", json);
 
@@ -129,8 +145,12 @@ namespace PrefabPalette
         [MenuItem("Assets/Prefab Palette: Generate Prefab Collection", true)]
         private static bool ValidateDoSomethingWithFolder()
         {
-            return GetSelectedFolderPath() != null;
+            return Selection.objects.Length > 0 && (
+                Selection.objects.All(o => AssetDatabase.GetAssetPath(o).EndsWith(".prefab")) ||
+                GetSelectedFolderPath() != null
+            );
         }
+
 
         private static string GetSelectedFolderPath()
         {
