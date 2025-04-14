@@ -24,14 +24,15 @@ namespace PrefabPalette
         {
             var window = GetWindow<PaletteWindow>("Prefab Palette");
             window.tool = tool;
-            VisualPlacer.OnEnable(tool.Settings);
-            SceneInteraction.OnEnable();
-            PlacementModeManager.CurrentMode.OnEnter(tool);
         }
 
         private void OnEnable()
         {
-            OnShowToolWindow(PrefabPaletteTool.Instance);
+            tool = PrefabPaletteTool.Instance;
+            VisualPlacer.OnEnable(tool.Settings);
+            SceneInteraction.OnEnable();
+            PlacementModeManager.CurrentMode.OnEnter(tool);
+
             SceneView.duringSceneGui += OnSceneGUI;
         }
 
@@ -55,7 +56,7 @@ namespace PrefabPalette
                      .Cast<CollectionName>()
                      .Any(c => c != CollectionName.None))
             {
-                EditorGUILayout.HelpBox("You don't have any collections yet,\nAdd one from the menu", MessageType.Warning);
+                EditorGUILayout.HelpBox("You don't have any collections yet!", MessageType.Warning);
 
                 if (GUILayout.Button("Open Menu"))
                 {
