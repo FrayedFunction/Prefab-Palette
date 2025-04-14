@@ -94,15 +94,6 @@ namespace PrefabPalette
                 return;
             }
 
-            if (tool.SelectedPrefab != null)
-            {
-                if (GUILayout.Button("Stop Placing Prefabs", GUILayout.Height(25)))
-                {
-                    PlacementModeManager.CurrentMode.OnExit(tool);
-                    tool.SelectedPrefab = null;
-                }
-            }
-
             SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
 
             // Placement mode toolbar
