@@ -46,7 +46,17 @@ namespace PrefabPalette
             {
                 if (!string.IsNullOrEmpty(collectionName.Trim()))
                 {
-                    onCreate?.Invoke(collectionName.Trim());
+                    // sanitise the name for enum generation
+                    var sanitisedName = Helpers.SanitiseEnumName(collectionName);
+
+                    // Check if a collection already exists with this name
+                    if (Enum.TryParse<CollectionName>(sanitisedName, out _))
+                    {
+                        EditorUtility.DisplayDialog("Collection Already Exisits!", "Please enter a unique name.", "OK");
+                        return;
+                    }
+
+                    onCreate?.Invoke(sanitisedName);
                     Close();
                 }
                 else

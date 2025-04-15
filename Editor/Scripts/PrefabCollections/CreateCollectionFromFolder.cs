@@ -53,7 +53,7 @@ namespace PrefabPalette
                 }
                 else
                 {
-                    Debug.LogError($"PrefabPalette: Could not parse '{sanitizedName}' after reload. Enum might still be invalid.");
+                    Debug.LogError($"PrefabPalette: Could not parse '{sanitizedName}' after reload!");
                 }
             }
         }
@@ -91,7 +91,7 @@ namespace PrefabPalette
                 }
             }
 
-            // prevent duplicates
+            // prevent duplicate prefabs
             prefabPaths = prefabPaths.Distinct().ToList();
 
             if (prefabPaths.Count == 0)
@@ -106,10 +106,9 @@ namespace PrefabPalette
 
             CreateCollectionWindow.Show(collectionName =>
             {
-                var sanitisedName = Helpers.SanitiseEnumName(collectionName);
-                EditorPrefs.SetString("PendingPrefabCollectionName", sanitisedName);
+                EditorPrefs.SetString("PendingPrefabCollectionName", collectionName);
 
-                PrefabCollectionList.Instance.collectionNames.Add(sanitisedName);
+                PrefabCollectionList.Instance.collectionNames.Add(collectionName);
                 EditorUtility.SetDirty(PrefabCollectionList.Instance);
                 AssetDatabase.SaveAssets();
                 PrefabCollectionList.Instance.GenerateEnum();
