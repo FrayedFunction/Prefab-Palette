@@ -162,7 +162,6 @@ namespace PrefabPalette
             );
         }
 
-
         private static string GetSelectedFolderPath()
         {
             UnityEngine.Object selected = Selection.activeObject;
