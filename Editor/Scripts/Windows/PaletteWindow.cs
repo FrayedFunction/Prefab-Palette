@@ -30,7 +30,7 @@ namespace PrefabPalette
         {
             tool = PrefabPaletteTool.Instance;
             VisualPlacer.OnEnable(tool.Settings);
-            SceneInteraction.OnEnable();
+            SceneInteraction.OnEnable(tool.Settings);
             PlacementModeManager.CurrentMode.OnEnter(tool);
 
             SceneView.duringSceneGui += OnSceneGUI;

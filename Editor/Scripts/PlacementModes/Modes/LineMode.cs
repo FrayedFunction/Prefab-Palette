@@ -7,9 +7,7 @@ namespace PrefabPalette
     public class LineMode : IPlacementMode
     {
         static List<Vector3> fencePoints = new List<Vector3>();
-
         static GameObject brokenFencePrefab;
-
         static GameObject fenceParentObject;
 
         private static List<GameObject> spawnedFences = new List<GameObject>();
@@ -25,22 +23,42 @@ namespace PrefabPalette
             if (fenceParentObject == null)
                 fenceParentObject = new GameObject("Fence");
 
-            if (e.type == EventType.MouseDown && e.button == 0 && !e.alt) // Left click
+            Vector3 currentMousePosition = SceneInteraction.Position;
+
+            // Add point on left click
+            if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
             {
-                fencePoints.Add(SceneInteraction.Position);
-
-                // Whenever points change, re-spawn the fence segments
-                ClearSpawnedFences();
-                CreateFenceSegments(tool);
-                SceneView.RepaintAll();
-
+                fencePoints.Add(currentMousePosition);
                 e.Use();
             }
 
-            // Draw the fence points and segments
-            for (int i = 0; i < fencePoints.Count - 1; i++)
+            // Confirm with Enter
+            if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Return)
             {
-                Handles.DrawLine(fencePoints[i], fencePoints[i + 1]);
+                CreateFenceSegments(tool, fencePoints);
+                OnExit(tool);
+                e.Use();
+            }
+
+            // Cancel with Escape
+            if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape)
+            {
+                fencePoints.Clear();
+                e.Use();
+            }
+
+            List<Vector3> previewPoints = new List<Vector3>(fencePoints);
+            previewPoints.Add(currentMousePosition);
+            CreateFenceSegments(tool, previewPoints);
+
+            // Draw lines
+            List<Vector3> drawPoints = new List<Vector3>(fencePoints);
+            if (fencePoints.Count > 0)
+                drawPoints.Add(currentMousePosition);
+
+            for (int i = 0; i < drawPoints.Count - 1; i++)
+            {
+                Handles.DrawLine(drawPoints[i], drawPoints[i + 1]);
             }
         }
 
@@ -56,23 +74,27 @@ namespace PrefabPalette
             fenceParentObject = null;
         }
 
-        private static void CreateFenceSegments(PrefabPaletteTool tool)
+        private static void CreateFenceSegments(PrefabPaletteTool tool, List<Vector3> points)
         {
-            // For each segment between fence points...
-            for (int i = 0; i < fencePoints.Count - 1; i++)
-            {
-                Vector3 start = fencePoints[i];
-                Vector3 end = fencePoints[i + 1];
+            List<GameObject> pool = spawnedFences;
+            EnsureFencePool(pool, points, tool);
 
-                // Adjust endpoints at corners
+            int poolIndex = 0;
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Vector3 start = points[i];
+                Vector3 end = points[i + 1];
+
                 if (i > 0)
                 {
-                    Vector3 prev = fencePoints[i - 1];
+                    Vector3 prev = points[i - 1];
                     start += GetCornerOffset(prev, start, end, tool.Settings.fenceCornerOffset);
                 }
-                if (i < fencePoints.Count - 2)
+
+                if (i < points.Count - 2)
                 {
-                    Vector3 next = fencePoints[i + 2];
+                    Vector3 next = points[i + 2];
                     end -= GetCornerOffset(start, end, next, tool.Settings.fenceCornerOffset);
                 }
 
@@ -81,82 +103,68 @@ namespace PrefabPalette
                 int numberOfFences = Mathf.FloorToInt(distance / tool.Settings.fenceSpacing);
                 numberOfFences = Mathf.Max(1, numberOfFences);
 
-                // Calculate perpendicular direction (rotate 90° about Y)
-                Vector3 perpendicularDirection = new Vector3(direction.z, 0f, -direction.x);
+                Vector3 perp = new Vector3(direction.z, 0f, -direction.x);
 
                 for (int j = 0; j < numberOfFences; j++)
                 {
                     float t = (numberOfFences == 1) ? 0.5f : (float)j / (numberOfFences - 1);
-                    Vector3 fencePosition = Vector3.Lerp(start, end, t);
+                    Vector3 pos = Vector3.Lerp(start, end, t);
 
-                    // Determine if this fence should be "broken"
-                    bool spawnBroken = false;
+                    if (Physics.Raycast(pos + Vector3.up * 2f, Vector3.down, out RaycastHit hit, 5f))
+                        pos.y = hit.point.y;
+
+                    GameObject fence = pool[poolIndex++];
+
                     if (brokenFencePrefab != null)
                     {
-                        if (tool.Settings.randomBrokenFences)
-                        {
-                            spawnBroken = (UnityEngine.Random.value < tool.Settings.brokenProbability);
-                        }
-                        else
-                        {
-                            // For set intervals, e.g. every brokenInterval-th fence is broken
-                            spawnBroken = ((j + 1) % tool.Settings.brokenInterval == 0);
-                        }
+                        bool spawnBroken = tool.Settings.randomBrokenFences
+                            ? UnityEngine.Random.value < tool.Settings.brokenProbability
+                            : ((j + 1) % tool.Settings.brokenInterval == 0);
+
+                        if (spawnBroken)
+                            fence = brokenFencePrefab;
                     }
 
-                    GameObject prefabToSpawn = tool.SelectedPrefab;
-                    // If broken fence is desired and we have a broken prefab, use it;
-                    // if no broken prefab is assigned, use the fence prefab.
-                    if (spawnBroken && brokenFencePrefab != null)
-                    {
-                        prefabToSpawn = brokenFencePrefab;
-                    }
+                    fence.transform.position = pos;
+                    fence.transform.rotation = Quaternion.LookRotation(perp, Vector3.up);
+                    fence.transform.SetParent(fenceParentObject.transform, false);
+                    fence.SetActive(true);
 
-                    GameObject newFence = (GameObject)PrefabUtility.InstantiatePrefab(prefabToSpawn);
-
-                    newFence.transform.position = fencePosition;
-
-                    if (Physics.Raycast(fencePosition + Vector3.up * 2f, Vector3.down, out RaycastHit hit, 5f))
-                    {
-                        fencePosition.y = hit.point.y;
-                    }
-
-                    newFence.transform.rotation = Quaternion.LookRotation(perpendicularDirection, Vector3.up);
-
-
-                    newFence.transform.SetParent(fenceParentObject.transform);
-                    Undo.RegisterCreatedObjectUndo(newFence, "Created Fence Segment");
-                    spawnedFences.Add(newFence);
+                    Undo.RegisterCreatedObjectUndo(fence, "Created Fence Segment");
                 }
             }
         }
 
-        // Returns an offset vector along the bisector for a corner point.
+        private static void EnsureFencePool(List<GameObject> pool, List<Vector3> points, PrefabPaletteTool tool)
+        {
+            int totalFenceCount = 0;
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Vector3 start = points[i];
+                Vector3 end = points[i + 1];
+                float distance = Vector3.Distance(start, end);
+                totalFenceCount += Mathf.Max(1, Mathf.FloorToInt(distance / tool.Settings.fenceSpacing));
+            }
+
+            while (pool.Count < totalFenceCount)
+            {
+                GameObject obj = (GameObject)PrefabUtility.InstantiatePrefab(tool.SelectedPrefab);
+                obj.SetActive(false);
+                spawnedFences.Add(obj);
+            }
+        }
+
         private static Vector3 GetCornerOffset(Vector3 prevPoint, Vector3 cornerPoint, Vector3 nextPoint, float offset)
         {
             Vector3 dir1 = (cornerPoint - prevPoint).normalized;
             Vector3 dir2 = (nextPoint - cornerPoint).normalized;
             Vector3 bisector = (dir1 + dir2).normalized;
-            // Optionally, you can factor in the angle between segments here for a more dynamic offset.
             return bisector * offset;
-        }
-
-        // Clears previously spawned fence segments.
-        private static void ClearSpawnedFences()
-        {
-            foreach (GameObject fence in spawnedFences)
-            {
-                if (fence != null)
-                {
-                    Undo.DestroyObjectImmediate(fence);
-                }
-            }
-            spawnedFences.Clear();
         }
 
         public void SettingsGUI(PrefabPaletteTool tool)
         {
-
             tool.Settings.fenceSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.fenceSpacing);
             tool.Settings.fenceCornerOffset = EditorGUILayout.FloatField("Corner Offset", tool.Settings.fenceCornerOffset);
             brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
@@ -166,22 +174,15 @@ namespace PrefabPalette
                 tool.Settings.randomBrokenFences = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.randomBrokenFences);
 
                 if (tool.Settings.randomBrokenFences)
-                {
                     tool.Settings.brokenProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.brokenProbability, 0, 1);
-                }
                 else
-                {
                     tool.Settings.brokenInterval = EditorGUILayout.IntField("Interval", tool.Settings.brokenInterval);
-                }
             }
-
 
             if (fencePoints.Count > 1)
             {
                 if (GUILayout.Button("Place Line", GUILayout.Height(25)))
-                {
                     OnExit(tool);
-                }
             }
         }
     }

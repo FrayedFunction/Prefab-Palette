@@ -28,9 +28,24 @@ namespace PrefabPalette
             // Placer Setttings
             GUILayout.Label("Placer Settings");
             EditorGUI.indentLevel++;
+            tool.Settings.includeMask = LayerMaskField("Include Layers", tool.Settings.includeMask);
             tool.Settings.placerColor = EditorGUILayout.ColorField("Placer Color", tool.Settings.placerColor);
             tool.Settings.placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", tool.Settings.placerRadius));
             EditorGUI.indentLevel-- ;
+        }
+
+        private LayerMask LayerMaskField(string label, LayerMask selected)
+        {
+            // Get all layer names
+            string[] layerNames = new string[32];
+            for (int i = 0; i < 32; i++)
+            {
+                string layerName = LayerMask.LayerToName(i);
+                layerNames[i] = string.IsNullOrEmpty(layerName) ? $"Layer {i}" : layerName;
+            }
+
+            selected.value = EditorGUILayout.MaskField(label, selected.value, layerNames);
+            return selected;
         }
     }
 }
