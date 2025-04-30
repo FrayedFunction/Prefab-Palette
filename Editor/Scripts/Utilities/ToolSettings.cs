@@ -20,13 +20,15 @@ namespace PrefabPalette
         public Color placerColor = Color.white;
         public float placerRadius = 0.2f;
         public bool showHeader = true;
-        public float fenceSpacing = 1;
-        public float fenceCornerOffset = 0.5f;
-        public bool randomBrokenFences = true;
-        public float brokenProbability = 0.5f;
-        public int brokenInterval = 4;
+        public float lineSpacing = 1;
+        public float lineCornerOffset = 0.5f;
+        public bool randomAltObjs = true;
+        public float altObjProbability = 0.5f;
+        public int altObjInterval = 4;
         public bool showModeSettings;
         public LayerMask includeMask = ~0; // masks to be included in scene interaction raycast. Default is everything.
+        public Vector3 relativeRotation;
+
 
         // Marked dirty on disable so Unity knows to save it
         private void OnDisable()

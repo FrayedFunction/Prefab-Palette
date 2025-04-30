@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class LineMode : IPlacementMode
+    public class LineModeOG : IPlacementMode
     {
         static List<Vector3> fencePoints = new List<Vector3>();
         static GameObject brokenFencePrefab;
@@ -89,18 +89,18 @@ namespace PrefabPalette
                 if (i > 0)
                 {
                     Vector3 prev = points[i - 1];
-                    start += GetCornerOffset(prev, start, end, tool.Settings.fenceCornerOffset);
+                    start += GetCornerOffset(prev, start, end, tool.Settings.lineCornerOffset);
                 }
 
                 if (i < points.Count - 2)
                 {
                     Vector3 next = points[i + 2];
-                    end -= GetCornerOffset(start, end, next, tool.Settings.fenceCornerOffset);
+                    end -= GetCornerOffset(start, end, next, tool.Settings.lineCornerOffset);
                 }
 
                 Vector3 direction = (end - start).normalized;
                 float distance = Vector3.Distance(start, end);
-                int numberOfFences = Mathf.FloorToInt(distance / tool.Settings.fenceSpacing);
+                int numberOfFences = Mathf.FloorToInt(distance / tool.Settings.lineSpacing);
                 numberOfFences = Mathf.Max(1, numberOfFences);
 
                 Vector3 perp = new Vector3(direction.z, 0f, -direction.x);
@@ -117,9 +117,9 @@ namespace PrefabPalette
 
                     if (brokenFencePrefab != null)
                     {
-                        bool spawnBroken = tool.Settings.randomBrokenFences
-                            ? UnityEngine.Random.value < tool.Settings.brokenProbability
-                            : ((j + 1) % tool.Settings.brokenInterval == 0);
+                        bool spawnBroken = tool.Settings.randomAltObjs
+                            ? UnityEngine.Random.value < tool.Settings.altObjProbability
+                            : ((j + 1) % tool.Settings.altObjInterval == 0);
 
                         if (spawnBroken)
                             fence = brokenFencePrefab;
@@ -144,7 +144,7 @@ namespace PrefabPalette
                 Vector3 start = points[i];
                 Vector3 end = points[i + 1];
                 float distance = Vector3.Distance(start, end);
-                totalFenceCount += Mathf.Max(1, Mathf.FloorToInt(distance / tool.Settings.fenceSpacing));
+                totalFenceCount += Mathf.Max(1, Mathf.FloorToInt(distance / tool.Settings.lineSpacing));
             }
 
             while (pool.Count < totalFenceCount)
@@ -165,18 +165,18 @@ namespace PrefabPalette
 
         public void SettingsGUI(PrefabPaletteTool tool)
         {
-            tool.Settings.fenceSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.fenceSpacing);
-            tool.Settings.fenceCornerOffset = EditorGUILayout.FloatField("Corner Offset", tool.Settings.fenceCornerOffset);
+            tool.Settings.lineSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.lineSpacing);
+            tool.Settings.lineCornerOffset = EditorGUILayout.FloatField("Corner Offset", tool.Settings.lineCornerOffset);
             brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
 
             if (brokenFencePrefab)
             {
-                tool.Settings.randomBrokenFences = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.randomBrokenFences);
+                tool.Settings.randomAltObjs = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.randomAltObjs);
 
-                if (tool.Settings.randomBrokenFences)
-                    tool.Settings.brokenProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.brokenProbability, 0, 1);
+                if (tool.Settings.randomAltObjs)
+                    tool.Settings.altObjProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.altObjProbability, 0, 1);
                 else
-                    tool.Settings.brokenInterval = EditorGUILayout.IntField("Interval", tool.Settings.brokenInterval);
+                    tool.Settings.altObjInterval = EditorGUILayout.IntField("Interval", tool.Settings.altObjInterval);
             }
 
             if (fencePoints.Count > 1)
