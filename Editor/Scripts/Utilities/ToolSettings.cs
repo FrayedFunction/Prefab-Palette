@@ -28,7 +28,7 @@ namespace PrefabPalette
         public LayerMask includeMask = ~0; // masks to be included in scene interaction raycast. Default is everything.
         public Vector3 relativeRotation;
         public bool chainLines;
-        public Vector3 chainLinkOffset;
+        public Vector3 segmentOffset;
 
 
         // Marked dirty on disable so Unity knows to save it
