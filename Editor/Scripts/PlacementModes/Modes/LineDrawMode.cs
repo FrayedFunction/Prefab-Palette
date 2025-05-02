@@ -103,6 +103,10 @@ namespace PrefabPalette
 
         public void OnExit(PrefabPaletteTool tool)
         {
+            linePoints.Clear();
+            spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
+            spawnedObjects.Clear();
+            ClearPreviewObjects();
         }
         #endregion
 
