@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.Linq;
-using static UnityEngine.GridBrushBase;
-using log4net.Util;
-using System.IO.Pipes;
 
 namespace PrefabPalette
 {
@@ -23,10 +20,18 @@ namespace PrefabPalette
 
             if (linePoints.Count < 1) return;
 
-            // This is inefficient!
+            // Debug line
+            for (int i = 0; i < linePoints.Count; i++)
+            {
+                if (i != linePoints.Count - 1)
+                {
+                    Handles.color = Color.black;
+                    Handles.DrawLine(linePoints[i], linePoints[i + 1], 4f);
+                }
+            }
+
             ClearPreviewObjects();
 
-            // Draw preview
             Vector3 startPoint = linePoints.Last();
             Vector3 endPoint = SceneInteraction.Position;
 
@@ -34,20 +39,35 @@ namespace PrefabPalette
             float dist = line.magnitude;
             Vector3 dir = line.normalized;
 
-            int pointCount = Mathf.FloorToInt(dist / tool.Settings.lineSpacing);
+            // First Obj
+            var firstObj = GameObject.Instantiate(tool.SelectedPrefab);
+            firstObj.transform.position = startPoint;
+            Quaternion rotation = Quaternion.LookRotation(dir, Vector3.up);
+            rotation.eulerAngles += tool.Settings.relativeRotation;
+            firstObj.transform.rotation = rotation;
+            previewObjects.Add(firstObj);
+
+            // Line
+            float objectSpacing = tool.Settings.lineSpacing;
+            Renderer renderer = tool.SelectedPrefab.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Bounds bounds = renderer.bounds;
+                objectSpacing = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) + tool.Settings.lineSpacing;
+            }
+
+            int pointCount = Mathf.FloorToInt(dist / objectSpacing);
 
             if (pointCount < 1) 
                 return;
 
-            float spacing = dist / (pointCount + 1);
-
-            for (int i = 0; i < pointCount; i++)
+            for (int i = 1; i <= pointCount; i++)
             {
-                Vector3 point = startPoint + dir * spacing * (i + 1);
+                Vector3 currentPoint = startPoint + dir * objectSpacing * i;
+                Handles.DrawSolidDisc(currentPoint, Vector3.up, 0.2f);
+
                 var obj = GameObject.Instantiate(tool.SelectedPrefab);
-                obj.transform.position = point;
-                Quaternion rotation = Quaternion.LookRotation(dir, Vector3.up);
-                rotation.eulerAngles += tool.Settings.relativeRotation;
+                obj.transform.position = currentPoint;
                 obj.transform.rotation = rotation;
 
                 previewObjects.Add(obj);
