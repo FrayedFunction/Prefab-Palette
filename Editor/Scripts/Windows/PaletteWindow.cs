@@ -34,6 +34,8 @@ namespace PrefabPalette
             PlacementModeManager.CurrentMode.OnEnter(tool);
 
             SceneView.duringSceneGui += OnSceneGUI;
+            minSize = new Vector2(400, 400);
+
         }
 
         private void OnDisable()
