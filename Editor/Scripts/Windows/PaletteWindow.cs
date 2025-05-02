@@ -49,6 +49,7 @@ namespace PrefabPalette
         void OnGUI()
         {
             // Select collection
+            GUILayout.Space(5);
             tool.Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.collectionName);
             GUILayout.Space(5);
             tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.collectionName);
