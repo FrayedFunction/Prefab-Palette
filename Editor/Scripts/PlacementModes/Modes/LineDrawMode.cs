@@ -97,6 +97,7 @@ namespace PrefabPalette
                 // Add a point for the lines start position
                 linePoints.Add(SceneInteraction.Position);
 
+                // Place the last lot of objects if there are any.
                 if (linePoints.Count > 0)
                 {
                     foreach (var preview in previewObjects)
@@ -105,6 +106,13 @@ namespace PrefabPalette
                         placed.transform.SetPositionAndRotation(preview.transform.position, preview.transform.rotation);
                         spawnedObjects.Add(placed);
                     }
+                }
+
+                if (!tool.Settings.chainLines && linePoints.Count >= 2)
+                {
+                    ClearPreviewObjects();
+                    spawnedObjects.Clear();
+                    linePoints.Clear();
                 }
 
                 e.Use();
@@ -134,8 +142,8 @@ namespace PrefabPalette
         public void SettingsGUI(PrefabPaletteTool tool)
         {
             tool.Settings.lineSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.lineSpacing);
-            tool.Settings.lineCornerOffset = EditorGUILayout.FloatField("Corner Offset", tool.Settings.lineCornerOffset);
             tool.Settings.relativeRotation = EditorGUILayout.Vector3Field("Relative Rotation", tool.Settings.relativeRotation);
+            tool.Settings.chainLines = EditorGUILayout.Toggle("Chain Lines?", tool.Settings.chainLines);
             brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
 
             if (brokenFencePrefab)
