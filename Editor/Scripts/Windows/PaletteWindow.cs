@@ -102,7 +102,7 @@ namespace PrefabPalette
             // Placement mode toolbar
             PlacementModeManager.ToolbarGUI(tool);
             GUILayout.Space(1);
-            GUILayout.Label($"{PlacementModeManager.CurrentType} Mode", EditorStyles.largeLabel);
+            GUILayout.Label($"{PlacementModeManager.CurrentType}", EditorStyles.largeLabel);
             GUILayout.Space(2.5f);
             
             tool.Settings.showModeSettings = EditorGUILayout.Foldout(tool.Settings.showModeSettings, "Settings");
