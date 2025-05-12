@@ -83,35 +83,6 @@ namespace PrefabPalette
 
         void PaletteGUI()
         {
-            if (tool.Settings.collectionName == CollectionName.None)
-            {
-                tool.SelectedPrefab = null;
-                if (GUILayout.Button("Open Menu"))
-                {
-                    CollectionsWindow.OpenMainWindow();
-                    CollectionsListInspector.OpenWindow(tool);
-
-                    GetWindow<PaletteWindow>().Close();
-                }
-                return;
-            }
-
-            // Placement mode toolbar
-            PlacementModeManager.ToolbarGUI(tool);
-            GUILayout.Space(1);
-            GUILayout.Label($"{PlacementModeManager.CurrentType}", EditorStyles.largeLabel);
-            GUILayout.Space(2.5f);
-            
-            tool.Settings.showModeSettings = EditorGUILayout.Foldout(tool.Settings.showModeSettings, "Settings");
-            if (tool.Settings.showModeSettings)
-            {
-                EditorGUI.indentLevel++;
-                SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
-                PlacementModeManager.CurrentMode.SettingsGUI(tool);
-                GUILayout.Space(15);
-                EditorGUI.indentLevel--;
-            }
-
             GUILayout.Space(5);
             GUILayout.Label($"Palette - {tool.CurrentPrefabCollection.Name}", EditorStyles.boldLabel);
             GUILayout.Space(5);
