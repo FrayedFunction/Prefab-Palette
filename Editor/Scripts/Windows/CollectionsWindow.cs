@@ -26,8 +26,8 @@ namespace PrefabPalette
         private void OnEnable()
         {
             tool = PrefabPaletteTool.Instance;
-            minSize = new Vector2(300, 150);
-            maxSize = new Vector2(350, 200);
+            minSize = new Vector2(300, 200);
+            maxSize = new Vector2(350, 205);
 
         }
 
