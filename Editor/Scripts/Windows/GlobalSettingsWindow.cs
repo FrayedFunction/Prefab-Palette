@@ -27,7 +27,7 @@ namespace PrefabPalette
             Helpers.DrawLine(Color.gray);
 
             // Palette Settings
-            GUILayout.Label("Palette Settings");
+            GUILayout.Label("Palette Settings", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
             tool.Settings.gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", tool.Settings.gridColumns));
             tool.Settings.minPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", tool.Settings.minPaletteScale), 50f, tool.Settings.maxPaletteScale);
@@ -36,7 +36,7 @@ namespace PrefabPalette
             GUILayout.Space(2);
 
             // Placer Setttings
-            GUILayout.Label("Placer Settings");
+            GUILayout.Label("Placer Settings", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
             tool.Settings.includeMask = LayerMaskField("Include Layers", tool.Settings.includeMask);
             tool.Settings.placerColor = EditorGUILayout.ColorField("Placer Color", tool.Settings.placerColor);
