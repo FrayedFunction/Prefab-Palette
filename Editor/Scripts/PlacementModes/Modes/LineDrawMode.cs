@@ -11,6 +11,7 @@ namespace PrefabPalette
         static List<GameObject> spawnedObjects = new();
         static List<GameObject> previewObjects = new List<GameObject>();
         static GameObject brokenFencePrefab;
+        static GameObject spawnedObjParent;
 
         #region Placement Mode interface
         public void OnActive(PrefabPaletteTool tool)
@@ -62,12 +63,20 @@ namespace PrefabPalette
             float dist = line.magnitude;
             Vector3 dir = line.normalized;
 
+            Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
+            objRotation.eulerAngles += tool.Settings.relativeRotation;
+
+            // Parent Obj
+            if (spawnedObjParent == null)
+            {
+                spawnedObjParent = new GameObject($"Line:{tool.SelectedPrefab.name}");
+                spawnedObjParent.transform.position = startPoint;
+            }
+
             // First Obj
-            var firstObj = GameObject.Instantiate(tool.SelectedPrefab);
+            var firstObj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
             firstObj.transform.position = startPoint;
-            Quaternion rotation = Quaternion.LookRotation(dir, Vector3.up);
-            rotation.eulerAngles += tool.Settings.relativeRotation;
-            firstObj.transform.rotation = rotation;
+            firstObj.transform.rotation = objRotation;
             previewObjects.Add(firstObj);
 
             // Line
@@ -89,9 +98,9 @@ namespace PrefabPalette
                 Vector3 currentPoint = startPoint + dir * objectSpacing * i;
                 Handles.DrawSolidDisc(currentPoint, Vector3.up, 0.2f);
 
-                var obj = GameObject.Instantiate(tool.SelectedPrefab);
+                var obj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
                 obj.transform.position = currentPoint;
-                obj.transform.rotation = rotation;
+                obj.transform.rotation = objRotation;
 
                 previewObjects.Add(obj);
             }
@@ -129,7 +138,7 @@ namespace PrefabPalette
                 {
                     foreach (var preview in previewObjects)
                     {
-                        GameObject placed = GameObject.Instantiate(tool.SelectedPrefab);
+                        GameObject placed = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
                         placed.transform.SetPositionAndRotation(preview.transform.position, preview.transform.rotation);
                         spawnedObjects.Add(placed);
                     }
@@ -140,6 +149,7 @@ namespace PrefabPalette
                     ClearPreviewObjects();
                     spawnedObjects.Clear();
                     linePoints.Clear();
+                    spawnedObjParent = null;
                 }
 
                 e.Use();
@@ -151,6 +161,7 @@ namespace PrefabPalette
                 ClearPreviewObjects();
                 linePoints.Clear();
                 spawnedObjects.Clear();
+                spawnedObjParent = null;
                 e.Use();
             }
 
@@ -161,6 +172,7 @@ namespace PrefabPalette
                 spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
                 spawnedObjects.Clear();
                 ClearPreviewObjects();
+                GameObject.DestroyImmediate(spawnedObjParent);
                 e.Use();
             }
         }
