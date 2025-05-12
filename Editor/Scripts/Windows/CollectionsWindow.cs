@@ -5,16 +5,15 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class MainWindow : EditorWindow
+    public class CollectionsWindow : EditorWindow
     {
         static PrefabPaletteTool tool;
-        bool canInteractWithCollectionDropdown = true;
-        float buttonSpace = 2;
+        float buttonSpace = 4;
 
-        [MenuItem("Window/Prefab Palette/Main")]
+        [MenuItem("Window/Prefab Palette/Collections")]
         public static void OpenMainWindow()
         {
-            GetWindow<MainWindow>("Prefab Palete: Main");
+            GetWindow<CollectionsWindow>("Prefab Palete: Collections");
         }
 
         [MenuItem("Window/Prefab Palette/Palette")]
@@ -27,40 +26,36 @@ namespace PrefabPalette
         private void OnEnable()
         {
             tool = PrefabPaletteTool.Instance;
+            minSize = new Vector2(300, 150);
+            maxSize = new Vector2(350, 200);
+
         }
 
         private void OnGUI()
         {
+            Helpers.TitleText("Prefab Palette: Collections");
+
             // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
             if (HasOpenInstances<CollectionsListInspector>())
             {
                 tool.Settings.collectionName = CollectionName.None;
-                canInteractWithCollectionDropdown = false;
                 EditorGUILayout.HelpBox("Collections Inspector window is open, close it when you're finished editing", MessageType.Warning);
                 return;
             }
-            else
-            {
-                canInteractWithCollectionDropdown = true;
-            }
 
+            GUILayout.Space(buttonSpace);
+
+            Helpers.DrawLine(Color.grey);
+            
             if (GUILayout.Button("Manage Collections"))
             {
                 CollectionsListInspector.OpenWindow(tool);
-                
+
                 if (HasOpenInstances<PaletteWindow>())
                 {
                     GetWindow<PaletteWindow>().Close();
                 }
             }
-            GUILayout.Space(buttonSpace);
-
-            if (GUILayout.Button("Settings"))
-            {
-                GlobalSettingsWindow.OpenWindow(tool);
-            }
-
-            Helpers.DrawLine(Color.grey);
 
             tool.Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.collectionName);
             tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.collectionName);
@@ -93,6 +88,9 @@ namespace PrefabPalette
             {
                 PaletteWindow.OnShowToolWindow(tool);
             }
+
+            GUILayout.Space(buttonSpace);
+            Helpers.DrawLine(Color.grey);
         }
     }
 }

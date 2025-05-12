@@ -27,7 +27,8 @@ namespace PrefabPalette
 
         private void OnGUI()
         {
-            GUILayout.Label($"{targetCollection.Name}", EditorStyles.whiteLargeLabel);
+            Helpers.TitleText($"{targetCollection.Name}");
+            Helpers.DrawLine(Color.grey);
 
             if (serializedObject != null)
             {

@@ -8,13 +8,23 @@ namespace PrefabPalette
     {
         PrefabPaletteTool tool;
 
-        public static void OpenWindow(PrefabPaletteTool tool)
+        [MenuItem("Window/Prefab Palette/Settings")]
+        public static void OpenWindow()
         {
-            var window = GetWindow<GlobalSettingsWindow>("Settings");
-            window.tool = tool;
+            var window = GetWindow<GlobalSettingsWindow>("Prefab Palette: Settings");
+            window.tool = PrefabPaletteTool.Instance;
         }
 
-        private void OnGUI() {
+        private void OnEnable()
+        {
+            minSize = new Vector2(300, 500);
+            maxSize = new Vector2(350, 550);
+        }
+
+        private void OnGUI() 
+        {
+            Helpers.TitleText("Prefab Palette: Settings");
+            Helpers.DrawLine(Color.gray);
 
             // Palette Settings
             GUILayout.Label("Palette Settings");

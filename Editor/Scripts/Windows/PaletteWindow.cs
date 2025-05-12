@@ -35,7 +35,6 @@ namespace PrefabPalette
 
             SceneView.duringSceneGui += OnSceneGUI;
             minSize = new Vector2(400, 400);
-
         }
 
         private void OnDisable()
@@ -63,7 +62,7 @@ namespace PrefabPalette
 
                 if (GUILayout.Button("Open Menu"))
                 {
-                    MainWindow.OpenMainWindow();
+                    CollectionsWindow.OpenMainWindow();
                     CollectionsListInspector.OpenWindow(tool);
 
                     GetWindow<PaletteWindow>().Close();
@@ -89,15 +88,13 @@ namespace PrefabPalette
                 tool.SelectedPrefab = null;
                 if (GUILayout.Button("Open Menu"))
                 {
-                    MainWindow.OpenMainWindow();
+                    CollectionsWindow.OpenMainWindow();
                     CollectionsListInspector.OpenWindow(tool);
 
                     GetWindow<PaletteWindow>().Close();
                 }
                 return;
             }
-
-            SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
 
             // Placement mode toolbar
             PlacementModeManager.ToolbarGUI(tool);
@@ -109,7 +106,7 @@ namespace PrefabPalette
             if (tool.Settings.showModeSettings)
             {
                 EditorGUI.indentLevel++;
-
+                SceneInteraction.SnapToGrid = GUILayout.Toggle(SceneInteraction.SnapToGrid, EditorGUIUtility.IconContent("SceneViewSnap").image, "Button", GUILayout.Width(40), GUILayout.Height(40));
                 PlacementModeManager.CurrentMode.SettingsGUI(tool);
                 GUILayout.Space(15);
                 EditorGUI.indentLevel--;

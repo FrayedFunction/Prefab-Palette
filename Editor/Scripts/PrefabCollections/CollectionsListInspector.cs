@@ -30,7 +30,8 @@ namespace PrefabPalette
 
         private void OnGUI()
         {
-            GUILayout.Label("Collections", EditorStyles.whiteLargeLabel);
+            Helpers.TitleText("Prefab Collections", 15);
+            Helpers.DrawLine(Color.grey);
 
             if (editorInstance != null)
             {

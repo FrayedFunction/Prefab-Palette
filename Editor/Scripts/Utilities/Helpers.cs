@@ -7,6 +7,20 @@ namespace PrefabPalette
 {
     public static class Helpers
     {
+        public static void TitleText(string text, int fontSize = 20, float padding = 10)
+        {
+            GUIStyle titleStyle = new GUIStyle(EditorStyles.label)
+            {
+                fontSize = fontSize,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white } // Adjust for dark/light themes as needed
+            };
+
+            GUILayout.Space(padding);
+            EditorGUILayout.LabelField(text, titleStyle);
+            GUILayout.Space(padding);
+        }
         public static Vector3 SnapToGrid(Vector3 position)
         {
             // Use unitys built in scene grid
