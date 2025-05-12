@@ -8,7 +8,7 @@ namespace PrefabPalette
     public class CollectionsWindow : EditorWindow
     {
         static PrefabPaletteTool tool;
-        float buttonSpace = 4;
+        float buttonSpace = 5;
 
         [MenuItem("Window/Prefab Palette/Collections")]
         public static void OpenMainWindow()
@@ -26,9 +26,8 @@ namespace PrefabPalette
         private void OnEnable()
         {
             tool = PrefabPaletteTool.Instance;
-            minSize = new Vector2(300, 200);
-            maxSize = new Vector2(350, 205);
-
+            minSize = new Vector2(600, 500);
+            maxSize = new Vector2(601, 501);
         }
 
         private void OnGUI()
@@ -42,12 +41,11 @@ namespace PrefabPalette
                 EditorGUILayout.HelpBox("Collections Inspector window is open, close it when you're finished editing", MessageType.Warning);
                 return;
             }
-
-            GUILayout.Space(buttonSpace);
-
+     
             Helpers.DrawLine(Color.grey);
-            
-            if (GUILayout.Button("Manage Collections"))
+            GUILayout.Space(10);
+
+            if (GUILayout.Button("Manage Collections", GUILayout.Height(50)))
             {
                 CollectionsListInspector.OpenWindow(tool);
 
@@ -56,6 +54,9 @@ namespace PrefabPalette
                     GetWindow<PaletteWindow>().Close();
                 }
             }
+            
+            GUILayout.Space(10);
+            Helpers.DrawLine(Color.gray);
 
             tool.Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.collectionName);
             tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.collectionName);
@@ -76,7 +77,7 @@ namespace PrefabPalette
             }
 
             GUILayout.Space(buttonSpace);
-            if (GUILayout.Button("Edit Prefab Collection"))
+            if (GUILayout.Button("Edit Prefab Collection", GUILayout.Height(25)))
             {
                 // Inspect the currentPrefabCollection scriptable object
                 PrefabCollectionInspector.OpenWindow(tool.CurrentPrefabCollection);
@@ -84,7 +85,7 @@ namespace PrefabPalette
 
             GUILayout.Space(buttonSpace);
 
-            if (GUILayout.Button("Open Palette"))
+            if (GUILayout.Button("Open Palette", GUILayout.Height(25)))
             {
                 PaletteWindow.OnShowToolWindow(tool);
             }
