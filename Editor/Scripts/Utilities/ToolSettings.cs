@@ -29,7 +29,7 @@ namespace PrefabPalette
         public Vector3 relativeRotation;
         public bool chainLines;
         public Vector3 segmentOffset;
-
+        public Vector2 overlaySize = new(420, 250);
 
         // Marked dirty on disable so Unity knows to save it
         private void OnDisable()

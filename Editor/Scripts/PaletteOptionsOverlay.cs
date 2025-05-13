@@ -15,12 +15,11 @@ namespace PrefabPalette
         {
             var container = new IMGUIContainer(() =>
             {
-                _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(420), GUILayout.Height(250));
+                var tool = PrefabPaletteTool.Instance;
+                _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(tool.Settings.overlaySize.x), GUILayout.Height(tool.Settings.overlaySize.y));
 
                 if (EditorWindow.HasOpenInstances<PaletteWindow>())
                 {
-                    var tool = PrefabPaletteTool.Instance;
-
                     GUILayout.BeginVertical();
 
                     SceneInteraction.SnapToGrid = GUILayout.Toggle(
