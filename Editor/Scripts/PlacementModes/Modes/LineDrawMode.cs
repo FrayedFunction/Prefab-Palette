@@ -75,8 +75,7 @@ namespace PrefabPalette
 
             // First Obj
             var firstObj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
-            firstObj.transform.position = startPoint;
-            firstObj.transform.rotation = objRotation;
+            firstObj.transform.SetPositionAndRotation(startPoint, objRotation);
             previewObjects.Add(firstObj);
 
             // Line
@@ -99,9 +98,7 @@ namespace PrefabPalette
                 Handles.DrawSolidDisc(currentPoint, Vector3.up, 0.2f);
 
                 var obj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
-                obj.transform.position = currentPoint;
-                obj.transform.rotation = objRotation;
-
+                obj.transform.SetPositionAndRotation(currentPoint, objRotation);
                 previewObjects.Add(obj);
             }
         }
