@@ -27,7 +27,7 @@ namespace PrefabPalette
             {
                 if (instance == null)
                 {
-                    instance = Helpers.LoadOrCreateAsset<PrefabCollectionList>(PathDr.GetGeneratedFolderPath, "CollectionNamesList.asset", out string assetPath);
+                    instance = Helpers.LoadOrCreateAsset<PrefabCollectionList>(PathDr.GetGeneratedFolderPath, "CollectionNamesList.asset", out _);
                 }
 
                 return instance;
