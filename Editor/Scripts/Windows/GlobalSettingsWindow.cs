@@ -48,8 +48,11 @@ namespace PrefabPalette
 
             // Overlay Settings
             GUILayout.Label("Overlay:", EditorStyles.whiteLargeLabel);
-            tool.Settings.overlaySize = EditorGUILayout.Vector2Field("Overlay Size", tool.Settings.overlaySize);        
-                }
+            EditorGUI.indentLevel++;
+            tool.Settings.autoOverlaySize = EditorGUILayout.Toggle("Auto Size?", tool.Settings.autoOverlaySize);
+            tool.Settings.overlaySize = tool.Settings.autoOverlaySize ? Vector2.zero : EditorGUILayout.Vector2Field("Overlay Size", tool.Settings.overlaySize);
+            EditorGUI.indentLevel--;
+        }
 
         private LayerMask LayerMaskField(string label, LayerMask selected)
         {
