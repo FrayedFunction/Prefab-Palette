@@ -14,7 +14,7 @@ namespace PrefabPalette
                 fontSize = fontSize,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.white } // Adjust for dark/light themes as needed
+                normal = { textColor = Color.white }
             };
 
             GUILayout.Space(padding);
@@ -23,7 +23,6 @@ namespace PrefabPalette
         }
         public static Vector3 SnapToGrid(Vector3 position)
         {
-            // Use unitys built in scene grid
             float gridSize = UnityEditor.EditorSnapSettings.move.x;
             position.x = Mathf.Round(position.x / gridSize) * gridSize;
             position.y = Mathf.Round(position.y / gridSize) * gridSize;
