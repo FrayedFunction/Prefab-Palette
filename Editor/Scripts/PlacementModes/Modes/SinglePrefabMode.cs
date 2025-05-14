@@ -23,7 +23,7 @@ namespace PrefabPalette
                 lastSurfaceNormal = SceneInteraction.SurfaceNormal;
 
                 currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(tool.SelectedPrefab);
-                currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + tool.Settings.placementOffset, tool.Settings.alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
+                currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + tool.Settings.freeMode_placementOffset, tool.Settings.freeMode_alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
                 Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
 
                 e.Use();
@@ -32,8 +32,8 @@ namespace PrefabPalette
             // Rotate while holding the mouse button
             if (e.type == EventType.MouseDrag && e.button == 0 && !e.alt && currentPlacedObject != null)
             {
-                float angle = e.delta.x * tool.Settings.rotationSpeed;
-                Vector3 axis = tool.Settings.alignWithSurface ? lastSurfaceNormal : Vector3.up;
+                float angle = e.delta.x * tool.Settings.freeMode_rotationSpeed;
+                Vector3 axis = tool.Settings.freeMode_alignWithSurface ? lastSurfaceNormal : Vector3.up;
                 currentPlacedObject.transform.Rotate(axis, angle, Space.World);
                 e.Use();
             }
@@ -57,9 +57,9 @@ namespace PrefabPalette
 
         public void SettingsGUI(PrefabPaletteTool tool)
         {
-            tool.Settings.rotationSpeed = EditorGUILayout.Slider("Rotation Speed", tool.Settings.rotationSpeed, 0.1f, 5);
-            tool.Settings.placementOffset = EditorGUILayout.Vector3Field("Placement Offset", tool.Settings.placementOffset);
-            tool.Settings.alignWithSurface = EditorGUILayout.Toggle("Align with surface?", tool.Settings.alignWithSurface);
+            tool.Settings.freeMode_rotationSpeed = EditorGUILayout.Slider("Rotation Speed", tool.Settings.freeMode_rotationSpeed, 0.1f, 5);
+            tool.Settings.freeMode_placementOffset = EditorGUILayout.Vector3Field("Placement Offset", tool.Settings.freeMode_placementOffset);
+            tool.Settings.freeMode_alignWithSurface = EditorGUILayout.Toggle("Align with surface?", tool.Settings.freeMode_alignWithSurface);
         }
     }
 }

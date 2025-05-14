@@ -36,7 +36,7 @@ namespace PrefabPalette
 
             Vector3 startPoint = linePoints.Last();
 
-            if (tool.Settings.chainLines && linePoints.Count >= 2)
+            if (tool.Settings.lineMode_chainLines && linePoints.Count >= 2)
             {
                 Vector3 segmentDir = (linePoints.Last() - linePoints[linePoints.Count - 2]).normalized;
 
@@ -51,9 +51,9 @@ namespace PrefabPalette
 
                 // Offset the position using the segment-aligned local space
                 Vector3 offset =
-                    right * tool.Settings.segmentOffset.x +
-                    localUp * tool.Settings.segmentOffset.y +
-                    segmentDir * tool.Settings.segmentOffset.z;
+                    right * tool.Settings.lineMode_segmentOffset.x +
+                    localUp * tool.Settings.lineMode_segmentOffset.y +
+                    segmentDir * tool.Settings.lineMode_segmentOffset.z;
 
                 startPoint += offset;
             }
@@ -66,7 +66,7 @@ namespace PrefabPalette
 
             // Obj rotation
             Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
-            objRotation.eulerAngles += tool.Settings.relativeRotation;
+            objRotation.eulerAngles += tool.Settings.lineMode_relativeRotation;
 
             // Parent Obj
             if (spawnedObjParent == null)
@@ -81,12 +81,12 @@ namespace PrefabPalette
             previewObjects.Add(firstObj);
 
             // Line
-            float objectSpacing = tool.Settings.lineSpacing;
+            float objectSpacing = tool.Settings.lineMode_lineSpacing;
             Renderer renderer = tool.SelectedPrefab.GetComponent<Renderer>();
             if (renderer != null)
             {
                 Bounds bounds = renderer.bounds;
-                objectSpacing = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) + tool.Settings.lineSpacing;
+                objectSpacing = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) + tool.Settings.lineMode_lineSpacing;
             }
 
             int pointCount = Mathf.FloorToInt(dist / objectSpacing);
@@ -101,16 +101,16 @@ namespace PrefabPalette
 
                 // Needs to be re-calculated for each object to avoid cumulative results.
                 objRotation = Quaternion.LookRotation(dir, Vector3.up);
-                objRotation.eulerAngles += tool.Settings.relativeRotation;
+                objRotation.eulerAngles += tool.Settings.lineMode_relativeRotation;
 
                 // variable rotation
-                if (tool.Settings.lineObjRndRotation)
+                if (tool.Settings.linemode_ObjRndRotation)
                 {
                     if (!cachedRotations.TryGetValue(i, out var cachedRot))
                     {
-                        float xRot = tool.Settings.rotateOnX ? UnityEngine.Random.Range(tool.Settings.lineObjRndRotationMin, tool.Settings.lineObjRndRotationMax) : 0;
-                        float yRot = tool.Settings.rotateOnY ? UnityEngine.Random.Range(tool.Settings.lineObjRndRotationMin, tool.Settings.lineObjRndRotationMax) : 0;
-                        float zRot = tool.Settings.rotateOnZ ? UnityEngine.Random.Range(tool.Settings.lineObjRndRotationMin, tool.Settings.lineObjRndRotationMax) : 0;
+                        float xRot = tool.Settings.lineMode_rotateOnX ? UnityEngine.Random.Range(tool.Settings.lineMode_ObjRndRotationMin, tool.Settings.lineMode_ObjRndRotationMax) : 0;
+                        float yRot = tool.Settings.lineMode_rotateOnY ? UnityEngine.Random.Range(tool.Settings.lineMode_ObjRndRotationMin, tool.Settings.lineMode_ObjRndRotationMax) : 0;
+                        float zRot = tool.Settings.lineMode_rotateOnZ ? UnityEngine.Random.Range(tool.Settings.lineMode_ObjRndRotationMin, tool.Settings.lineMode_ObjRndRotationMax) : 0;
 
                         cachedRot = new(xRot, yRot, zRot);
                         cachedRotations[i] = cachedRot;
@@ -165,7 +165,7 @@ namespace PrefabPalette
                     }
                 }
 
-                if (!tool.Settings.chainLines && linePoints.Count >= 2)
+                if (!tool.Settings.lineMode_chainLines && linePoints.Count >= 2)
                 {
                     cachedRotations.Clear();
                     ClearPreviewObjects();
@@ -204,11 +204,11 @@ namespace PrefabPalette
         #region GUI
         public void SettingsGUI(PrefabPaletteTool tool)
         {
-            tool.Settings.lineSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.lineSpacing);
-            tool.Settings.relativeRotation = EditorGUILayout.Vector3Field("Relative Rotation", tool.Settings.relativeRotation);
+            tool.Settings.lineMode_lineSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.lineMode_lineSpacing);
+            tool.Settings.lineMode_relativeRotation = EditorGUILayout.Vector3Field("Relative Rotation", tool.Settings.lineMode_relativeRotation);
 
-            tool.Settings.lineObjRndRotation = EditorGUILayout.Toggle("Variable Rotation?", tool.Settings.lineObjRndRotation);
-            if (tool.Settings.lineObjRndRotation) 
+            tool.Settings.linemode_ObjRndRotation = EditorGUILayout.Toggle("Variable Rotation?", tool.Settings.linemode_ObjRndRotation);
+            if (tool.Settings.linemode_ObjRndRotation) 
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.BeginVertical();
@@ -222,15 +222,15 @@ namespace PrefabPalette
                 EditorGUILayout.BeginHorizontal();
 
                 // Min float field
-                tool.Settings.lineObjRndRotationMin = EditorGUILayout.FloatField(tool.Settings.lineObjRndRotationMin, GUILayout.Width(50));
-                tool.Settings.lineObjRndRotationMin = Mathf.Clamp(tool.Settings.lineObjRndRotationMin, -360f, tool.Settings.lineObjRndRotationMax);
+                tool.Settings.lineMode_ObjRndRotationMin = EditorGUILayout.FloatField(tool.Settings.lineMode_ObjRndRotationMin, GUILayout.Width(50));
+                tool.Settings.lineMode_ObjRndRotationMin = Mathf.Clamp(tool.Settings.lineMode_ObjRndRotationMin, -360f, tool.Settings.lineMode_ObjRndRotationMax);
 
                 // MinMax slider
-                EditorGUILayout.MinMaxSlider(ref tool.Settings.lineObjRndRotationMin, ref tool.Settings.lineObjRndRotationMax, -360f, 360f);
+                EditorGUILayout.MinMaxSlider(ref tool.Settings.lineMode_ObjRndRotationMin, ref tool.Settings.lineMode_ObjRndRotationMax, -360f, 360f);
 
                 // Max float field
-                tool.Settings.lineObjRndRotationMax = EditorGUILayout.FloatField(tool.Settings.lineObjRndRotationMax, GUILayout.Width(50));
-                tool.Settings.lineObjRndRotationMax = Mathf.Clamp(tool.Settings.lineObjRndRotationMax, tool.Settings.lineObjRndRotationMin, 360f);
+                tool.Settings.lineMode_ObjRndRotationMax = EditorGUILayout.FloatField(tool.Settings.lineMode_ObjRndRotationMax, GUILayout.Width(50));
+                tool.Settings.lineMode_ObjRndRotationMax = Mathf.Clamp(tool.Settings.lineMode_ObjRndRotationMax, tool.Settings.lineMode_ObjRndRotationMin, 360f);
 
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.EndVertical();
@@ -250,15 +250,15 @@ namespace PrefabPalette
                 GUILayout.FlexibleSpace();
 
                 GUILayout.Label("X", GUILayout.Width(15));
-                tool.Settings.rotateOnX = GUILayout.Toggle(tool.Settings.rotateOnX, GUIContent.none, GUILayout.Width(20));
+                tool.Settings.lineMode_rotateOnX = GUILayout.Toggle(tool.Settings.lineMode_rotateOnX, GUIContent.none, GUILayout.Width(20));
 
                 GUILayout.Space(10);
                 GUILayout.Label("Y", GUILayout.Width(15));
-                tool.Settings.rotateOnY = GUILayout.Toggle(tool.Settings.rotateOnY, GUIContent.none, GUILayout.Width(20));
+                tool.Settings.lineMode_rotateOnY = GUILayout.Toggle(tool.Settings.lineMode_rotateOnY, GUIContent.none, GUILayout.Width(20));
 
                 GUILayout.Space(10);
                 GUILayout.Label("Z", GUILayout.Width(15));
-                tool.Settings.rotateOnZ = GUILayout.Toggle(tool.Settings.rotateOnZ, GUIContent.none, GUILayout.Width(20));
+                tool.Settings.lineMode_rotateOnZ = GUILayout.Toggle(tool.Settings.lineMode_rotateOnZ, GUIContent.none, GUILayout.Width(20));
 
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
@@ -268,12 +268,12 @@ namespace PrefabPalette
 
             }
 
-            tool.Settings.chainLines = EditorGUILayout.Toggle("Chain Lines?", tool.Settings.chainLines);
+            tool.Settings.lineMode_chainLines = EditorGUILayout.Toggle("Chain Lines?", tool.Settings.lineMode_chainLines);
 
-            if (tool.Settings.chainLines)
+            if (tool.Settings.lineMode_chainLines)
             {
                 EditorGUI.indentLevel++;
-                tool.Settings.segmentOffset = EditorGUILayout.Vector3Field("Link Offset", tool.Settings.segmentOffset);
+                tool.Settings.lineMode_segmentOffset = EditorGUILayout.Vector3Field("Link Offset", tool.Settings.lineMode_segmentOffset);
                 EditorGUI.indentLevel--;
             }
 
@@ -282,12 +282,12 @@ namespace PrefabPalette
             if (brokenFencePrefab)
             {
                 EditorGUI.indentLevel++;
-                tool.Settings.randomAltObjs = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.randomAltObjs);
+                tool.Settings.lineMode_randomAltObjs = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.lineMode_randomAltObjs);
 
-                if (tool.Settings.randomAltObjs)
-                    tool.Settings.altObjProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.altObjProbability, 0, 1);
+                if (tool.Settings.lineMode_randomAltObjs)
+                    tool.Settings.lineMode_altObjProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.lineMode_altObjProbability, 0, 1);
                 else
-                    tool.Settings.altObjInterval = EditorGUILayout.IntField("Interval", tool.Settings.altObjInterval);
+                    tool.Settings.lineMode_altObjInterval = EditorGUILayout.IntField("Interval", tool.Settings.lineMode_altObjInterval);
                 EditorGUI.indentLevel--;
             }
 

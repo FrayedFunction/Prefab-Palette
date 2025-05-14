@@ -41,7 +41,7 @@ namespace PrefabPalette
                 // Force a repaint when position changes
                 sceneView.Repaint();
             }
-            var normal = settings.alignWithSurface ? SceneInteraction.SurfaceNormal : Vector3.up;
+            var normal = settings.freeMode_alignWithSurface ? SceneInteraction.SurfaceNormal : Vector3.up;
 
             // Draw the visual placer
             DrawPlacer(previewPosition, normal);
@@ -63,8 +63,8 @@ namespace PrefabPalette
         /// </summary>
         public static void ShowTarget()
         {
-            color = settings.placerColor;
-            targetRadius = Mathf.Max(0.1f, settings.placerRadius);
+            color = settings.placer_color;
+            targetRadius = Mathf.Max(0.1f, settings.placer_radius);
 
             if (isActive)
                 return;

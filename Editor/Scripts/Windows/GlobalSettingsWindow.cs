@@ -29,9 +29,9 @@ namespace PrefabPalette
             // Palette Settings
             GUILayout.Label("Palette:", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
-            tool.Settings.gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", tool.Settings.gridColumns));
-            tool.Settings.minPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", tool.Settings.minPaletteScale), 50f, tool.Settings.maxPaletteScale);
-            tool.Settings.maxPaletteScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", tool.Settings.maxPaletteScale), tool.Settings.minPaletteScale, 500f);
+            tool.Settings.palette_gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", tool.Settings.palette_gridColumns));
+            tool.Settings.palette_minScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", tool.Settings.palette_minScale), 50f, tool.Settings.palette_maxScale);
+            tool.Settings.palette_maxScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", tool.Settings.palette_maxScale), tool.Settings.palette_minScale, 500f);
             EditorGUI.indentLevel--;
             
             GUILayout.Space(2);
@@ -39,9 +39,9 @@ namespace PrefabPalette
             // Placer Setttings
             GUILayout.Label("Placer:", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
-            tool.Settings.includeMask = LayerMaskField("Include Layers", tool.Settings.includeMask);
-            tool.Settings.placerColor = EditorGUILayout.ColorField("Placer Color", tool.Settings.placerColor);
-            tool.Settings.placerRadius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", tool.Settings.placerRadius));
+            tool.Settings.placer_includeMask = LayerMaskField("Include Layers", tool.Settings.placer_includeMask);
+            tool.Settings.placer_color = EditorGUILayout.ColorField("Placer Color", tool.Settings.placer_color);
+            tool.Settings.placer_radius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", tool.Settings.placer_radius));
             EditorGUI.indentLevel-- ;
 
             GUILayout.Space(2);
@@ -49,8 +49,8 @@ namespace PrefabPalette
             // Overlay Settings
             GUILayout.Label("Overlay:", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
-            tool.Settings.autoOverlaySize = EditorGUILayout.Toggle("Auto Size?", tool.Settings.autoOverlaySize);
-            tool.Settings.overlaySize = tool.Settings.autoOverlaySize ? Vector2.zero : EditorGUILayout.Vector2Field("Overlay Size", tool.Settings.overlaySize);
+            tool.Settings.overlay_autoSize = EditorGUILayout.Toggle("Auto Size?", tool.Settings.overlay_autoSize);
+            tool.Settings.overlay_size = tool.Settings.overlay_autoSize ? Vector2.zero : EditorGUILayout.Vector2Field("Overlay Size", tool.Settings.overlay_size);
             EditorGUI.indentLevel--;
         }
 

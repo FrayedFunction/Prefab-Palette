@@ -16,7 +16,7 @@ namespace PrefabPalette
             var container = new IMGUIContainer(() =>
             {
                 var tool = PrefabPaletteTool.Instance;
-                _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(tool.Settings.overlaySize.x), GUILayout.Height(tool.Settings.overlaySize.y));
+                _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(tool.Settings.overlay_size.x), GUILayout.Height(tool.Settings.overlay_size.y));
 
                 if (EditorWindow.HasOpenInstances<PaletteWindow>())
                 {

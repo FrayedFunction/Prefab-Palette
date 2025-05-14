@@ -49,9 +49,9 @@ namespace PrefabPalette
         {
             // Select collection
             GUILayout.Space(5);
-            tool.Settings.collectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.collectionName);
+            tool.Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.currentCollectionName);
             GUILayout.Space(5);
-            tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.collectionName);
+            tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.currentCollectionName);
 
             // if the enum only contains .None
             if (!Enum.GetValues(typeof(CollectionName))
@@ -90,16 +90,16 @@ namespace PrefabPalette
 
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 
-            dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / tool.Settings.gridColumns - 10, 40), tool.Settings.minPaletteScale, tool.Settings.maxPaletteScale);
+            dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / tool.Settings.palette_gridColumns - 10, 40), tool.Settings.palette_minScale, tool.Settings.palette_maxScale);
 
             // Start Scroll View
             paletteScrollPosition = GUILayout.BeginScrollView(paletteScrollPosition); // Set max visible height
 
             var prefabList = tool.CurrentPrefabCollection.prefabList;
-            int rowCount = Mathf.CeilToInt((float)prefabList.Count / tool.Settings.gridColumns);
+            int rowCount = Mathf.CeilToInt((float)prefabList.Count / tool.Settings.palette_gridColumns);
 
             // Calculate the total width of the grid (based on the number of columns and button size)
-            float gridWidth = tool.Settings.gridColumns * dynamicPrefabIconSize;
+            float gridWidth = tool.Settings.palette_gridColumns * dynamicPrefabIconSize;
 
             // Calculate the left padding required to center the grid
             float gridPadding = Mathf.Max((windowWidth - gridWidth) * 0.2f, 0);
@@ -109,9 +109,9 @@ namespace PrefabPalette
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(gridPadding);
 
-                for (int col = 0; col < tool.Settings.gridColumns; col++)
+                for (int col = 0; col < tool.Settings.palette_gridColumns; col++)
                 {
-                    int index = row * tool.Settings.gridColumns + col;
+                    int index = row * tool.Settings.palette_gridColumns + col;
                     if (index >= prefabList.Count) break;
 
                     GameObject prefab = prefabList[index];

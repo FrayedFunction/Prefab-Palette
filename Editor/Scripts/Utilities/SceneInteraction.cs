@@ -31,7 +31,7 @@ namespace PrefabPalette
             if (e == null) return;
 
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, toolSettings.includeMask))
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, toolSettings.placer_includeMask))
             {
                 SurfaceNormal = hit.normal;
 

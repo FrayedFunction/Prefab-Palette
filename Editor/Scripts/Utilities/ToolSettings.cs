@@ -8,33 +8,39 @@ namespace PrefabPalette
     /// </summary>
     public class ToolSettings : ScriptableObject
     {
-        public CollectionName collectionName = CollectionName.None;
-        public Vector3 placementOffset = Vector3.zero;
-        public bool alignWithSurface = false;
-        public float rotationSpeed = 2f;
-        public float minPaletteScale = 50f;
-        public float maxPaletteScale = 300f;
-        public bool showPaletteSettings = false;
-        public bool showPlacerSettings = false;
-        public int gridColumns = 4;
-        public Color placerColor = Color.white;
-        public float placerRadius = 0.2f;
-        public bool showHeader = true;
-        public float lineSpacing = 1;
-        public bool randomAltObjs = true;
-        public float altObjProbability = 0.5f;
-        public int altObjInterval = 4;
-        public bool showModeSettings;
-        public LayerMask includeMask = ~0; // masks to be included in scene interaction raycast. Default is everything.
-        public Vector3 relativeRotation;
-        public bool chainLines;
-        public Vector3 segmentOffset;
-        public Vector2 overlaySize = new(420, 250);
-        public bool autoOverlaySize;
-        public float lineObjRndRotationMin;
-        public float lineObjRndRotationMax;
-        public bool lineObjRndRotation;
-        public bool rotateOnX, rotateOnY, rotateOnZ;
+        public CollectionName currentCollectionName = CollectionName.None;
+        
+        // Palette
+        public float palette_minScale = 50f;
+        public float palette_maxScale = 300f;
+        public int palette_gridColumns = 4;
+
+        // Placer
+        public Color placer_color = Color.white;
+        public float placer_radius = 0.2f;
+        public LayerMask placer_includeMask = ~0; // masks to be included in scene interaction raycast. Default is everything.
+
+        // Overlay
+        public Vector2 overlay_size = new(420, 250);
+        public bool overlay_autoSize;
+
+        // Free Mode
+        public Vector3 freeMode_placementOffset = Vector3.zero;
+        public bool freeMode_alignWithSurface = false;
+        public float freeMode_rotationSpeed = 2f;
+
+        // Line Mode
+        public float lineMode_ObjRndRotationMin;
+        public float lineMode_ObjRndRotationMax;
+        public bool linemode_ObjRndRotation;
+        public bool lineMode_rotateOnX, lineMode_rotateOnY, lineMode_rotateOnZ;
+        public bool lineMode_chainLines;
+        public Vector3 lineMode_segmentOffset;
+        public Vector3 lineMode_relativeRotation;
+        public float lineMode_lineSpacing = 1;
+        public bool lineMode_randomAltObjs = true;
+        public float lineMode_altObjProbability = 0.5f;
+        public int lineMode_altObjInterval = 4;
 
         // Marked dirty on disable so Unity knows to save it
         private void OnDisable()
