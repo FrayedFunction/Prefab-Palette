@@ -31,6 +31,10 @@ namespace PrefabPalette
         public Vector3 segmentOffset;
         public Vector2 overlaySize = new(420, 250);
         public bool autoOverlaySize;
+        public float lineObjRndRotationMin;
+        public float lineObjRndRotationMax;
+        public bool lineObjRndRotation;
+        public bool rotateOnX, rotateOnY, rotateOnZ;
 
         // Marked dirty on disable so Unity knows to save it
         private void OnDisable()
