@@ -29,7 +29,7 @@ namespace PrefabPalette
         /// <summary>
         /// List of prefabs in this collection.
         /// </summary>
-        public List<GameObject> prefabList = new List<GameObject>();
+        public List<GameObject> prefabList = new();
 
         public static PrefabCollection CreateNewCollection(CollectionName name)
         {
