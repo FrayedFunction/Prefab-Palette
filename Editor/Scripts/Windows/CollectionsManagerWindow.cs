@@ -5,15 +5,15 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class CollectionsWindow : EditorWindow
+    public class CollectionsManagerWindow : EditorWindow
     {
         static PrefabPaletteTool tool;
         float buttonSpace = 5;
 
-        [MenuItem("Window/Prefab Palette/Collections")]
+        [MenuItem("Window/Prefab Palette/Collections Manager")]
         public static void OpenMainWindow()
         {
-            GetWindow<CollectionsWindow>("Prefab Palete: Collections");
+            GetWindow<CollectionsManagerWindow>("Prefab Palete: Collections Manager");
         }
 
         [MenuItem("Window/Prefab Palette/Palette")]
@@ -32,7 +32,7 @@ namespace PrefabPalette
 
         private void OnGUI()
         {
-            Helpers.TitleText("Prefab Palette: Collections");
+            Helpers.TitleText("Prefab Palette: Collections Manager");
 
             // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
             if (HasOpenInstances<CollectionsListInspector>())
@@ -47,7 +47,7 @@ namespace PrefabPalette
 
             if (GUILayout.Button("Manage Collections", GUILayout.Height(50)))
             {
-                CollectionsListInspector.OpenWindow(tool);
+                CollectionsListInspector.OpenWindow();
 
                 if (HasOpenInstances<PaletteWindow>())
                 {
@@ -59,7 +59,6 @@ namespace PrefabPalette
             Helpers.DrawLine(Color.gray);
 
             tool.Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.currentCollectionName);
-            tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.currentCollectionName);
 
             // if the enum only contains .None
             if (!Enum.GetValues(typeof(CollectionName))
@@ -80,7 +79,7 @@ namespace PrefabPalette
             if (GUILayout.Button("Edit Prefab Collection", GUILayout.Height(25)))
             {
                 // Inspect the currentPrefabCollection scriptable object
-                PrefabCollectionInspector.OpenWindow(tool.CurrentPrefabCollection);
+                PrefabCollectionInspector.OpenWindow(tool.Settings.CurrentPrefabCollection);
             }
 
             GUILayout.Space(buttonSpace);

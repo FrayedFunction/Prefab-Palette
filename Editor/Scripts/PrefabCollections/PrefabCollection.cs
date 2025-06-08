@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -44,6 +45,36 @@ namespace PrefabPalette
             AssetDatabase.Refresh();
 
             return asset;
+        }
+
+        /// <summary>
+        /// Returns a list of all saved prefab collections.
+        /// </summary>
+        public static List<PrefabCollection> GetAllCollectionsInFolder =>
+            AssetDatabase.FindAssets($"t:{nameof(PrefabCollection)}", new[] { PathDr.GetCollectionsFolder })
+            .Select(guid => AssetDatabase.LoadAssetAtPath<PrefabCollection>(AssetDatabase.GUIDToAssetPath(guid)))
+            .ToList();
+
+        /// <summary>
+        /// Returns prefab collection object by name, creates it if it doesn't exist
+        /// </summary>
+        /// <remarks>
+        /// Note: CollectionName.None returns null.
+        /// </remarks>
+        public static PrefabCollection GetCollectionByName(CollectionName name)
+        {
+            if (name == CollectionName.None)
+                return null;
+
+            foreach (var collection in GetAllCollectionsInFolder)
+            {
+                if (collection != null && collection.Name == name)
+                {
+                    return collection;
+                }
+            }
+
+            return PrefabCollection.CreateNewCollection(name);
         }
     }
 }

@@ -14,16 +14,14 @@ namespace PrefabPalette
     public class CollectionsListInspector : EditorWindow
     {
         private PrefabCollectionList collectionsList;
-        private PrefabPaletteTool tool;
         private Editor editorInstance;
         private Vector2 scrollPos;
 
-        public static void OpenWindow(PrefabPaletteTool t)
+        public static void OpenWindow()
         {
             CollectionsListInspector window = GetWindow<CollectionsListInspector>("Collections Inspector");
             window.collectionsList = PrefabCollectionList.Instance;
             window.collectionsList.SyncListWithEnum();
-            window.tool = t;
             window.editorInstance = Editor.CreateEditor(window.collectionsList);
             window.Show();
         }
@@ -46,7 +44,7 @@ namespace PrefabPalette
             if (GUILayout.Button(GUI.enabled ? "Save" : "Saving..."))
             {
                 collectionsList.GenerateEnum();
-                CleanupCollectionsFolder(tool.GetAllCollectionsInFolder, collectionsList);
+                CleanupCollectionsFolder(PrefabCollection.GetAllCollectionsInFolder, collectionsList);
             }
 
             EditorGUILayout.Space(10f);

@@ -51,7 +51,6 @@ namespace PrefabPalette
             GUILayout.Space(5);
             tool.Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.currentCollectionName);
             GUILayout.Space(5);
-            tool.CurrentPrefabCollection = tool.GetPrefabCollection(tool.Settings.currentCollectionName);
 
             // if the enum only contains .None
             if (!Enum.GetValues(typeof(CollectionName))
@@ -62,8 +61,8 @@ namespace PrefabPalette
 
                 if (GUILayout.Button("Open Menu"))
                 {
-                    CollectionsWindow.OpenMainWindow();
-                    CollectionsListInspector.OpenWindow(tool);
+                    CollectionsManagerWindow.OpenMainWindow();
+                    CollectionsListInspector.OpenWindow();
 
                     GetWindow<PaletteWindow>().Close();
                 }
@@ -71,7 +70,7 @@ namespace PrefabPalette
                 return;
             }
 
-            if (tool.CurrentPrefabCollection != null)
+            if (tool.Settings.CurrentPrefabCollection != null)
             {
                 windowScrollPosition = GUILayout.BeginScrollView(windowScrollPosition);
                 PaletteGUI();
@@ -84,7 +83,7 @@ namespace PrefabPalette
         void PaletteGUI()
         {
             GUILayout.Space(5);
-            GUILayout.Label($"Palette - {tool.CurrentPrefabCollection.Name}", EditorStyles.boldLabel);
+            GUILayout.Label($"Palette - {tool.Settings.CurrentPrefabCollection.Name}", EditorStyles.boldLabel);
             GUILayout.Space(5);
             GUILayout.BeginVertical("box");
 
@@ -95,7 +94,7 @@ namespace PrefabPalette
             // Start Scroll View
             paletteScrollPosition = GUILayout.BeginScrollView(paletteScrollPosition); // Set max visible height
 
-            var prefabList = tool.CurrentPrefabCollection.prefabList;
+            var prefabList = tool.Settings.CurrentPrefabCollection.prefabList;
             int rowCount = Mathf.CeilToInt((float)prefabList.Count / tool.Settings.palette_gridColumns);
 
             // Calculate the total width of the grid (based on the number of columns and button size)
