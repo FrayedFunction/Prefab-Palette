@@ -10,9 +10,9 @@ namespace PrefabPalette
         static List<Vector3> linePoints = new();
         static List<GameObject> spawnedObjects = new();
         static List<GameObject> previewObjects = new List<GameObject>();
-        static GameObject brokenFencePrefab;
         static GameObject spawnedObjParent;
         static Dictionary<int, Vector3> cachedRotations = new();
+        static Dictionary<int, GameObject> cachedObjects = new();
 
         #region Placement Mode interface
         public void OnActive(PrefabPaletteTool tool)
@@ -23,12 +23,12 @@ namespace PrefabPalette
             if (linePoints.Count < 1) return;
 
             // Debug line (fit this in the line loop, why tf is it here?
-            for (int i = 0; i < linePoints.Count; i++)
+            for (int j = 0; j < linePoints.Count; j++)
             {
-                if (i != linePoints.Count - 1)
+                if (j != linePoints.Count - 1)
                 {
                     Handles.color = Color.black;
-                    Handles.DrawLine(linePoints[i], linePoints[i + 1], 4f);
+                    Handles.DrawLine(linePoints[j], linePoints[j + 1], 4f);
                 }
             }
 
@@ -58,6 +58,13 @@ namespace PrefabPalette
                 startPoint += offset;
             }
 
+            // Parent Obj
+            if (spawnedObjParent == null)
+            {
+                spawnedObjParent = new GameObject($"Line:{tool.SelectedPrefab.name}");
+                spawnedObjParent.transform.position = startPoint;
+            }
+
             Vector3 endPoint = SceneInteraction.Position;
 
             Vector3 line = endPoint - startPoint;
@@ -68,60 +75,109 @@ namespace PrefabPalette
             Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
             objRotation.eulerAngles += tool.Settings.lineMode_relativeRotation;
 
-            // Parent Obj
-            if (spawnedObjParent == null)
-            {
-                spawnedObjParent = new GameObject($"Line:{tool.SelectedPrefab.name}");
-                spawnedObjParent.transform.position = startPoint;
-            }
-
-            // First Obj
+/*            // First Obj
             var firstObj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
             firstObj.transform.SetPositionAndRotation(startPoint, objRotation);
-            previewObjects.Add(firstObj);
+            previewObjects.Add(firstObj);*/
 
-            // Line
-            float objectSpacing = tool.Settings.lineMode_lineSpacing;
-            Renderer renderer = tool.SelectedPrefab.GetComponent<Renderer>();
-            if (renderer != null)
+            int i = 1;
+            float totalDist = 0f;
+
+            while (totalDist < dist)
             {
-                Bounds bounds = renderer.bounds;
-                objectSpacing = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) + tool.Settings.lineMode_lineSpacing;
-            }
+                if (!cachedObjects.TryGetValue(i, out GameObject objToSpawn))
+                {
+                    bool spawnAlt = false;
 
-            int pointCount = Mathf.FloorToInt(dist / objectSpacing);
+                    if (tool.Settings.lineMode_useAltObjs)
+                    {
+                        if (tool.Settings.lineMode_randomAltObjs)
+                        {
+                            spawnAlt = Random.value <= tool.Settings.lineMode_altObjProbability;
+                        }
+                        else if (tool.Settings.lineMode_altObjInterval > 0 && i % tool.Settings.lineMode_altObjInterval == 0)
+                        {
+                            spawnAlt = true;
+                        }
+                    }
 
-            if (pointCount < 1) 
-                return;
+                    if (spawnAlt)
+                    {
+                        if (tool.Settings.lineMode_useCollection)
+                        {
+                            if (tool.Settings.lineMode_altObjsCollection != CollectionName.None)
+                            {
+                                int rndIndex = UnityEngine.Random.Range(0, tool.Settings.lineMode_altCollection.prefabList.Count);
+                                objToSpawn = tool.Settings.lineMode_altCollection.prefabList[rndIndex];
+                            }
+                            else
+                            {
+                                objToSpawn = tool.SelectedPrefab;
+                            }
+                        }
+                        else
+                        {
 
-            for (int i = 1; i <= pointCount; i++)
-            {
-                Vector3 currentPoint = startPoint + dir * objectSpacing * i;
-                Handles.DrawSolidDisc(currentPoint, Vector3.up, 0.2f);
+                            objToSpawn = tool.Settings.lineMode_altObj ? tool.Settings.lineMode_altObj : tool.SelectedPrefab;
+                        }
+                    }
+                    else
+                    {
+                        objToSpawn = tool.SelectedPrefab;
+                    }
 
-                // Needs to be re-calculated for each object to avoid cumulative results.
-                objRotation = Quaternion.LookRotation(dir, Vector3.up);
-                objRotation.eulerAngles += tool.Settings.lineMode_relativeRotation;
+                    cachedObjects[i] = objToSpawn;
+                }
 
-                // variable rotation
                 if (tool.Settings.linemode_ObjRndRotation)
                 {
-                    if (!cachedRotations.TryGetValue(i, out var cachedRot))
+                    if (!cachedRotations.TryGetValue(i, out Vector3 cachedRot))
                     {
                         float xRot = tool.Settings.lineMode_rotateOnX ? UnityEngine.Random.Range(tool.Settings.lineMode_ObjRndRotationMin, tool.Settings.lineMode_ObjRndRotationMax) : 0;
                         float yRot = tool.Settings.lineMode_rotateOnY ? UnityEngine.Random.Range(tool.Settings.lineMode_ObjRndRotationMin, tool.Settings.lineMode_ObjRndRotationMax) : 0;
                         float zRot = tool.Settings.lineMode_rotateOnZ ? UnityEngine.Random.Range(tool.Settings.lineMode_ObjRndRotationMin, tool.Settings.lineMode_ObjRndRotationMax) : 0;
 
-                        cachedRot = new(xRot, yRot, zRot);
+                        cachedRot = new Vector3(xRot, yRot, zRot);
                         cachedRotations[i] = cachedRot;
                     }
 
                     objRotation.eulerAngles += cachedRot;
                 }
 
-                var obj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
+                // Calculate object-specific spacing
+                float objectSpacing = tool.Settings.lineMode_lineSpacing;
+                Renderer renderer = objToSpawn.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    Bounds bounds = renderer.bounds;
+
+                    // Get the rotation-aware size vector
+                    Vector3 size = bounds.size;
+
+                    // Project size onto the line direction using the object's transform
+                    Vector3 localDir = objToSpawn.transform.InverseTransformDirection(dir.normalized);
+                    Vector3 extents = bounds.extents * 2f; // bounds.size is extents * 2, but we want to use directional info
+                    Vector3 worldSizeDir = objToSpawn.transform.TransformDirection(Vector3.Scale(extents, localDir.normalized));
+
+                    float projectedSize = Mathf.Abs(Vector3.Dot(worldSizeDir, dir.normalized));
+                    objectSpacing += projectedSize;
+                }
+
+
+                // If too far, break early
+                if (totalDist + objectSpacing > dist)
+                    break;
+
+                Vector3 currentPoint = startPoint + dir * totalDist;
+                Handles.DrawSolidDisc(currentPoint, Vector3.up, 0.2f);
+
+                // Instantiate
+                var obj = GameObject.Instantiate(objToSpawn, spawnedObjParent.transform);
                 obj.transform.SetPositionAndRotation(currentPoint, objRotation);
                 previewObjects.Add(obj);
+
+                totalDist += objectSpacing;
+                i++;
             }
         }
 
@@ -131,6 +187,7 @@ namespace PrefabPalette
 
         public void OnExit(PrefabPaletteTool tool)
         {
+            cachedObjects.Clear();
             cachedRotations.Clear();
             linePoints.Clear();
             spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
@@ -158,15 +215,17 @@ namespace PrefabPalette
                 {
                     foreach (var preview in previewObjects)
                     {
-                        GameObject placed = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
+                        GameObject placed = GameObject.Instantiate(preview, spawnedObjParent.transform);
                         placed.transform.SetPositionAndRotation(preview.transform.position, preview.transform.rotation);
                         spawnedObjects.Add(placed);
                         cachedRotations.Clear();
+                        cachedObjects.Clear();
                     }
                 }
 
                 if (!tool.Settings.lineMode_chainLines && linePoints.Count >= 2)
                 {
+                    cachedObjects.Clear();
                     cachedRotations.Clear();
                     ClearPreviewObjects();
                     spawnedObjects.Clear();
@@ -180,6 +239,7 @@ namespace PrefabPalette
             // Confirm with Enter
             if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Return)
             {
+                cachedObjects.Clear();
                 cachedRotations.Clear();
                 ClearPreviewObjects();
                 linePoints.Clear();
@@ -191,6 +251,7 @@ namespace PrefabPalette
             // Cancel with Escape
             if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape)
             {
+                cachedObjects.Clear();
                 cachedRotations.Clear();
                 linePoints.Clear();
                 spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
@@ -277,25 +338,30 @@ namespace PrefabPalette
                 EditorGUI.indentLevel--;
             }
 
-            brokenFencePrefab = (GameObject)EditorGUILayout.ObjectField("Broken Fence Prefab", brokenFencePrefab, typeof(GameObject), false);
-
-            if (brokenFencePrefab)
+            tool.Settings.lineMode_useAltObjs = EditorGUILayout.Toggle("Use Alt Objs?", tool.Settings.lineMode_useAltObjs);
+            EditorGUI.indentLevel++;
+            if (tool.Settings.lineMode_useAltObjs)
             {
-                EditorGUI.indentLevel++;
-                tool.Settings.lineMode_randomAltObjs = EditorGUILayout.Toggle("Random Broken Fences?", tool.Settings.lineMode_randomAltObjs);
+                tool.Settings.lineMode_useCollection = EditorGUILayout.Toggle("Use Prefab Alt Collection?", tool.Settings.lineMode_useCollection);
+                
+                if (tool.Settings.lineMode_useCollection)
+                {
+                    tool.Settings.lineMode_altObjsCollection = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.lineMode_altObjsCollection);
+                    GUILayout.Space(5);
+                }
+                else
+                {
+                    tool.Settings.lineMode_altObj = (GameObject)EditorGUILayout.ObjectField("Alt Object Prefab", tool.Settings.lineMode_altObj, typeof(GameObject), false);
+                }
+
+                tool.Settings.lineMode_randomAltObjs = EditorGUILayout.Toggle("Random?", tool.Settings.lineMode_randomAltObjs);
 
                 if (tool.Settings.lineMode_randomAltObjs)
-                    tool.Settings.lineMode_altObjProbability = EditorGUILayout.Slider("Broken Probability", tool.Settings.lineMode_altObjProbability, 0, 1);
+                    tool.Settings.lineMode_altObjProbability = EditorGUILayout.Slider("Probability", tool.Settings.lineMode_altObjProbability, 0, 1);
                 else
                     tool.Settings.lineMode_altObjInterval = EditorGUILayout.IntField("Interval", tool.Settings.lineMode_altObjInterval);
-                EditorGUI.indentLevel--;
             }
-
-            if (linePoints.Count > 1)
-            {
-                if (GUILayout.Button("Place Line", GUILayout.Height(25)))
-                    OnExit(tool);
-            }
+            EditorGUI.indentLevel--;
         }
         #endregion
     }
