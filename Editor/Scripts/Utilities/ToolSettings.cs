@@ -38,6 +38,12 @@ namespace PrefabPalette
         public Vector3 lineMode_segmentOffset;
         public Vector3 lineMode_relativeRotation;
         public float lineMode_lineSpacing = 1;
+        
+        public bool lineMode_useAltObjs;
+        public bool lineMode_useCollection;
+        public CollectionName lineMode_altObjsCollection;
+        public PrefabCollection lineMode_altCollection => PrefabCollection.GetCollectionByName(lineMode_altObjsCollection);
+        public GameObject lineMode_altObj;
         public bool lineMode_randomAltObjs = true;
         public float lineMode_altObjProbability = 0.5f;
         public int lineMode_altObjInterval = 4;
