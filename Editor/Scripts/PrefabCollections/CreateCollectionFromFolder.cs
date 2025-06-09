@@ -7,12 +7,6 @@ using System.Linq;
 
 namespace PrefabPalette
 {
-    using UnityEngine;
-    using UnityEditor;
-    using System.IO;
-    using System.Linq;
-    using System.Collections.Generic;
-
     [InitializeOnLoad]
     public static class CreateCollectionFromFolder
     {
@@ -90,13 +84,18 @@ namespace PrefabPalette
                     }
                 }
             }
+            
 
             // prevent duplicate prefabs
             prefabPaths = prefabPaths.Distinct().ToList();
 
             if (prefabPaths.Count == 0)
             {
-                Debug.LogWarning("PrefabPalette: No prefabs found in selected assets or folders.");
+                EditorUtility.DisplayDialog(
+                    "No Prefabs Found",
+                    "No prefabs were found in the selected assets or folders.",
+                    "OK"
+                );
                 return;
             }
 
@@ -152,8 +151,12 @@ namespace PrefabPalette
             return prefabPaths;
         }
 
+        /// <summary>
+        /// Validates that the selected object is either a folder or prefab/s.
+        /// </summary>
+        /// <returns></returns>
         [MenuItem("Assets/Prefab Palette: Generate Prefab Collection", true)]
-        private static bool ValidateDoSomethingWithFolder()
+        private static bool ValidateSelected()
         {
             return Selection.objects.Length > 0 && (
                 Selection.objects.All(o => AssetDatabase.GetAssetPath(o).EndsWith(".prefab")) ||
@@ -163,13 +166,14 @@ namespace PrefabPalette
 
         private static string GetSelectedFolderPath()
         {
-            UnityEngine.Object selected = Selection.activeObject;
-            if (selected == null)
-                return null;
+            foreach (var obj in Selection.objects)
+            {
+                string path = AssetDatabase.GetAssetPath(obj);
+                if (AssetDatabase.IsValidFolder(path))
+                    return path;
+            }
 
-            string path = AssetDatabase.GetAssetPath(selected);
-
-            return AssetDatabase.IsValidFolder(path) ? path : null;
+            return null;
         }
 
         [System.Serializable]
@@ -178,11 +182,4 @@ namespace PrefabPalette
             public List<string> prefabPaths = new List<string>();
         }
     }
-
-    [Serializable]
-    public class PrefabListWrapper
-    {
-        public List<string> prefabPaths = new();
-    }
-
 }
