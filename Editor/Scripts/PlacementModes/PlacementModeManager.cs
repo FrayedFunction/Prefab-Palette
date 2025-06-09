@@ -7,7 +7,7 @@ namespace PrefabPalette
 {
     public static class PlacementModeManager
     {
-        public enum ModeType
+        public enum ModeName
         {
             Free,
             Line
@@ -15,51 +15,55 @@ namespace PrefabPalette
 
         static PlacementModeManager()
         {
+            // Add buttons to the toolbar here:
+            // NOTE: Mode enum and toolbarButtons must be in the same order.
             toolbarButtons = new GUIContent[]
             {
                 new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Free Mode"),
                 new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
             };
 
-            modes = new Dictionary<ModeType, IPlacementMode>()
+            // Hook up the modes class with the mode enum:
+            modes = new Dictionary<ModeName, IPlacementMode>()
             {
-                { ModeType.Line, new LineDrawMode() },
-                { ModeType.Free, new SinglePrefabMode() },
+                { ModeName.Line, new LineDrawMode() },
+                { ModeName.Free, new SinglePrefabMode() },
             };
 
-            CurrentType = ModeType.Free;
+            // Set defualt mode here
+            Current = ModeName.Free;
         }
 
         static GUIContent[] toolbarButtons;
-        static Dictionary<ModeType, IPlacementMode> modes;
+        static Dictionary<ModeName, IPlacementMode> modes;
 
         public static IPlacementMode CurrentMode
         {
             get
             {
                 if (modes != null)
-                    return modes[CurrentType];
+                    return modes[Current];
 
                 return null;
             }
         }
 
-        public static ModeType CurrentType { get; private set; }
+        public static ModeName Current { get; private set; }
 
         public static void ToolbarGUI(ToolContext tool)
         {
-            int selectedIndex = (int)CurrentType;
+            int selectedIndex = (int)Current;
 
             selectedIndex = GUILayout.Toolbar(selectedIndex, toolbarButtons, GUILayout.Height(30));
-            ModeType asModeType = (ModeType)selectedIndex;
+            ModeName asModeType = (ModeName)selectedIndex;
 
-            if (asModeType != CurrentType)
+            if (asModeType != Current)
             {
-                modes[CurrentType].OnExit(tool);
+                modes[Current].OnExit(tool);
                 modes[asModeType].OnEnter(tool);
             }
 
-            CurrentType = asModeType;
+            Current = asModeType;
         }
     }
 }
