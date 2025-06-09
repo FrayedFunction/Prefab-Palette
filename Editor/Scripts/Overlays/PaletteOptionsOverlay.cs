@@ -22,13 +22,18 @@ namespace PrefabPalette
                 {
                     GUILayout.BeginVertical();
 
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(10f);
                     SceneInteraction.SnapToGrid = GUILayout.Toggle(
                         SceneInteraction.SnapToGrid,
                         EditorGUIUtility.IconContent("SceneViewSnap").image,
                         "Button",
-                        GUILayout.Width(400),
+                        GUILayout.ExpandWidth(true),
                         GUILayout.Height(40)
                     );
+                    GUILayout.Space(10f);
+                    GUILayout.EndHorizontal();
+
                     Helpers.DrawLine(Color.grey);
 
                     GUILayout.Space(4);
