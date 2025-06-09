@@ -31,7 +31,7 @@ namespace PrefabPalette
             };
 
             // Set defualt mode here:
-            Current = ModeName.Free;
+            CurrentModeName = ModeName.Free;
         }
 
         static GUIContent[] toolbarButtons;
@@ -42,28 +42,28 @@ namespace PrefabPalette
             get
             {
                 if (modes != null)
-                    return modes[Current];
+                    return modes[CurrentModeName];
 
                 return null;
             }
         }
 
-        public static ModeName Current { get; private set; }
+        public static ModeName CurrentModeName { get; private set; }
 
         public static void ToolbarGUI(ToolContext tool)
         {
-            int selectedIndex = (int)Current;
+            int selectedIndex = (int)CurrentModeName;
 
             selectedIndex = GUILayout.Toolbar(selectedIndex, toolbarButtons, GUILayout.Height(30));
             ModeName asModeType = (ModeName)selectedIndex;
 
-            if (asModeType != Current)
+            if (asModeType != CurrentModeName)
             {
-                modes[Current].OnExit(tool);
+                modes[CurrentModeName].OnExit(tool);
                 modes[asModeType].OnEnter(tool);
             }
 
-            Current = asModeType;
+            CurrentModeName = asModeType;
         }
     }
 }

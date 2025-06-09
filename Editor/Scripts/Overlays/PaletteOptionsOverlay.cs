@@ -39,7 +39,7 @@ namespace PrefabPalette
                     GUILayout.Space(4);
                     PlacementModeManager.ToolbarGUI(tool);
                     GUILayout.Space(2.5f);
-                    GUILayout.Label(PlacementModeManager.Current.ToString(), EditorStyles.boldLabel);
+                    GUILayout.Label(PlacementModeManager.CurrentModeName.ToString(), EditorStyles.boldLabel);
                     GUILayout.Space(5f);
 
                     PlacementModeManager.CurrentMode.SettingsGUI(tool);
