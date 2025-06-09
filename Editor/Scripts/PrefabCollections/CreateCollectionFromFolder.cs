@@ -7,6 +7,11 @@ using System.Linq;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Handles creating a PrefabCollection asset from selected folders or prefabs in the Project Window.
+    /// This class uses EditorPrefs to store data across domain reloads so the process can continue smoothly.
+    /// It supports generating a collection from selected prefabs or all prefabs inside selected folders.
+    /// </summary>
     [InitializeOnLoad]
     public static class CreateCollectionFromFolder
     {
@@ -113,7 +118,6 @@ namespace PrefabPalette
                 PrefabCollectionList.Instance.GenerateEnum();
             });
         }
-
 
         public static List<string> GetPrefabPathsFromFolder(string folderPath)
         {
