@@ -14,13 +14,13 @@ namespace PrefabPalette
     /// </summary>
     public class PaletteWindow : EditorWindow
     {
-        PrefabPaletteTool tool;
+        ToolContext tool;
 
         Vector2 paletteScrollPosition;
         Vector2 windowScrollPosition;
         float dynamicPrefabIconSize;
 
-        public static void OnShowToolWindow(PrefabPaletteTool tool)
+        public static void OnShowToolWindow(ToolContext tool)
         {
             var window = GetWindow<PaletteWindow>("Prefab Palette");
             window.tool = tool;
@@ -28,7 +28,7 @@ namespace PrefabPalette
 
         private void OnEnable()
         {
-            tool = PrefabPaletteTool.Instance;
+            tool = ToolContext.Instance;
             VisualPlacer.OnEnable(tool.Settings);
             SceneInteraction.OnEnable(tool.Settings);
             PlacementModeManager.CurrentMode.OnEnter(tool);

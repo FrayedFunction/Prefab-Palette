@@ -6,13 +6,13 @@ namespace PrefabPalette
 {
     public class GlobalSettingsWindow : EditorWindow
     {
-        PrefabPaletteTool tool;
+        ToolContext tool;
 
         [MenuItem("Window/Prefab Palette/Settings")]
         public static void OpenWindow()
         {
             var window = GetWindow<GlobalSettingsWindow>("Prefab Palette: Settings");
-            window.tool = PrefabPaletteTool.Instance;
+            window.tool = ToolContext.Instance;
         }
 
         private void OnEnable()

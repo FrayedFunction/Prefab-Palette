@@ -8,7 +8,7 @@ namespace PrefabPalette
         GameObject currentPlacedObject;
         Vector3 lastSurfaceNormal;
 
-        public void OnActive(PrefabPaletteTool tool)
+        public void OnActive(ToolContext tool)
         {
             Event e = Event.current;
 
@@ -47,15 +47,15 @@ namespace PrefabPalette
             }
         }
 
-        public void OnEnter(PrefabPaletteTool tool)
+        public void OnEnter(ToolContext tool)
         {
         }
 
-        public void OnExit(PrefabPaletteTool tool)
+        public void OnExit(ToolContext tool)
         {
         }
 
-        public void SettingsGUI(PrefabPaletteTool tool)
+        public void SettingsGUI(ToolContext tool)
         {
             tool.Settings.freeMode_rotationSpeed = EditorGUILayout.Slider("Rotation Speed", tool.Settings.freeMode_rotationSpeed, 0.1f, 5);
             tool.Settings.freeMode_placementOffset = EditorGUILayout.Vector3Field("Placement Offset", tool.Settings.freeMode_placementOffset);

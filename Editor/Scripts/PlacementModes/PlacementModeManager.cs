@@ -46,7 +46,7 @@ namespace PrefabPalette
 
         public static ModeType CurrentType { get; private set; }
 
-        public static void ToolbarGUI(PrefabPaletteTool tool)
+        public static void ToolbarGUI(ToolContext tool)
         {
             int selectedIndex = (int)CurrentType;
 

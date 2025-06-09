@@ -7,7 +7,7 @@ namespace PrefabPalette
 {
     public class CollectionsManagerWindow : EditorWindow
     {
-        static PrefabPaletteTool tool;
+        static ToolContext tool;
         float buttonSpace = 5;
 
         [MenuItem("Window/Prefab Palette/Collections Manager")]
@@ -19,13 +19,13 @@ namespace PrefabPalette
         [MenuItem("Window/Prefab Palette/Palette")]
         public static void OpenPalette()
         {
-            tool = PrefabPaletteTool.Instance;
+            tool = ToolContext.Instance;
             PaletteWindow.OnShowToolWindow(tool);
         }
 
         private void OnEnable()
         {
-            tool = PrefabPaletteTool.Instance;
+            tool = ToolContext.Instance;
             minSize = new Vector2(600, 500);
             maxSize = new Vector2(601, 501);
         }

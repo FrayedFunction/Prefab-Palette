@@ -6,17 +6,17 @@ using static UnityEngine.GridBrushBase;
 
 namespace PrefabPalette
 {
-    public class PrefabPaletteTool
+    public class ToolContext
     {
-        private static PrefabPaletteTool instance;
+        private static ToolContext instance;
 
-        public static PrefabPaletteTool Instance => instance ??= new();
+        public static ToolContext Instance => instance ??= new();
 
         public ToolSettings Settings { get; private set; }
 
         public GameObject SelectedPrefab { get; set; }
 
-        PrefabPaletteTool()
+        ToolContext()
         {
             Settings = Helpers.LoadOrCreateAsset<ToolSettings>(PathDr.GetGeneratedFolderPath, "ToolSettings.asset", out _);
         }

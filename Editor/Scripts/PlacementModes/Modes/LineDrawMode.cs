@@ -15,7 +15,7 @@ namespace PrefabPalette
         static Dictionary<int, GameObject> cachedObjects = new();
 
         #region Placement Mode interface
-        public void OnActive(PrefabPaletteTool tool)
+        public void OnActive(ToolContext tool)
         {
             Event e = Event.current;
             HandleInput(tool, e);
@@ -181,11 +181,11 @@ namespace PrefabPalette
             }
         }
 
-        public void OnEnter(PrefabPaletteTool tool)
+        public void OnEnter(ToolContext tool)
         {
         }
 
-        public void OnExit(PrefabPaletteTool tool)
+        public void OnExit(ToolContext tool)
         {
             cachedObjects.Clear();
             cachedRotations.Clear();
@@ -202,7 +202,7 @@ namespace PrefabPalette
             previewObjects.Clear();
         }
 
-        private void HandleInput(PrefabPaletteTool tool, Event e)
+        private void HandleInput(ToolContext tool, Event e)
         {
             // Create line with left mouse click
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
@@ -263,7 +263,7 @@ namespace PrefabPalette
         }
 
         #region GUI
-        public void SettingsGUI(PrefabPaletteTool tool)
+        public void SettingsGUI(ToolContext tool)
         {
             tool.Settings.lineMode_lineSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.lineMode_lineSpacing);
             tool.Settings.lineMode_relativeRotation = EditorGUILayout.Vector3Field("Relative Rotation", tool.Settings.lineMode_relativeRotation);

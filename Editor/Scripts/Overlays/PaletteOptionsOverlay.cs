@@ -15,7 +15,7 @@ namespace PrefabPalette
         {
             var container = new IMGUIContainer(() =>
             {
-                var tool = PrefabPaletteTool.Instance;
+                var tool = ToolContext.Instance;
                 _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Width(tool.Settings.overlay_size.x), GUILayout.Height(tool.Settings.overlay_size.y));
 
                 if (EditorWindow.HasOpenInstances<PaletteWindow>())
@@ -52,7 +52,7 @@ namespace PrefabPalette
                 {
                     if (GUILayout.Button("Open Palette"))
                     {
-                        PaletteWindow.OnShowToolWindow(PrefabPaletteTool.Instance);
+                        PaletteWindow.OnShowToolWindow(ToolContext.Instance);
                         SceneView.RepaintAll(); // Attempt to refresh view
                     }
                 }
