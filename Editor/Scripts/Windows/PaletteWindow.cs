@@ -20,6 +20,15 @@ namespace PrefabPalette
         Vector2 windowScrollPosition;
         float dynamicPrefabIconSize;
 
+        /// <summary>
+        /// Opens the main Prefab Palette window via the Unity menu.
+        /// </summary>
+        [MenuItem("Window/Prefab Palette/Palette")]
+        public static void OpenPalette()
+        {
+            PaletteWindow.OnShowToolWindow(ToolContext.Instance);
+        }
+
         public static void OnShowToolWindow(ToolContext tool)
         {
             var window = GetWindow<PaletteWindow>("Prefab Palette");

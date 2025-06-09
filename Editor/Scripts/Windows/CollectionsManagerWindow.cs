@@ -16,13 +16,6 @@ namespace PrefabPalette
             GetWindow<CollectionsManagerWindow>("Prefab Palete: Collections Manager");
         }
 
-        [MenuItem("Window/Prefab Palette/Palette")]
-        public static void OpenPalette()
-        {
-            tool = ToolContext.Instance;
-            PaletteWindow.OnShowToolWindow(tool);
-        }
-
         private void OnEnable()
         {
             tool = ToolContext.Instance;
