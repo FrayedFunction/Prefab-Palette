@@ -7,18 +7,10 @@ namespace PrefabPalette
 {
     public static class PlacementModeManager
     {
-        static GUIContent[] toolbarButtons;
-        static Dictionary<ModeType, IPlacementMode> modes;
-
-        public static IPlacementMode CurrentMode
+        public enum ModeType
         {
-            get
-            {
-                if (modes != null)
-                    return modes[CurrentType];
-
-                return null;
-            }
+            Free,
+            Line
         }
 
         static PlacementModeManager()
@@ -38,10 +30,18 @@ namespace PrefabPalette
             CurrentType = ModeType.Free;
         }
 
-        public enum ModeType
+        static GUIContent[] toolbarButtons;
+        static Dictionary<ModeType, IPlacementMode> modes;
+
+        public static IPlacementMode CurrentMode
         {
-            Free,
-            Line
+            get
+            {
+                if (modes != null)
+                    return modes[CurrentType];
+
+                return null;
+            }
         }
 
         public static ModeType CurrentType { get; private set; }
