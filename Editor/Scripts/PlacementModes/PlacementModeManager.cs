@@ -30,7 +30,7 @@ namespace PrefabPalette
                 { ModeName.Free, new SinglePrefabMode() },
             };
 
-            // Set defualt mode here
+            // Set defualt mode here:
             Current = ModeName.Free;
         }
 
