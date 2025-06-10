@@ -6,11 +6,21 @@ using UnityEngine.UIElements;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Scene View overlay that provides UI controls for the tool.
+    /// Allows users to toggle grid snapping, select placement modes, and configure mode-specific settings.
+    /// </summary>
     [Overlay(typeof(SceneView), "Prefab Palette: Options")]
     public class PaletteOptionsOverlay : Overlay
     {
         private Vector2 _scrollPos;
 
+        /// <summary>
+        /// Creates the UI panel content shown in the Scene View overlay.
+        /// Displays tool settings, placement mode controls, and provides access
+        /// to the Palette Window if it is not already open.
+        /// </summary>
+        /// <returns>The root <see cref="VisualElement"/> containing the overlay UI.</returns>
         public override VisualElement CreatePanelContent()
         {
             var container = new IMGUIContainer(() =>

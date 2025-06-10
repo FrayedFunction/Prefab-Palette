@@ -3,11 +3,18 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Allows placing and rotating a single prefab in the scene using mouse input.
+    /// </summary>
     public class SinglePrefabMode : IPlacementMode
     {
         GameObject currentPlacedObject;
         Vector3 lastSurfaceNormal;
 
+        /// <summary>
+        /// Called every frame while the mode is active. Handles prefab placement and rotation based on mouse input.
+        /// </summary>
+        /// <param name="tool">The current tool context.</param>
         public void OnActive(ToolContext tool)
         {
             Event e = Event.current;
@@ -55,6 +62,11 @@ namespace PrefabPalette
         {
         }
 
+        /// <summary>
+        /// Draws the settings GUI for this placement mode in the overlay.
+        /// Allows configuration of rotation speed, placement offset, and alignment.
+        /// </summary>
+        /// <param name="tool">The current tool context.</param>
         public void SettingsGUI(ToolContext tool)
         {
             tool.Settings.freeMode_rotationSpeed = EditorGUILayout.Slider("Rotation Speed", tool.Settings.freeMode_rotationSpeed, 0.1f, 5);

@@ -5,6 +5,12 @@ using System.Linq;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Implements a mode for placing prefabs along a defined line.
+    /// It allows users to dynamically draw lines and automatically distributes instances of a selected
+    /// prefab (or alternative prefabs) along it, offering controls for spacing, rotation,
+    /// and chaining multiple line segments.
+    /// </summary>
     public class LineDrawMode : IPlacementMode
     {
         static List<Vector3> linePoints = new();

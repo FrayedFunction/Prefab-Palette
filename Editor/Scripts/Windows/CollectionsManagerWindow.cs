@@ -5,11 +5,18 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Editor window to manage prefab collections within the Prefab Palette system.
+    /// Provides UI to select collections, open related inspectors, and navigate to the palette window.
+    /// </summary>
     public class CollectionsManagerWindow : EditorWindow
     {
         static ToolContext tool;
         float buttonSpace = 5;
 
+        /// <summary>
+        /// Opens the Collections Manager window via the Window dropdown menu.
+        /// </summary>
         [MenuItem("Window/Prefab Palette/Collections Manager")]
         public static void OpenMainWindow()
         {

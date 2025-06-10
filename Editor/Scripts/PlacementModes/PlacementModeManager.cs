@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Manages the placement mode toolbar and handles mode lifecycle events and transitions.
+    /// </summary>
     public static class PlacementModeManager
     {
         public enum ModeName
@@ -37,6 +40,9 @@ namespace PrefabPalette
         static GUIContent[] toolbarButtons;
         static Dictionary<ModeName, IPlacementMode> modes;
 
+        /// <summary>
+        /// Gets the currently active placement mode instance.
+        /// </summary>
         public static IPlacementMode CurrentMode
         {
             get
@@ -48,8 +54,16 @@ namespace PrefabPalette
             }
         }
 
+        /// <summary>
+        /// Gets the name of the currently selected mode.
+        /// </summary>
         public static ModeName CurrentModeName { get; private set; }
 
+        /// <summary>
+        /// Renders the placement mode toolbar UI and handles mode switching.
+        /// Calls OnExit on the old mode and OnEnter on the new mode when the selection changes.
+        /// </summary>
+        /// <param name="tool">The current tool context passed to mode lifecycle methods.</param>
         public static void ToolbarGUI(ToolContext tool)
         {
             int selectedIndex = (int)CurrentModeName;

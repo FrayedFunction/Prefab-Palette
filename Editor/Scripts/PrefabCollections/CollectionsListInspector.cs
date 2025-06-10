@@ -9,7 +9,8 @@ using System;
 namespace PrefabPalette
 {
     /// <summary>
-    /// Inspector window for the collections list object.
+    /// Editor window for inspecting and managing the list of prefab collections.
+    /// Allows editing of collections, syncing with enum, saving changes, and cleaning up unused assets.
     /// </summary>
     public class CollectionsListInspector : EditorWindow
     {

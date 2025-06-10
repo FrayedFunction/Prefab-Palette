@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
+    /// <summary>
+    /// Editor window for prompting the user to enter a name for a new prefab collection.
+    /// Provides input validation and sanitization before passing the name back via a callback.
+    /// </summary>
     public class CreateCollectionWindow : EditorWindow
     {
         private string collectionName = "NewPrefabCollection";
