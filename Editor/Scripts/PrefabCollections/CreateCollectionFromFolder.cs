@@ -48,7 +48,11 @@ namespace PrefabPalette
                         AssetDatabase.SaveAssets();
                     }
 
-                    Debug.Log($"PrefabPalette: Collection '{sanitizedName}' created after reload.");
+                    EditorUtility.DisplayDialog(
+                        "Successfully Created Colelction!",
+                        $"Collection '{sanitizedName}' was created successfully after reload!",
+                        "OK"
+                    );
                 }
                 else
                 {
