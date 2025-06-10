@@ -1,11 +1,7 @@
-using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using static UnityEngine.GridBrushBase;
 
 namespace PrefabPalette
 {
