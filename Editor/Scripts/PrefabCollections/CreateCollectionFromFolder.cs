@@ -61,8 +61,8 @@ namespace PrefabPalette
             }
         }
 
-        [MenuItem("Assets/Prefab Palette: Generate Prefab Collection", false, 2000)]
-        private static void Generate()
+        [MenuItem("Assets/Create Prefab Collection", false, 2000)]
+        private static void Create()
         {
             var prefabPaths = new List<string>();
 
