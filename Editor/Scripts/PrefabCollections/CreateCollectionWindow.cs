@@ -7,12 +7,12 @@ namespace PrefabPalette
     public class CreateCollectionWindow : EditorWindow
     {
         private string collectionName = "NewPrefabCollection";
-        private Action<string> onCreate;
+        private Action<string> onCollectionNameConfirmed;
 
         private const float WindowWidth = 300f;
         private const float WindowHeight = 90f;
 
-        public static void Show(Action<string> onCreateCallback)
+        public static void Show(Action<string> onCollectionNameConfirmed)
         {
             var window = CreateInstance<CreateCollectionWindow>();
             window.titleContent = new GUIContent("Name Your Collection");
@@ -24,7 +24,7 @@ namespace PrefabPalette
 
             window.minSize = new Vector2(WindowWidth, WindowHeight);
             window.maxSize = new Vector2(WindowWidth, WindowHeight);
-            window.onCreate = onCreateCallback;
+            window.onCollectionNameConfirmed = onCollectionNameConfirmed;
             window.ShowUtility();
         }
 
@@ -56,7 +56,7 @@ namespace PrefabPalette
                         return;
                     }
 
-                    onCreate?.Invoke(sanitisedName);
+                    onCollectionNameConfirmed?.Invoke(sanitisedName);
                     Close();
                 }
                 else
