@@ -8,17 +8,16 @@ namespace PrefabPalette
     /// </summary>
     public static class VisualPlacer
     {
-        private static Vector3 previewPosition;
-        private static bool isActive = false;
-        private static float targetRadius = 1.0f;
-        private static Vector3 lastPreviewPosition;
-        private static Color color;
-        static ToolSettings settings;
+        static Vector3 previewPosition;
+        static bool isActive = false;
+        static float targetRadius = 1.0f;
+        static Vector3 lastPreviewPosition;
+        static Color color;
+        static ToolSettings Settings => ToolContext.Instance.Settings;
 
-        public static void OnEnable(ToolSettings settings)
+        public static void OnEnable()
         {            
             SceneView.duringSceneGui += OnSceneGUI;
-            VisualPlacer.settings = settings;
         }
 
         public static void OnDisable()
@@ -41,7 +40,7 @@ namespace PrefabPalette
                 // Force a repaint when position changes
                 sceneView.Repaint();
             }
-            var normal = settings.freeMode_alignWithSurface ? SceneInteraction.SurfaceNormal : Vector3.up;
+            var normal = Settings.freeMode_alignWithSurface ? SceneInteraction.SurfaceNormal : Vector3.up;
 
             // Draw the visual placer
             DrawPlacer(previewPosition, normal);
@@ -63,8 +62,8 @@ namespace PrefabPalette
         /// </summary>
         public static void ShowTarget()
         {
-            color = settings.placer_color;
-            targetRadius = Mathf.Max(0.1f, settings.placer_radius);
+            color = Settings.placer_color;
+            targetRadius = Mathf.Max(0.1f, Settings.placer_radius);
 
             if (isActive)
                 return;

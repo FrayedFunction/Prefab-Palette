@@ -10,33 +10,26 @@ namespace PrefabPalette
     /// </summary>
     public class PaletteWindow : EditorWindow
     {
-        ToolContext tool;
-
         Vector2 paletteScrollPosition;
         Vector2 windowScrollPosition;
         float dynamicPrefabIconSize;
 
+        ToolSettings Settings => ToolContext.Instance.Settings;
+
         /// <summary>
-        /// Opens the main Prefab Palette window via the Unity menu.
+        /// Opens the main Prefab Palette window.
         /// </summary>
         [MenuItem("Window/Prefab Palette/Palette")]
-        public static void OpenPalette()
-        {
-            PaletteWindow.OnShowToolWindow(ToolContext.Instance);
-        }
-
-        public static void OnShowToolWindow(ToolContext tool)
+        public static void OnShowToolWindow()
         {
             var window = GetWindow<PaletteWindow>("Prefab Palette");
-            window.tool = tool;
         }
 
         private void OnEnable()
         {
-            tool = ToolContext.Instance;
-            VisualPlacer.OnEnable(tool.Settings);
-            SceneInteraction.OnEnable(tool.Settings);
-            PlacementModeManager.CurrentMode.OnEnter(tool);
+            VisualPlacer.OnEnable();
+            SceneInteraction.OnEnable();
+            PlacementModeManager.CurrentMode.OnEnter(ToolContext.Instance);
 
             SceneView.duringSceneGui += OnSceneGUI;
             minSize = new Vector2(400, 400);
@@ -47,14 +40,14 @@ namespace PrefabPalette
             SceneView.duringSceneGui -= OnSceneGUI;
             VisualPlacer.OnDisable();
             SceneInteraction.OnDisable();
-            PlacementModeManager.CurrentMode.OnExit(tool);
+            PlacementModeManager.CurrentMode.OnExit(ToolContext.Instance);
         }
 
         void OnGUI()
         {
             // Select collection
             GUILayout.Space(5);
-            tool.Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.currentCollectionName);
+            Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.currentCollectionName);
             GUILayout.Space(5);
 
             // if the enum only contains .None
@@ -75,7 +68,7 @@ namespace PrefabPalette
                 return;
             }
 
-            if (tool.Settings.CurrentPrefabCollection != null)
+            if (Settings.CurrentPrefabCollection != null)
             {
                 windowScrollPosition = GUILayout.BeginScrollView(windowScrollPosition);
                 PaletteGUI();
@@ -88,22 +81,22 @@ namespace PrefabPalette
         void PaletteGUI()
         {
             GUILayout.Space(5);
-            GUILayout.Label($"Palette - {tool.Settings.CurrentPrefabCollection.Name}", EditorStyles.boldLabel);
+            GUILayout.Label($"Palette - {Settings.CurrentPrefabCollection.Name}", EditorStyles.boldLabel);
             GUILayout.Space(5);
             GUILayout.BeginVertical("box");
 
             float windowWidth = EditorGUIUtility.currentViewWidth - 10; // Get editor window width (minus padding)
 
-            dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / tool.Settings.palette_gridColumns - 10, 40), tool.Settings.palette_minScale, tool.Settings.palette_maxScale);
+            dynamicPrefabIconSize = Mathf.Clamp(Mathf.Max(windowWidth / Settings.palette_gridColumns - 10, 40), Settings.palette_minScale, Settings.palette_maxScale);
 
             // Start Scroll View
             paletteScrollPosition = GUILayout.BeginScrollView(paletteScrollPosition); // Set max visible height
 
-            var prefabList = tool.Settings.CurrentPrefabCollection.prefabList;
-            int rowCount = Mathf.CeilToInt((float)prefabList.Count / tool.Settings.palette_gridColumns);
+            var prefabList = Settings.CurrentPrefabCollection.prefabList;
+            int rowCount = Mathf.CeilToInt((float)prefabList.Count / Settings.palette_gridColumns);
 
             // Calculate the total width of the grid (based on the number of columns and button size)
-            float gridWidth = tool.Settings.palette_gridColumns * dynamicPrefabIconSize;
+            float gridWidth = Settings.palette_gridColumns * dynamicPrefabIconSize;
 
             // Calculate the left padding required to center the grid
             float gridPadding = Mathf.Max((windowWidth - gridWidth) * 0.2f, 0);
@@ -113,9 +106,9 @@ namespace PrefabPalette
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(gridPadding);
 
-                for (int col = 0; col < tool.Settings.palette_gridColumns; col++)
+                for (int col = 0; col < Settings.palette_gridColumns; col++)
                 {
-                    int index = row * tool.Settings.palette_gridColumns + col;
+                    int index = row * Settings.palette_gridColumns + col;
                     if (index >= prefabList.Count) break;
 
                     GameObject prefab = prefabList[index];
@@ -137,7 +130,7 @@ namespace PrefabPalette
                         );
 
                         bool isHovering = totalRect.Contains(Event.current.mousePosition);
-                        bool isSelected = tool.SelectedPrefab == prefab;
+                        bool isSelected = ToolContext.Instance.SelectedPrefab == prefab;
 
                         // Draw selection background (centering it with button)
                         if (isSelected)
@@ -151,13 +144,13 @@ namespace PrefabPalette
                         // Handle selection logic
                         if (GUI.Button(totalRect, GUIContent.none, GUIStyle.none))
                         {
-                            if (tool.SelectedPrefab != null && tool.SelectedPrefab == prefab)
+                            if (ToolContext.Instance.SelectedPrefab != null && ToolContext.Instance.SelectedPrefab == prefab)
                             {
-                                tool.SelectedPrefab = null;
+                                ToolContext.Instance.SelectedPrefab = null;
                             }
                             else
                             {
-                                tool.SelectedPrefab = prefab;
+                                ToolContext.Instance.SelectedPrefab = prefab;
 
                             }
                         }
@@ -186,14 +179,14 @@ namespace PrefabPalette
 
         void OnSceneGUI(SceneView sceneView)
         {
-            if (tool != null && tool.SelectedPrefab != null)
+            if (ToolContext.Instance.SelectedPrefab != null)
             {
-                PlacementModeManager.CurrentMode.OnActive(tool);
+                PlacementModeManager.CurrentMode.OnActive(ToolContext.Instance);
                 VisualPlacer.ShowTarget();
             }
             else
             {
-                PlacementModeManager.CurrentMode.OnExit(tool);
+                PlacementModeManager.CurrentMode.OnExit(ToolContext.Instance);
                 VisualPlacer.Stop();
             }
         }

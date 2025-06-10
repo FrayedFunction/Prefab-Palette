@@ -7,14 +7,13 @@ namespace PrefabPalette
 {
     public static class SceneInteraction
     {
-        static ToolSettings toolSettings;
+        static ToolSettings Settings => ToolContext.Instance.Settings;
 
         public static bool SnapToGrid { get; set; }
 
-        public static void OnEnable(ToolSettings settings)
+        public static void OnEnable()
         {
             SceneView.duringSceneGui += UpdateRaycast;
-            toolSettings = settings;
         }
 
         public static void OnDisable()
@@ -31,7 +30,7 @@ namespace PrefabPalette
             if (e == null) return;
 
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, toolSettings.placer_includeMask))
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, Settings.placer_includeMask))
             {
                 SurfaceNormal = hit.normal;
 

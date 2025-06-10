@@ -62,7 +62,7 @@ namespace PrefabPalette
                 {
                     if (GUILayout.Button("Open Palette"))
                     {
-                        PaletteWindow.OnShowToolWindow(ToolContext.Instance);
+                        PaletteWindow.OnShowToolWindow();
                         SceneView.RepaintAll(); // Attempt to refresh view
                     }
                 }

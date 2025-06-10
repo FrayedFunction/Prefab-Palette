@@ -11,7 +11,7 @@ namespace PrefabPalette
     /// </summary>
     public class CollectionsManagerWindow : EditorWindow
     {
-        static ToolContext tool;
+        ToolSettings Settings => ToolContext.Instance.Settings;
         float buttonSpace = 5;
 
         /// <summary>
@@ -25,7 +25,6 @@ namespace PrefabPalette
 
         private void OnEnable()
         {
-            tool = ToolContext.Instance;
             minSize = new Vector2(600, 500);
             maxSize = new Vector2(601, 501);
         }
@@ -37,7 +36,7 @@ namespace PrefabPalette
             // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
             if (HasOpenInstances<CollectionsListInspector>())
             {
-                tool.Settings.currentCollectionName = CollectionName.None;
+                Settings.currentCollectionName = CollectionName.None;
                 EditorGUILayout.HelpBox("Collections Inspector window is open, close it when you're finished editing", MessageType.Warning);
                 return;
             }
@@ -58,7 +57,7 @@ namespace PrefabPalette
             GUILayout.Space(10);
             Helpers.DrawLine(Color.gray);
 
-            tool.Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", tool.Settings.currentCollectionName);
+            Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.currentCollectionName);
 
             // if the enum only contains .None
             if (!Enum.GetValues(typeof(CollectionName))
@@ -69,7 +68,7 @@ namespace PrefabPalette
                 return;
             }
 
-            if (tool.Settings.currentCollectionName == CollectionName.None)
+            if (Settings.currentCollectionName == CollectionName.None)
             {
                 EditorGUILayout.HelpBox("Choose a Collection to get Started", MessageType.Warning);
                 return;
@@ -79,14 +78,14 @@ namespace PrefabPalette
             if (GUILayout.Button("Edit Prefab Collection", GUILayout.Height(25)))
             {
                 // Inspect the currentPrefabCollection scriptable object
-                PrefabCollectionInspector.OpenWindow(tool.Settings.CurrentPrefabCollection);
+                PrefabCollectionInspector.OpenWindow(Settings.CurrentPrefabCollection);
             }
 
             GUILayout.Space(buttonSpace);
 
             if (GUILayout.Button("Open Palette", GUILayout.Height(25)))
             {
-                PaletteWindow.OnShowToolWindow(tool);
+                PaletteWindow.OnShowToolWindow();
             }
 
             GUILayout.Space(buttonSpace);
