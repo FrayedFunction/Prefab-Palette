@@ -12,7 +12,7 @@ namespace PrefabPalette
     {
         public enum ModeName
         {
-            Free,
+            Single,
             Line
         }
 
@@ -22,7 +22,7 @@ namespace PrefabPalette
             // NOTE: Mode enum and toolbarButtons must be in the same order.
             toolbarButtons = new GUIContent[]
             {
-                new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Free Mode"),
+                new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Single Mode"),
                 new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
             };
 
@@ -30,11 +30,11 @@ namespace PrefabPalette
             modes = new Dictionary<ModeName, IPlacementMode>()
             {
                 { ModeName.Line, new LineDrawMode() },
-                { ModeName.Free, new SinglePrefabMode() },
+                { ModeName.Single, new SinglePrefabMode() },
             };
 
             // Set defualt mode here:
-            CurrentModeName = ModeName.Free;
+            CurrentModeName = ModeName.Single;
         }
 
         static GUIContent[] toolbarButtons;
