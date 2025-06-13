@@ -369,6 +369,12 @@ namespace PrefabPalette
             }
             EditorGUI.indentLevel--;
         }
+
+        public string[] ControlsHelpBox => new string[] 
+        { 
+            "LMB", "Place Point",
+            "Escape", "Cancel Drawing Line"
+        };
         #endregion
-    }
+}
 }

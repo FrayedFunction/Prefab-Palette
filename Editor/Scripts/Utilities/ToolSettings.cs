@@ -24,6 +24,7 @@ namespace PrefabPalette
         // Overlay
         public Vector2 overlay_size = new(420, 250);
         public bool overlay_autoSize;
+        public bool overlay_showControlsHelpBox = true;
 
         // Free Mode
         public Vector3 freeMode_placementOffset = Vector3.zero;

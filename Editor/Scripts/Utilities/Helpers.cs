@@ -21,6 +21,66 @@ namespace PrefabPalette
             EditorGUILayout.LabelField(text, titleStyle);
             GUILayout.Space(padding);
         }
+
+        // "Label Grid" should be reworked as a generic to extend it for other types, but it'll do for now.
+        public static float CalculateLabelGridWidth(string[] labels, int columns = 2, float padding = 10f)
+        {
+            GUIStyle labelStyle = GUI.skin.label;
+            float maxLabelWidth = 0f;
+
+            foreach (var label in labels)
+            {
+                Vector2 size = labelStyle.CalcSize(new GUIContent(label));
+                if (size.x > maxLabelWidth)
+                    maxLabelWidth = size.x;
+            }
+
+            return (maxLabelWidth + padding) * columns;
+        }
+
+        public static void DrawLabelGrid(string[] labels, int columns = 2, float padding = 10f)
+        {
+            int total = labels.Length;
+            int rows = Mathf.CeilToInt((float)total / columns);
+
+            GUIStyle boxStyle = new GUIStyle(GUI.skin.box)
+            {
+                margin = new RectOffset(1, 1, 1, 1),
+                padding = new RectOffset(4, 4, 4, 4),
+                alignment = TextAnchor.MiddleCenter,
+                wordWrap = true
+            };
+
+            float maxLabelWidth = 0f;
+            foreach (var label in labels)
+            {
+                Vector2 size = GUI.skin.label.CalcSize(new GUIContent(label));
+                if (size.x > maxLabelWidth)
+                    maxLabelWidth = size.x;
+            }
+
+            float cellWidth = maxLabelWidth + padding;
+            float cellHeight = 30f;
+
+            for (int row = 0; row < rows; row++)
+            {
+                GUILayout.BeginHorizontal();
+                for (int col = 0; col < columns; col++)
+                {
+                    int index = row * columns + col;
+                    if (index < total)
+                    {
+                        GUILayout.Box(labels[index], boxStyle, GUILayout.Width(cellWidth), GUILayout.Height(cellHeight));
+                    }
+                    else
+                    {
+                        GUILayout.Box("", boxStyle, GUILayout.Width(cellWidth), GUILayout.Height(cellHeight));
+                    }
+                }
+                GUILayout.EndHorizontal();
+            }
+        }
+
         public static Vector3 SnapToGrid(Vector3 position)
         {
             float gridSize = UnityEditor.EditorSnapSettings.move.x;

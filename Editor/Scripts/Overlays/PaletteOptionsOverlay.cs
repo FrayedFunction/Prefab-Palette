@@ -48,8 +48,38 @@ namespace PrefabPalette
 
                     GUILayout.Space(4);
                     PlacementModeManager.ToolbarGUI(tool);
+
                     GUILayout.Space(2.5f);
                     GUILayout.Label(PlacementModeManager.CurrentModeName.ToString(), EditorStyles.boldLabel);
+                    GUILayout.Space(2.5f);
+
+                    string[] controls = PlacementModeManager.CurrentMode.ControlsHelpBox;
+                    if (controls != null && controls.Length > 0)
+                    {
+                        if (GUILayout.Button("Controls"))
+                        {
+                            tool.Settings.overlay_showControlsHelpBox = !tool.Settings.overlay_showControlsHelpBox;
+                        }
+
+                        if (tool.Settings.overlay_showControlsHelpBox)
+                        {
+                            GUILayout.BeginVertical(EditorStyles.helpBox);
+
+                            float gridWidth = Helpers.CalculateLabelGridWidth(controls, 2);
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.FlexibleSpace();
+
+                            GUILayout.BeginVertical(GUILayout.Width(gridWidth));
+                            Helpers.DrawLabelGrid(controls, 2);
+                            GUILayout.EndVertical();
+
+                            GUILayout.FlexibleSpace();
+                            GUILayout.EndHorizontal();
+
+                            GUILayout.EndVertical();
+                        }
+                    }
                     GUILayout.Space(5f);
 
                     PlacementModeManager.CurrentMode.SettingsGUI(tool);

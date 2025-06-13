@@ -8,6 +8,12 @@ namespace PrefabPalette
     public interface IPlacementMode
     {
         /// <summary>
+        /// Tells you what buttons to press from the context menu
+        /// </summary>
+        /// <param name="tool"></param>
+        string[] ControlsHelpBox { get; }
+
+        /// <summary>
         /// Draws the settings user interface for this placement mode in the Editor Overlay.
         /// </summary>
         /// <param name="tool">The context of the current tool.</param>

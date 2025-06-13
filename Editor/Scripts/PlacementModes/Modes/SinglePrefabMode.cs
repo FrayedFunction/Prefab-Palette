@@ -73,5 +73,10 @@ namespace PrefabPalette
             tool.Settings.freeMode_placementOffset = EditorGUILayout.Vector3Field("Placement Offset", tool.Settings.freeMode_placementOffset);
             tool.Settings.freeMode_alignWithSurface = EditorGUILayout.Toggle("Align with surface?", tool.Settings.freeMode_alignWithSurface);
         }
+
+        public string[] ControlsHelpBox => new string[]
+        {
+                "LMB", "Place Single Prefab"
+        };
     }
 }
