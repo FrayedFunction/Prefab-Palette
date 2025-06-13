@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using System.Runtime.CompilerServices;
 
 namespace PrefabPalette
 {
@@ -28,9 +27,9 @@ namespace PrefabPalette
             // Palette Settings
             GUILayout.Label("Palette:", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
-            Settings.palette_gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Palette Columns", Settings.palette_gridColumns));
-            Settings.palette_minScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Palette Scale", Settings.palette_minScale), 50f, Settings.palette_maxScale);
-            Settings.palette_maxScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Palette Scale", Settings.palette_maxScale), Settings.palette_minScale, 500f);
+            Settings.palette_gridColumns = Mathf.Max(1, EditorGUILayout.IntField("Columns", Settings.palette_gridColumns));
+            Settings.palette_minScale = Mathf.Clamp(EditorGUILayout.FloatField("Min Scale", Settings.palette_minScale), 50f, Settings.palette_maxScale);
+            Settings.palette_maxScale = Mathf.Clamp(EditorGUILayout.FloatField("Max Scale", Settings.palette_maxScale), Settings.palette_minScale, 500f);
             EditorGUI.indentLevel--;
             
             GUILayout.Space(2);
@@ -39,8 +38,8 @@ namespace PrefabPalette
             GUILayout.Label("Placer:", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
             Settings.placer_includeMask = LayerMaskField("Include Layers", Settings.placer_includeMask);
-            Settings.placer_color = EditorGUILayout.ColorField("Placer Color", Settings.placer_color);
-            Settings.placer_radius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Placer Visual Radius", Settings.placer_radius));
+            Settings.placer_color = EditorGUILayout.ColorField("Color", Settings.placer_color);
+            Settings.placer_radius = Mathf.Max(0.01f, EditorGUILayout.FloatField("Radius", Settings.placer_radius));
             EditorGUI.indentLevel-- ;
 
             GUILayout.Space(2);
@@ -49,7 +48,7 @@ namespace PrefabPalette
             GUILayout.Label("Overlay:", EditorStyles.whiteLargeLabel);
             EditorGUI.indentLevel++;
             Settings.overlay_autoSize = EditorGUILayout.Toggle("Auto Size?", Settings.overlay_autoSize);
-            Settings.overlay_size = Settings.overlay_autoSize ? Vector2.zero : EditorGUILayout.Vector2Field("Overlay Size", Settings.overlay_size);
+            Settings.overlay_size = Settings.overlay_autoSize ? Vector2.zero : EditorGUILayout.Vector2Field("Size", Settings.overlay_size);
             EditorGUI.indentLevel--;
         }
 
