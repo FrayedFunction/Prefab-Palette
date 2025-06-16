@@ -28,7 +28,7 @@ namespace PrefabPalette
 
             if (linePoints.Count < 1) return;
 
-            // Debug line (fit this in the line loop, why tf is it here?
+            // Debug line (fit this in the line loop, why tf is it here?)
             for (int j = 0; j < linePoints.Count; j++)
             {
                 if (j != linePoints.Count - 1)
