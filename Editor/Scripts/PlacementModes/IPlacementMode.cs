@@ -10,7 +10,6 @@ namespace PrefabPalette
         /// <summary>
         /// Tells you what buttons to press from the context menu
         /// </summary>
-        /// <param name="tool"></param>
         string[] ControlsHelpBox { get; }
 
         /// <summary>
