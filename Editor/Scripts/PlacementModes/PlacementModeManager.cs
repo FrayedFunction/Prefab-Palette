@@ -10,6 +10,9 @@ namespace PrefabPalette
     /// </summary>
     public static class PlacementModeManager
     {
+        static LineModeSettings LineSettings => Helpers.LoadOrCreateAsset<LineModeSettings>(PathDr.GetGeneratedFolderPath, "lineModeSettings.asset",  out _);
+        static SingleModeSettings SingleSettings => Helpers.LoadOrCreateAsset<SingleModeSettings>(PathDr.GetGeneratedFolderPath, "singleModeSettings.asset",  out _);
+        
         public enum ModeName
         {
             Single,
@@ -29,8 +32,8 @@ namespace PrefabPalette
             // Hook up the modes class with the mode enum:
             modes = new Dictionary<ModeName, IPlacementMode>()
             {
-                { ModeName.Line, new LineDrawMode() },
-                { ModeName.Single, new SinglePrefabMode() },
+                { ModeName.Line, new LineDrawMode(LineSettings) },
+                { ModeName.Single, new SinglePrefabMode(SingleSettings) },
             };
 
             // Set defualt mode here:

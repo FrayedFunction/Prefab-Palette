@@ -26,29 +26,7 @@ namespace PrefabPalette
         public bool overlay_autoSize;
         public bool overlay_showControlsHelpBox = true;
 
-        // Free Mode
-        public Vector3 freeMode_placementOffset = Vector3.zero;
         public bool freeMode_alignWithSurface = false;
-        public float freeMode_rotationSpeed = 2f;
-
-        // Line Mode
-        public float lineMode_ObjRndRotationMin;
-        public float lineMode_ObjRndRotationMax;
-        public bool linemode_ObjRndRotation;
-        public bool lineMode_rotateOnX, lineMode_rotateOnY, lineMode_rotateOnZ;
-        public bool lineMode_chainLines;
-        public Vector3 lineMode_segmentOffset;
-        public Vector3 lineMode_relativeRotation;
-        public float lineMode_lineSpacing = 1;
-        
-        public bool lineMode_useAltObjs;
-        public bool lineMode_useCollection;
-        public CollectionName lineMode_altObjsCollection;
-        public PrefabCollection lineMode_altCollection => PrefabCollection.GetCollectionByName(lineMode_altObjsCollection);
-        public GameObject lineMode_altObj;
-        public bool lineMode_randomAltObjs = true;
-        public float lineMode_altObjProbability = 0.5f;
-        public int lineMode_altObjInterval = 4;
 
         // Marked dirty on disable so Unity knows to save it
         private void OnDisable()
