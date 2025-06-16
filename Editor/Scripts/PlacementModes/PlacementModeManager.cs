@@ -10,8 +10,8 @@ namespace PrefabPalette
     /// </summary>
     public static class PlacementModeManager
     {
-        static LineModeSettings LineSettings => Helpers.LoadOrCreateAsset<LineModeSettings>(PathDr.GetGeneratedFolderPath, "lineModeSettings.asset",  out _);
-        static SingleModeSettings SingleSettings => Helpers.LoadOrCreateAsset<SingleModeSettings>(PathDr.GetGeneratedFolderPath, "singleModeSettings.asset",  out _);
+        static LineModeSettings LineSettings => Helpers.LoadOrCreateAsset<LineModeSettings>(PathDr.GetModeSettingsFolder, "LineModeSettings.asset",  out _);
+        static SingleModeSettings SingleSettings => Helpers.LoadOrCreateAsset<SingleModeSettings>(PathDr.GetModeSettingsFolder, "SingleModeSettings.asset",  out _);
         
         public enum ModeName
         {
