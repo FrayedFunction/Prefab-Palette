@@ -193,14 +193,29 @@ namespace PrefabPalette
 
         public void OnExit(ToolContext tool)
         {
-            cachedObjects.Clear();
-            cachedRotations.Clear();
-            linePoints.Clear();
             spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
-            spawnedObjects.Clear();
-            ClearPreviewObjects();
+            Reset();
         }
         #endregion
+
+
+        private void AddLineToUndoStack()
+        {
+            Undo.RegisterCreatedObjectUndo(spawnedObjParent, "Create Line");
+            foreach (var obj in spawnedObjects)
+            {
+                Undo.RegisterCreatedObjectUndo(obj, "Create Line");
+            }
+        }
+
+        private void Reset()
+        {
+            cachedObjects.Clear();
+            cachedRotations.Clear();
+            ClearPreviewObjects();
+            spawnedObjects.Clear();
+            linePoints.Clear();
+        }
 
         private void ClearPreviewObjects()
         {
@@ -210,7 +225,8 @@ namespace PrefabPalette
 
         private void HandleInput(ToolContext tool, Event e)
         {
-            // Create line with left mouse click
+             // Switch might be more appropriate here.
+            // Create line point with left mouse click
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
             {
                 // Add a point for the lines start position
@@ -224,19 +240,16 @@ namespace PrefabPalette
                         GameObject placed = GameObject.Instantiate(preview, spawnedObjParent.transform);
                         placed.transform.SetPositionAndRotation(preview.transform.position, preview.transform.rotation);
                         spawnedObjects.Add(placed);
-                        cachedRotations.Clear();
-                        cachedObjects.Clear();
                     }
+
+                    cachedRotations.Clear();
+                    cachedObjects.Clear();
                 }
 
                 if (!tool.Settings.lineMode_chainLines && linePoints.Count >= 2)
                 {
-                    cachedObjects.Clear();
-                    cachedRotations.Clear();
-                    ClearPreviewObjects();
-                    spawnedObjects.Clear();
-                    linePoints.Clear();
                     spawnedObjParent = null;
+                    Reset();
                 }
 
                 e.Use();
@@ -245,25 +258,20 @@ namespace PrefabPalette
             // Confirm with Enter
             if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Return)
             {
-                cachedObjects.Clear();
-                cachedRotations.Clear();
-                ClearPreviewObjects();
-                linePoints.Clear();
-                spawnedObjects.Clear();
+                AddLineToUndoStack();
                 spawnedObjParent = null;
+                Reset();
+
                 e.Use();
             }
 
             // Cancel with Escape
             if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape)
             {
-                cachedObjects.Clear();
-                cachedRotations.Clear();
-                linePoints.Clear();
                 spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
-                spawnedObjects.Clear();
-                ClearPreviewObjects();
                 GameObject.DestroyImmediate(spawnedObjParent);
+                Reset();
+
                 e.Use();
             }
         }
@@ -373,8 +381,9 @@ namespace PrefabPalette
         public string[] ControlsHelpBox => new string[] 
         { 
             "LMB", "Place Point",
+            "Enter", "Confirm Line",
             "Escape", "Cancel Drawing Line"
         };
         #endregion
-}
+    }
 }
