@@ -77,7 +77,6 @@ namespace PrefabPalette
         {
             Settings.freeMode_rotationSpeed = EditorGUILayout.Slider("Rotation Speed", Settings.freeMode_rotationSpeed, 0.1f, 5);
             Settings.freeMode_placementOffset = EditorGUILayout.Vector3Field("Placement Offset", Settings.freeMode_placementOffset);
-            context.Settings.freeMode_alignWithSurface = EditorGUILayout.Toggle("Align with surface?", context.Settings.freeMode_alignWithSurface);
         }
 
         public string[] ControlsHelpBox => new string[]
