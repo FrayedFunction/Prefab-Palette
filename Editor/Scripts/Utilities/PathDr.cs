@@ -20,6 +20,7 @@ namespace PrefabPalette
         private static string toolPath;
         private static string generatedFolderPath;
         private static string collectionsPath;
+        private static string modeSettingsPath;
 
         static PathDr()
         {
@@ -44,49 +45,52 @@ namespace PrefabPalette
                 }
                 else
                 {
-                    Debug.LogError($"PrefabPalette/{nameof(PathDr)}Can't find editor folder");
-                }
-            }
-
-            generatedFolderPath = Path.Combine(GetToolPath, "Generated");
-
-            if (!Directory.Exists(generatedFolderPath))
-            {
-                string newGUID = AssetDatabase.CreateFolder(GetToolPath, "Generated");
-
-                if (string.IsNullOrEmpty(newGUID))
-                {
-                    // Creation failed
-                    Debug.LogError($"PrefabPalette/{nameof(PathDr)}: Failed to create Generated folder!");
+                    Debug.LogError($"PrefabPalette/{nameof(PathDr)}Can't find editor folder!");
                     return;
                 }
-
-                // Folder Created
-                generatedFolderPath = AssetDatabase.GUIDToAssetPath(newGUID);
-
-                Debug.Log($"PrefabPalette/{nameof(PathDr)}: Collections folder created successfully at {generatedFolderPath}. Refreshing AssetDatabase...");
-                AssetDatabase.Refresh();
             }
 
-            collectionsPath = Path.Combine(GetGeneratedFolderPath, "Collections");
+            generatedFolderPath = Path.Combine(toolPath, "Generated");
+            ValidateFolderPath(generatedFolderPath);
 
-            if (!Directory.Exists(collectionsPath))
-            {
-                string newGUID = AssetDatabase.CreateFolder(GetGeneratedFolderPath, "Collections");
+            collectionsPath = Path.Combine(generatedFolderPath, "Collections");
+            ValidateFolderPath(collectionsPath);
 
-                if (string.IsNullOrEmpty(newGUID))
-                {
-                    Debug.LogError($"PrefabPalette/{nameof(PathDr)}: Failed to create Collections folder!");
-                    return;
-                }
-
-                // Folder Created
-                collectionsPath = AssetDatabase.GUIDToAssetPath(newGUID);
-
-                Debug.Log($"PrefabPalette/{nameof(PathDr)}: Collections folder created successfully at {collectionsPath}. Refreshing AssetDatabase...");
-                AssetDatabase.Refresh();
-            }
+            modeSettingsPath = Path.Combine(generatedFolderPath, "Mode Settings");
+            ValidateFolderPath(modeSettingsPath);
         }
+
+        public static bool ValidateFolderPath(string fullPath)
+        {
+            if (!Directory.Exists(fullPath))
+            {
+                // Get parent folder and new folder name
+                string parent = Path.GetDirectoryName(fullPath);
+                string folderName = Path.GetFileName(fullPath);
+
+                if (string.IsNullOrEmpty(parent) || string.IsNullOrEmpty(folderName))
+                {
+                    Debug.LogError($"PrefabPalette/{nameof(ValidateFolderPath)}: Invalid path '{fullPath}'");
+                    return false;
+                }
+
+                string newGUID = AssetDatabase.CreateFolder(parent, folderName);
+
+                if (string.IsNullOrEmpty(newGUID))
+                {
+                    Debug.LogError($"PrefabPalette/{nameof(ValidateFolderPath)}: Failed to create folder '{folderName}' in '{parent}'");
+                    return false;
+                }
+
+                string createdPath = AssetDatabase.GUIDToAssetPath(newGUID);
+
+                Debug.Log($"PrefabPalette/{nameof(ValidateFolderPath)}: Folder '{folderName}' created successfully at '{createdPath}'. Refreshing AssetDatabase...");
+                AssetDatabase.Refresh();
+            }
+
+            return true;
+        }
+
 
         /// <returns>
         /// Path to /PrefabPalette/Editor
@@ -104,6 +108,8 @@ namespace PrefabPalette
         /// </remarks>
         public static string GetCollectionsFolder => collectionsPath;
 
+        public static string GetModeSettingsFolder => modeSettingsPath;
+        
         /// <returns>
         /// GUID of <paramref name="folderName"/> from asset database
         /// </returns>
