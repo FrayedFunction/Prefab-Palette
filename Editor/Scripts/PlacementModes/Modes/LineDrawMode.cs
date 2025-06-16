@@ -277,7 +277,7 @@ namespace PrefabPalette
         }
 
         #region GUI
-        public void SettingsGUI(ToolContext tool)
+        public void SettingsOverlayGUI(ToolContext tool)
         {
             tool.Settings.lineMode_lineSpacing = EditorGUILayout.FloatField("Spacing", tool.Settings.lineMode_lineSpacing);
             tool.Settings.lineMode_relativeRotation = EditorGUILayout.Vector3Field("Relative Rotation", tool.Settings.lineMode_relativeRotation);

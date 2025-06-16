@@ -17,7 +17,7 @@ namespace PrefabPalette
         /// Draws the settings user interface for this placement mode in the Editor Overlay.
         /// </summary>
         /// <param name="tool">The context of the current tool.</param>
-        void SettingsGUI(ToolContext tool);
+        void SettingsOverlayGUI(ToolContext tool);
 
         /// <summary>
         /// Called when the placement mode is selected.

@@ -82,7 +82,7 @@ namespace PrefabPalette
                     }
                     GUILayout.Space(5f);
 
-                    PlacementModeManager.CurrentMode.SettingsGUI(tool);
+                    PlacementModeManager.CurrentMode.SettingsOverlayGUI(tool);
 
                     GUILayout.Space(10);
                     Helpers.DrawLine(Color.grey);

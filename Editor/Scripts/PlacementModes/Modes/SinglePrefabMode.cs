@@ -67,7 +67,7 @@ namespace PrefabPalette
         /// Allows configuration of rotation speed, placement offset, and alignment.
         /// </summary>
         /// <param name="tool">The current tool context.</param>
-        public void SettingsGUI(ToolContext tool)
+        public void SettingsOverlayGUI(ToolContext tool)
         {
             tool.Settings.freeMode_rotationSpeed = EditorGUILayout.Slider("Rotation Speed", tool.Settings.freeMode_rotationSpeed, 0.1f, 5);
             tool.Settings.freeMode_placementOffset = EditorGUILayout.Vector3Field("Placement Offset", tool.Settings.freeMode_placementOffset);
