@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PrefabPalette
 {
-    public class LineModeSettings : ScriptableObject
+    public class LineModeSettings : PlacementModeSettings
     {
         // Line Mode
         public float lineMode_ObjRndRotationMin;
@@ -23,13 +23,5 @@ namespace PrefabPalette
         public bool lineMode_randomAltObjs = true;
         public float lineMode_altObjProbability = 0.5f;
         public int lineMode_altObjInterval = 4;
-
-        // Marked dirty on disable so Unity knows to save it
-        private void OnDisable()
-        {
-            EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
     }
 }
