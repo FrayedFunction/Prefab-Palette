@@ -43,7 +43,7 @@ namespace PrefabPalette
                     );
                     GUILayout.Space(10f);
                     GUILayout.EndHorizontal();
-                    ToolContext.Instance.Settings.freeMode_alignWithSurface = EditorGUILayout.Toggle("Align with surface?", ToolContext.Instance.Settings.freeMode_alignWithSurface);
+                    ToolContext.Instance.Settings.placer_alignWithSurface = EditorGUILayout.Toggle("Align with surface?", ToolContext.Instance.Settings.placer_alignWithSurface);
                     Helpers.DrawLine(Color.grey);
 
                     GUILayout.Space(4);

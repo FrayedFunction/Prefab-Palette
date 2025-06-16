@@ -36,7 +36,7 @@ namespace PrefabPalette
                 lastSurfaceNormal = SceneInteraction.SurfaceNormal;
 
                 currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(context.SelectedPrefab);
-                currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + Settings.freeMode_placementOffset, context.Settings.freeMode_alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
+                currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + Settings.freeMode_placementOffset, context.Settings.placer_alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
                 Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
 
                 e.Use();
@@ -46,7 +46,7 @@ namespace PrefabPalette
             if (e.type == EventType.MouseDrag && e.button == 0 && !e.alt && currentPlacedObject != null)
             {
                 float angle = e.delta.x * Settings.freeMode_rotationSpeed;
-                Vector3 axis = context.Settings.freeMode_alignWithSurface ? lastSurfaceNormal : Vector3.up;
+                Vector3 axis = context.Settings.placer_alignWithSurface ? lastSurfaceNormal : Vector3.up;
                 currentPlacedObject.transform.Rotate(axis, angle, Space.World);
                 e.Use();
             }
