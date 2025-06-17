@@ -26,7 +26,7 @@ namespace PrefabPalette
             toolbarButtons = new GUIContent[]
             {
                 new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Single Mode"),
-                new GUIContent(EditorGUIUtility.IconContent($"{PathDr.GetToolPath}/Imgs/LineIcon.png").image, "Line Mode")
+                new GUIContent(Resources.Load<Texture2D>("Imgs/LineIcon"), "Line Mode")
             };
 
             // Hook up the modes class with the mode enum:
