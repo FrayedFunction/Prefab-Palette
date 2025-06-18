@@ -90,10 +90,12 @@ namespace PrefabPalette
                 }
                 else
                 {
+                    Helpers.DrawLogo();
+
                     if (GUILayout.Button("Open Palette"))
                     {
                         PaletteWindow.OnShowToolWindow();
-                        SceneView.RepaintAll(); // Attempt to refresh view
+                        SceneView.RepaintAll();
                     }
                 }
 
