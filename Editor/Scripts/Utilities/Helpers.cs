@@ -7,6 +7,24 @@ namespace PrefabPalette
 {
     public static class Helpers
     {
+        /// <summary>
+        /// Draws tools logo in the centere of the ui. Defualts to blue 256x256
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="size"></param>
+        /// <param name="width"></param>
+        public static void DrawLogo(float size = 256, string name = "Logo_Blue_256")
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            Texture2D logo = Resources.Load<Texture2D>($"Imgs/{name}");
+            GUILayout.Label(logo, GUILayout.Width(size), GUILayout.Height(size));
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+
         public static void TitleText(string text, int fontSize = 20, float padding = 10)
         {
             GUIStyle titleStyle = new GUIStyle(EditorStyles.label)

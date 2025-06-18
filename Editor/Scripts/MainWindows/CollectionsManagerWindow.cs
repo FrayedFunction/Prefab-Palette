@@ -31,16 +31,7 @@ namespace PrefabPalette
 
         private void OnGUI()
         {
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-
-            Texture2D logo = Resources.Load<Texture2D>("Imgs/Logo_Blue_256");
-            GUILayout.Label(logo, GUILayout.Width(256), GUILayout.Height(256));
-
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-
-
+            Helpers.DrawLogo();
             Helpers.TitleText("Collections Manager");
 
             // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
