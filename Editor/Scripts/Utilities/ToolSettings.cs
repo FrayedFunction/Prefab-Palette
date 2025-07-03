@@ -23,7 +23,7 @@ namespace PrefabPalette
         public bool placer_alignWithSurface = false;
 
         // Overlay
-        public Vector2 overlay_size = new(420, 250);
+        public Vector2 overlay_size = new(420, 0);
         public bool overlay_autoSize;
         public bool overlay_showControlsHelpBox = true;
 
