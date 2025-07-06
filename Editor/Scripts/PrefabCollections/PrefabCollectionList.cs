@@ -53,7 +53,7 @@ namespace PrefabPalette
         public void GenerateEnum()
         {
             // Name validation
-            List<string> validNames = PrefabCollectionList.instance.collectionNames
+            List<string> validNames = collectionNames
                 .Where(i => !string.IsNullOrWhiteSpace(i)) // Ensure not empty
                 .Distinct() // Ensure is unique
                 .Select(Helpers.SanitiseEnumName) // Enure valid enum name
