@@ -22,7 +22,7 @@ namespace PrefabPalette
         static PlacementModeManager()
         {
             // Add buttons to the toolbar here:
-            // NOTE: Mode enum and toolbarButtons must be in the same order.
+            // NOTE: ModeName enum and toolbarButtons must be in the same order.
             toolbarButtons = new GUIContent[]
             {
                 new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Single Mode"),
