@@ -58,7 +58,7 @@ namespace PrefabPalette
             ValidateFolderPath(modeSettingsPath);
         }
 
-        public static bool ValidateFolderPath(string fullPath)
+        private static bool ValidateFolderPath(string fullPath)
         {
             if (!Directory.Exists(fullPath))
             {
