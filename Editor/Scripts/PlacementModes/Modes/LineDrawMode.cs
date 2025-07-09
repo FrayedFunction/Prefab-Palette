@@ -13,7 +13,7 @@ namespace PrefabPalette
     /// </summary>
     public class LineDrawMode : IPlacementMode
     {
-        LineModeSettings Settings;
+        LineModeSettings settings;
         static List<Vector3> linePoints = new();
         static List<GameObject> spawnedObjects = new();
         static List<GameObject> previewObjects = new List<GameObject>();
@@ -21,9 +21,9 @@ namespace PrefabPalette
         static Dictionary<int, Vector3> cachedRotations = new();
         static Dictionary<int, GameObject> cachedObjects = new();
 
-        public LineDrawMode(LineModeSettings settings)
+        public LineDrawMode(PlacementModeSettings settings)
         {
-            this.Settings = settings;
+            this.settings = (LineModeSettings)settings;
         }
 
         #region Placement Mode interface
@@ -48,7 +48,7 @@ namespace PrefabPalette
 
             Vector3 startPoint = linePoints.Last();
 
-            if (Settings.lineMode_chainLines && linePoints.Count >= 2)
+            if (settings.lineMode_chainLines && linePoints.Count >= 2)
             {
                 Vector3 segmentDir = (linePoints.Last() - linePoints[linePoints.Count - 2]).normalized;
 
@@ -63,9 +63,9 @@ namespace PrefabPalette
 
                 // Offset the position using the segment-aligned local space
                 Vector3 offset =
-                    right * Settings.lineMode_segmentOffset.x +
-                    localUp * Settings.lineMode_segmentOffset.y +
-                    segmentDir * Settings.lineMode_segmentOffset.z;
+                    right * settings.lineMode_segmentOffset.x +
+                    localUp * settings.lineMode_segmentOffset.y +
+                    segmentDir * settings.lineMode_segmentOffset.z;
 
                 startPoint += offset;
             }
@@ -85,7 +85,7 @@ namespace PrefabPalette
 
             // Obj rotation
             Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
-            objRotation.eulerAngles += Settings.lineMode_relativeRotation;
+            objRotation.eulerAngles += settings.lineMode_relativeRotation;
 
 /*            // First Obj
             var firstObj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
@@ -101,13 +101,13 @@ namespace PrefabPalette
                 {
                     bool spawnAlt = false;
 
-                    if (Settings.lineMode_useAltObjs)
+                    if (settings.lineMode_useAltObjs)
                     {
-                        if (Settings.lineMode_randomAltObjs)
+                        if (settings.lineMode_randomAltObjs)
                         {
-                            spawnAlt = Random.value <= Settings.lineMode_altObjProbability;
+                            spawnAlt = Random.value <= settings.lineMode_altObjProbability;
                         }
-                        else if (Settings.lineMode_altObjInterval > 0 && i % Settings.lineMode_altObjInterval == 0)
+                        else if (settings.lineMode_altObjInterval > 0 && i % settings.lineMode_altObjInterval == 0)
                         {
                             spawnAlt = true;
                         }
@@ -115,12 +115,12 @@ namespace PrefabPalette
 
                     if (spawnAlt)
                     {
-                        if (Settings.lineMode_useCollection)
+                        if (settings.lineMode_useCollection)
                         {
-                            if (Settings.lineMode_altObjsCollection != CollectionName.None)
+                            if (settings.lineMode_altObjsCollection != CollectionName.None)
                             {
-                                int rndIndex = UnityEngine.Random.Range(0, Settings.lineMode_altCollection.prefabList.Count);
-                                objToSpawn = Settings.lineMode_altCollection.prefabList[rndIndex];
+                                int rndIndex = UnityEngine.Random.Range(0, settings.lineMode_altCollection.prefabList.Count);
+                                objToSpawn = settings.lineMode_altCollection.prefabList[rndIndex];
                             }
                             else
                             {
@@ -130,7 +130,7 @@ namespace PrefabPalette
                         else
                         {
 
-                            objToSpawn = Settings.lineMode_altObj ? Settings.lineMode_altObj : context.SelectedPrefab;
+                            objToSpawn = settings.lineMode_altObj ? settings.lineMode_altObj : context.SelectedPrefab;
                         }
                     }
                     else
@@ -141,13 +141,13 @@ namespace PrefabPalette
                     cachedObjects[i] = objToSpawn;
                 }
 
-                if (Settings.linemode_ObjRndRotation)
+                if (settings.linemode_ObjRndRotation)
                 {
                     if (!cachedRotations.TryGetValue(i, out Vector3 cachedRot))
                     {
-                        float xRot = Settings.lineMode_rotateOnX ? UnityEngine.Random.Range(Settings.lineMode_ObjRndRotationMin, Settings.lineMode_ObjRndRotationMax) : 0;
-                        float yRot = Settings.lineMode_rotateOnY ? UnityEngine.Random.Range(Settings.lineMode_ObjRndRotationMin, Settings.lineMode_ObjRndRotationMax) : 0;
-                        float zRot = Settings.lineMode_rotateOnZ ? UnityEngine.Random.Range(Settings.lineMode_ObjRndRotationMin, Settings.lineMode_ObjRndRotationMax) : 0;
+                        float xRot = settings.lineMode_rotateOnX ? UnityEngine.Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0;
+                        float yRot = settings.lineMode_rotateOnY ? UnityEngine.Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0;
+                        float zRot = settings.lineMode_rotateOnZ ? UnityEngine.Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0;
 
                         cachedRot = new Vector3(xRot, yRot, zRot);
                         cachedRotations[i] = cachedRot;
@@ -157,7 +157,7 @@ namespace PrefabPalette
                 }
 
                 // Calculate object-specific spacing
-                float objectSpacing = Settings.lineMode_lineSpacing;
+                float objectSpacing = settings.lineMode_lineSpacing;
                 Renderer renderer = objToSpawn.GetComponent<Renderer>();
                 if (renderer != null)
                 {
@@ -253,7 +253,7 @@ namespace PrefabPalette
                     cachedObjects.Clear();
                 }
 
-                if (!Settings.lineMode_chainLines && linePoints.Count >= 2)
+                if (!settings.lineMode_chainLines && linePoints.Count >= 2)
                 {
                     spawnedObjParent = null;
                     Reset();
@@ -286,11 +286,11 @@ namespace PrefabPalette
         #region GUI
         public void SettingsOverlayGUI(ToolContext tool)
         {
-            Settings.lineMode_lineSpacing = EditorGUILayout.FloatField("Spacing", Settings.lineMode_lineSpacing);
-            Settings.lineMode_relativeRotation = EditorGUILayout.Vector3Field("Relative Rotation", Settings.lineMode_relativeRotation);
+            settings.lineMode_lineSpacing = EditorGUILayout.FloatField("Spacing", settings.lineMode_lineSpacing);
+            settings.lineMode_relativeRotation = EditorGUILayout.Vector3Field("Relative Rotation", settings.lineMode_relativeRotation);
 
-            Settings.linemode_ObjRndRotation = EditorGUILayout.Toggle("Variable Rotation?", Settings.linemode_ObjRndRotation);
-            if (Settings.linemode_ObjRndRotation) 
+            settings.linemode_ObjRndRotation = EditorGUILayout.Toggle("Variable Rotation?", settings.linemode_ObjRndRotation);
+            if (settings.linemode_ObjRndRotation) 
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.BeginVertical();
@@ -304,15 +304,15 @@ namespace PrefabPalette
                 EditorGUILayout.BeginHorizontal();
 
                 // Min float field
-                Settings.lineMode_ObjRndRotationMin = EditorGUILayout.FloatField(Settings.lineMode_ObjRndRotationMin, GUILayout.Width(50));
-                Settings.lineMode_ObjRndRotationMin = Mathf.Clamp(Settings.lineMode_ObjRndRotationMin, -360f, Settings.lineMode_ObjRndRotationMax);
+                settings.lineMode_ObjRndRotationMin = EditorGUILayout.FloatField(settings.lineMode_ObjRndRotationMin, GUILayout.Width(50));
+                settings.lineMode_ObjRndRotationMin = Mathf.Clamp(settings.lineMode_ObjRndRotationMin, -360f, settings.lineMode_ObjRndRotationMax);
 
                 // MinMax slider
-                EditorGUILayout.MinMaxSlider(ref Settings.lineMode_ObjRndRotationMin, ref Settings.lineMode_ObjRndRotationMax, -360f, 360f);
+                EditorGUILayout.MinMaxSlider(ref settings.lineMode_ObjRndRotationMin, ref settings.lineMode_ObjRndRotationMax, -360f, 360f);
 
                 // Max float field
-                Settings.lineMode_ObjRndRotationMax = EditorGUILayout.FloatField(Settings.lineMode_ObjRndRotationMax, GUILayout.Width(50));
-                Settings.lineMode_ObjRndRotationMax = Mathf.Clamp(Settings.lineMode_ObjRndRotationMax, Settings.lineMode_ObjRndRotationMin, 360f);
+                settings.lineMode_ObjRndRotationMax = EditorGUILayout.FloatField(settings.lineMode_ObjRndRotationMax, GUILayout.Width(50));
+                settings.lineMode_ObjRndRotationMax = Mathf.Clamp(settings.lineMode_ObjRndRotationMax, settings.lineMode_ObjRndRotationMin, 360f);
 
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.EndVertical();
@@ -332,15 +332,15 @@ namespace PrefabPalette
                 GUILayout.FlexibleSpace();
 
                 GUILayout.Label("X", GUILayout.Width(15));
-                Settings.lineMode_rotateOnX = GUILayout.Toggle(Settings.lineMode_rotateOnX, GUIContent.none, GUILayout.Width(20));
+                settings.lineMode_rotateOnX = GUILayout.Toggle(settings.lineMode_rotateOnX, GUIContent.none, GUILayout.Width(20));
 
                 GUILayout.Space(10);
                 GUILayout.Label("Y", GUILayout.Width(15));
-                Settings.lineMode_rotateOnY = GUILayout.Toggle(Settings.lineMode_rotateOnY, GUIContent.none, GUILayout.Width(20));
+                settings.lineMode_rotateOnY = GUILayout.Toggle(settings.lineMode_rotateOnY, GUIContent.none, GUILayout.Width(20));
 
                 GUILayout.Space(10);
                 GUILayout.Label("Z", GUILayout.Width(15));
-                Settings.lineMode_rotateOnZ = GUILayout.Toggle(Settings.lineMode_rotateOnZ, GUIContent.none, GUILayout.Width(20));
+                settings.lineMode_rotateOnZ = GUILayout.Toggle(settings.lineMode_rotateOnZ, GUIContent.none, GUILayout.Width(20));
 
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
@@ -350,37 +350,37 @@ namespace PrefabPalette
 
             }
 
-            Settings.lineMode_chainLines = EditorGUILayout.Toggle("Chain Lines?", Settings.lineMode_chainLines);
+            settings.lineMode_chainLines = EditorGUILayout.Toggle("Chain Lines?", settings.lineMode_chainLines);
 
-            if (Settings.lineMode_chainLines)
+            if (settings.lineMode_chainLines)
             {
                 EditorGUI.indentLevel++;
-               Settings.lineMode_segmentOffset = EditorGUILayout.Vector3Field("Link Offset",Settings.lineMode_segmentOffset);
+               settings.lineMode_segmentOffset = EditorGUILayout.Vector3Field("Link Offset",settings.lineMode_segmentOffset);
                 EditorGUI.indentLevel--;
             }
 
-           Settings.lineMode_useAltObjs = EditorGUILayout.Toggle("Use Alt Objs?",Settings.lineMode_useAltObjs);
+           settings.lineMode_useAltObjs = EditorGUILayout.Toggle("Use Alt Objs?",settings.lineMode_useAltObjs);
             EditorGUI.indentLevel++;
-            if (Settings.lineMode_useAltObjs)
+            if (settings.lineMode_useAltObjs)
             {
-               Settings.lineMode_useCollection = EditorGUILayout.Toggle("Use Prefab Alt Collection?",Settings.lineMode_useCollection);
+               settings.lineMode_useCollection = EditorGUILayout.Toggle("Use Prefab Alt Collection?",settings.lineMode_useCollection);
                 
-                if (Settings.lineMode_useCollection)
+                if (settings.lineMode_useCollection)
                 {
-                    Settings.lineMode_altObjsCollection = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection",Settings.lineMode_altObjsCollection);
+                    settings.lineMode_altObjsCollection = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection",settings.lineMode_altObjsCollection);
                     GUILayout.Space(5);
                 }
                 else
                 {
-                   Settings.lineMode_altObj = (GameObject)EditorGUILayout.ObjectField("Alt Object Prefab",Settings.lineMode_altObj, typeof(GameObject), false);
+                   settings.lineMode_altObj = (GameObject)EditorGUILayout.ObjectField("Alt Object Prefab",settings.lineMode_altObj, typeof(GameObject), false);
                 }
 
-               Settings.lineMode_randomAltObjs = EditorGUILayout.Toggle("Random?",Settings.lineMode_randomAltObjs);
+               settings.lineMode_randomAltObjs = EditorGUILayout.Toggle("Random?",settings.lineMode_randomAltObjs);
 
-                if (Settings.lineMode_randomAltObjs)
-                    Settings.lineMode_altObjProbability = EditorGUILayout.Slider("Probability", Settings.lineMode_altObjProbability, 0, 1);
+                if (settings.lineMode_randomAltObjs)
+                    settings.lineMode_altObjProbability = EditorGUILayout.Slider("Probability", settings.lineMode_altObjProbability, 0, 1);
                 else
-                   Settings.lineMode_altObjInterval = EditorGUILayout.IntField("Interval",Settings.lineMode_altObjInterval);
+                   settings.lineMode_altObjInterval = EditorGUILayout.IntField("Interval",settings.lineMode_altObjInterval);
             }
             EditorGUI.indentLevel--;
         }

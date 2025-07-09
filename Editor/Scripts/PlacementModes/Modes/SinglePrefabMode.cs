@@ -8,13 +8,13 @@ namespace PrefabPalette
     /// </summary>
     public class SinglePrefabMode : IPlacementMode
     {
-        SingleModeSettings Settings;
+        SingleModeSettings settings;
         GameObject currentPlacedObject;
         Vector3 lastSurfaceNormal;
 
-        public SinglePrefabMode(SingleModeSettings settings)
+        public SinglePrefabMode(PlacementModeSettings settings)
         {
-            this.Settings = settings;
+            this.settings = (SingleModeSettings)settings;
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace PrefabPalette
                 lastSurfaceNormal = SceneInteraction.SurfaceNormal;
 
                 currentPlacedObject = (GameObject)PrefabUtility.InstantiatePrefab(context.SelectedPrefab);
-                currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + Settings.freeMode_placementOffset, context.Settings.placer_alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
+                currentPlacedObject.transform.SetPositionAndRotation(SceneInteraction.Position + settings.freeMode_placementOffset, context.Settings.placer_alignWithSurface ? Quaternion.FromToRotation(Vector3.up, lastSurfaceNormal) : Quaternion.identity);
                 Undo.RegisterCreatedObjectUndo(currentPlacedObject, "Placed Prop");
 
                 e.Use();
@@ -45,7 +45,7 @@ namespace PrefabPalette
             // Rotate while holding the mouse button
             if (e.type == EventType.MouseDrag && e.button == 0 && !e.alt && currentPlacedObject != null)
             {
-                float angle = e.delta.x * Settings.freeMode_rotationSpeed;
+                float angle = e.delta.x * settings.freeMode_rotationSpeed;
                 Vector3 axis = context.Settings.placer_alignWithSurface ? lastSurfaceNormal : Vector3.up;
                 currentPlacedObject.transform.Rotate(axis, angle, Space.World);
                 e.Use();
@@ -75,8 +75,8 @@ namespace PrefabPalette
         /// <param name="context">The current tool context.</param>
         public void SettingsOverlayGUI(ToolContext context)
         {
-            Settings.freeMode_rotationSpeed = EditorGUILayout.Slider("Rotation Speed", Settings.freeMode_rotationSpeed, 0.1f, 5);
-            Settings.freeMode_placementOffset = EditorGUILayout.Vector3Field("Placement Offset", Settings.freeMode_placementOffset);
+            settings.freeMode_rotationSpeed = EditorGUILayout.Slider("Rotation Speed", settings.freeMode_rotationSpeed, 0.1f, 5);
+            settings.freeMode_placementOffset = EditorGUILayout.Vector3Field("Placement Offset", settings.freeMode_placementOffset);
         }
 
         public string[] ControlsHelpBox => new string[]
