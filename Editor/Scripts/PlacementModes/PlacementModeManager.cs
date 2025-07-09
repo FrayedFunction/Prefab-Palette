@@ -24,6 +24,15 @@ namespace PrefabPalette
 
         static PlacementModeManager()
         {
+            InitialiseToolbarButtons();
+            InitialisePlacementModes();
+
+            // Set defualt mode here:
+            CurrentModeName = ModeName.Single;
+        }
+
+        private static void InitialiseToolbarButtons()
+        {
             // Add buttons to the toolbar here:
             // NOTE: ModeName enum and toolbarButtons must be in the same order.
             toolbarButtons = new GUIContent[]
@@ -31,16 +40,16 @@ namespace PrefabPalette
                 new GUIContent(EditorGUIUtility.IconContent("d_MoveTool").image, "Single Mode"),
                 new GUIContent(Resources.Load<Texture2D>("Imgs/LineIcon"), "Line Mode")
             };
+        }
 
+        private static void InitialisePlacementModes()
+        {
             // Hook up the modes class with the mode enum:
             modes = new Dictionary<ModeName, IPlacementMode>()
             {
                 { ModeName.Line, new LineDrawMode(LineSettings) },
                 { ModeName.Single, new SinglePrefabMode(SingleSettings) },
             };
-
-            // Set defualt mode here:
-            CurrentModeName = ModeName.Single;
         }
 
         /// <summary>
