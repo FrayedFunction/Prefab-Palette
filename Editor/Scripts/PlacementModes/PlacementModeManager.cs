@@ -19,6 +19,9 @@ namespace PrefabPalette
             Line
         }
 
+        static GUIContent[] toolbarButtons;
+        static Dictionary<ModeName, IPlacementMode> modes;
+
         static PlacementModeManager()
         {
             // Add buttons to the toolbar here:
@@ -39,9 +42,6 @@ namespace PrefabPalette
             // Set defualt mode here:
             CurrentModeName = ModeName.Single;
         }
-
-        static GUIContent[] toolbarButtons;
-        static Dictionary<ModeName, IPlacementMode> modes;
 
         /// <summary>
         /// Gets the currently active placement mode instance.
