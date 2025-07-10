@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -74,7 +73,7 @@ namespace PrefabPalette
                 }
             }
 
-            return PrefabCollection.CreateNewCollection(name);
+            return  CreateNewCollection(name);
         }
     }
 }
