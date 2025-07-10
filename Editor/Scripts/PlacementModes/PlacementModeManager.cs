@@ -48,6 +48,7 @@ namespace PrefabPalette
                 { ModeName.Single, CreateModeInstance<SingleModeSettings, SinglePrefabMode>("SingleModeSettings.asset") },
             };
         }
+
         /// <summary>
         /// Creates an instance of a placement mode using the specified settings asset.
         /// Loads or creates the settings asset of type <typeparamref name="TSettings"/>,

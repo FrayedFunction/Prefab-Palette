@@ -1,10 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
-using PrefabPalette;
 using System.Linq;
-using System;
 
 namespace PrefabPalette
 {
