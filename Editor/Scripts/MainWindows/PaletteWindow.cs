@@ -50,7 +50,7 @@ namespace PrefabPalette
             Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.currentCollectionName);
             GUILayout.Space(5);
 
-            // if the enum only contains .None
+            // if the enum doesn't only contain .None
             if (!Enum.GetValues(typeof(CollectionName))
                      .Cast<CollectionName>()
                      .Any(c => c != CollectionName.None))
