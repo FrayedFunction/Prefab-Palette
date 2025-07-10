@@ -23,7 +23,7 @@ namespace PrefabPalette
         public CollectionName Name
         {
             get => Enum.TryParse(nameAsString, out CollectionName result) ? result : CollectionName.None;
-            set => nameAsString = value.ToString();
+            private set => nameAsString = value.ToString();
         }
 
         /// <summary>
