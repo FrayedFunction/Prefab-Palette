@@ -48,6 +48,8 @@ namespace PrefabPalette
             EditorGUILayout.Space(10f);
         }
 
+        // This shouldn't be a function of the list inspector, it would make more sense to be called
+        // from CollectionList.GenerateEnum()
         /// <summary>
         /// Delete PrefabCollection objects no longer in the list.
         /// </summary>

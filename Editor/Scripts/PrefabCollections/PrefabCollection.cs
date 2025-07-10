@@ -46,6 +46,7 @@ namespace PrefabPalette
             return asset;
         }
 
+        // This isn't really a property of a prefab collection, should live in a manager or utility script or something.
         /// <summary>
         /// Returns a list of all saved prefab collections.
         /// </summary>
