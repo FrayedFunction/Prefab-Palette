@@ -37,7 +37,7 @@ namespace PrefabPalette
             // Force the name dropdown to None to avoid regenerating assets accidentally if the list inspector is open
             if (HasOpenInstances<CollectionsListInspector>())
             {
-                Settings.currentCollectionName = CollectionName.None;
+                Settings.CurrentCollectionName = CollectionName.None;
                 EditorGUILayout.HelpBox("Collections Inspector window is open, close it when you're finished editing", MessageType.Warning);
                 return;
             }
@@ -58,7 +58,7 @@ namespace PrefabPalette
             GUILayout.Space(10);
             Helpers.DrawLine(Color.gray);
 
-            Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.currentCollectionName);
+            Settings.CurrentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.CurrentCollectionName);
 
             // if the enum only contains .None
             if (!Enum.GetValues(typeof(CollectionName))
@@ -69,7 +69,7 @@ namespace PrefabPalette
                 return;
             }
 
-            if (Settings.currentCollectionName == CollectionName.None)
+            if (Settings.CurrentCollectionName == CollectionName.None)
             {
                 EditorGUILayout.HelpBox("Choose a Collection to get Started", MessageType.Warning);
                 return;

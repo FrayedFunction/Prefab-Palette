@@ -8,8 +8,9 @@ namespace PrefabPalette
     /// </summary>
     public class ToolSettings : ScriptableObject
     {
-        public CollectionName currentCollectionName = CollectionName.None;
-        public PrefabCollection CurrentPrefabCollection => PrefabCollection.GetCollectionByName(currentCollectionName);
+        // Defualt collection name is .None
+        public CollectionName CurrentCollectionName { get; set; } = CollectionName.None;
+        public PrefabCollection CurrentPrefabCollection => PrefabCollection.GetCollectionByName(CurrentCollectionName);
 
         // Palette
         public float palette_minScale = 50f;

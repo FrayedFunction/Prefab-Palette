@@ -47,7 +47,7 @@ namespace PrefabPalette
         {
             // Select collection
             GUILayout.Space(5);
-            Settings.currentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.currentCollectionName);
+            Settings.CurrentCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection", Settings.CurrentCollectionName);
             GUILayout.Space(5);
 
             // if the enum only contains .None
@@ -57,7 +57,7 @@ namespace PrefabPalette
             {
                 EditorGUILayout.HelpBox("You don't have any collections yet!", MessageType.Warning);
 
-                if (GUILayout.Button("Open Menu"))
+                if (GUILayout.Button("Open Menu"))      
                 {
                     CollectionsManagerWindow.OpenMainWindow();
                     CollectionsListInspector.OpenWindow();
