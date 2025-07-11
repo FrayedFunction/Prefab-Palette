@@ -33,9 +33,8 @@ namespace PrefabPalette
 
         public static PrefabCollection CreateNewCollection(CollectionName name)
         {
-            // If no matching collection is found, create a new one
             PrefabCollection asset = ScriptableObject.CreateInstance<PrefabCollection>();
-            asset.Name = name; // Assigns string-based enum reference
+            asset.Name = name;
 
             string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{PathDr.GetCollectionsFolder}/{name}_PrefabCollection.asset");
 
