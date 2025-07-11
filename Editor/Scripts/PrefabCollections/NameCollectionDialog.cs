@@ -8,7 +8,7 @@ namespace PrefabPalette
     /// Editor window for prompting the user to enter a name for a new prefab collection.
     /// Provides input validation and sanitization before passing the name back via a callback.
     /// </summary>
-    public class CreateCollectionDialog : EditorWindow
+    public class NameCollectionDialog : EditorWindow
     {
         private string collectionName = "NewPrefabCollection";
         private Action<string> onCollectionNameConfirmed;
@@ -18,7 +18,7 @@ namespace PrefabPalette
 
         public static void Show(Action<string> onCollectionNameConfirmed)
         {
-            var window = CreateInstance<CreateCollectionDialog>();
+            var window = CreateInstance<NameCollectionDialog>();
             window.titleContent = new GUIContent("Name Your Collection");
             window.position = new Rect(
                 (Screen.width - WindowWidth) / 2f,
