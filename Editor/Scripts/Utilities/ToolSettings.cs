@@ -10,7 +10,7 @@ namespace PrefabPalette
     {
         // Defualt collection name is .None
         public CollectionName CurrentCollectionName { get; set; } = CollectionName.None;
-        public PrefabCollection CurrentPrefabCollection => PrefabCollection.GetCollectionByName(CurrentCollectionName);
+        public PrefabCollection CurrentPrefabCollection => PrefabCollection.GetOrCreateCollection(CurrentCollectionName);
 
         // Palette
         public float palette_minScale = 50f;

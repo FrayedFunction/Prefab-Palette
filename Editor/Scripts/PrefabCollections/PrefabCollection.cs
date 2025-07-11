@@ -61,7 +61,7 @@ namespace PrefabPalette
         /// <remarks>
         /// Note: CollectionName.None returns null.
         /// </remarks>
-        public static PrefabCollection GetCollectionByName(CollectionName name)
+        public static PrefabCollection GetOrCreateCollection(CollectionName name)
         {
             if (name == CollectionName.None)
                 return null;
