@@ -1,3 +1,4 @@
+using Codice.Client.BaseCommands.BranchExplorer;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
@@ -89,10 +90,10 @@ namespace PrefabPalette
             objRotation *= Quaternion.Euler(settings.lineMode_relativeRotation);
 
             float totalDist = 0f;
-
+            int i = 0;
             while (totalDist < dist)
             {
-                var obj = settings.lineMode_useAltObjs ? ObjectToSpawn(context) : context.SelectedPrefab;
+                var obj = settings.lineMode_useAltObjs ? SpawnAltObjectMaybe(context, i) : context.SelectedPrefab;
 
                 // Spawn preview instance
                 var objInstance = GameObject.Instantiate(obj, spawnedObjParent.transform);
@@ -105,6 +106,7 @@ namespace PrefabPalette
                     break;
 
                 totalDist += objectSpacing;
+                i++;
             }
         }
 
@@ -122,33 +124,31 @@ namespace PrefabPalette
 
         private float CalcSpacing(GameObject obj, float userSpacing)
         {
-            // Get renderer component on obj
-            var renderer = obj.GetComponent<MeshFilter>();
-            Vector3 size = renderer.sharedMesh.bounds.size;
+            // Use bounds of the shared mesh on the filter instead of the renderer.
+            // Renderer.bounds was causing issues because it's in world space, where as Mesh.bounds is local.
+            var meshFilter = obj.GetComponent<MeshFilter>();
+            Vector3 size = meshFilter.sharedMesh.bounds.size;
             float longestAxis = Mathf.Max(size.x, size.z);
 
             return longestAxis + userSpacing; 
         }
 
-        private GameObject ObjectToSpawn(ToolContext context)
+        private GameObject SpawnAltObjectMaybe(ToolContext context, int currentIndex)
         {
-            if (settings.lineMode_useCollection)
-            {
-                if (settings.lineMode_altObjsCollection != CollectionName.None)
-                {
-                    int rndIndex = UnityEngine.Random.Range(0, settings.lineMode_altCollection.prefabList.Count);
-                    return settings.lineMode_altCollection.prefabList[rndIndex];
-                }
-                else
-                {
-                    return context.SelectedPrefab;
-                }
-            }
-            else
-            {
+            bool shouldSpawnAlt = settings.lineMode_randomAltObjs ? 
+                Random.value < settings.lineMode_altObjProbability : 
+                currentIndex % settings.lineMode_altObjInterval == 0;
 
-                return settings.lineMode_altObj ? settings.lineMode_altObj : context.SelectedPrefab;
+            if (!shouldSpawnAlt) return context.SelectedPrefab;
+
+            if (settings.lineMode_useCollection && settings.lineMode_altCollectionName != CollectionName.None)
+            {
+                var prefabList = settings.lineMode_altCollection.prefabList;
+                int prefabCount = prefabList.Count;
+                return prefabList[Random.Range(0, prefabCount)];
             }
+            
+            return settings.lineMode_altObj ? settings.lineMode_altObj : context.SelectedPrefab;
         }
 
         private void AddLineToUndoStack()
@@ -312,7 +312,7 @@ namespace PrefabPalette
                 
                 if (settings.lineMode_useCollection)
                 {
-                    settings.lineMode_altObjsCollection = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection",settings.lineMode_altObjsCollection);
+                    settings.lineMode_altCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection",settings.lineMode_altCollectionName);
                     GUILayout.Space(5);
                 }
                 else
