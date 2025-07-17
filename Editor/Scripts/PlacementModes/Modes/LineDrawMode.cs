@@ -1,7 +1,9 @@
+using Codice.Client.BaseCommands.BranchExplorer;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using UnityEditor;
 using UnityEngine;
-using System.Linq;
 
 namespace PrefabPalette
 {
@@ -85,108 +87,23 @@ namespace PrefabPalette
 
             // Obj rotation
             Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
-            objRotation.eulerAngles += settings.lineMode_relativeRotation;
+            objRotation *= Quaternion.Euler(settings.lineMode_relativeRotation);
 
-/*            // First Obj
-            var firstObj = GameObject.Instantiate(tool.SelectedPrefab, spawnedObjParent.transform);
-            firstObj.transform.SetPositionAndRotation(startPoint, objRotation);
-            previewObjects.Add(firstObj);*/
-
-            int i = 1;
             float totalDist = 0f;
-
+            int i = 0;
             while (totalDist < dist)
             {
-                if (!cachedObjects.TryGetValue(i, out GameObject objToSpawn))
-                {
-                    bool spawnAlt = false;
+                var obj = settings.lineMode_useAltObjs ? SpawnAltObjectMaybe(context, i) : context.SelectedPrefab;
 
-                    if (settings.lineMode_useAltObjs)
-                    {
-                        if (settings.lineMode_randomAltObjs)
-                        {
-                            spawnAlt = Random.value <= settings.lineMode_altObjProbability;
-                        }
-                        else if (settings.lineMode_altObjInterval > 0 && i % settings.lineMode_altObjInterval == 0)
-                        {
-                            spawnAlt = true;
-                        }
-                    }
+                // Spawn preview instance
+                var objInstance = GameObject.Instantiate(obj, spawnedObjParent.transform);
+                objInstance.transform.SetPositionAndRotation(startPoint + dir * totalDist, objRotation);
+                previewObjects.Add(objInstance);
 
-                    if (spawnAlt)
-                    {
-                        if (settings.lineMode_useCollection)
-                        {
-                            if (settings.lineMode_altObjsCollection != CollectionName.None)
-                            {
-                                int rndIndex = UnityEngine.Random.Range(0, settings.lineMode_altCollection.prefabList.Count);
-                                objToSpawn = settings.lineMode_altCollection.prefabList[rndIndex];
-                            }
-                            else
-                            {
-                                objToSpawn = context.SelectedPrefab;
-                            }
-                        }
-                        else
-                        {
+                float objectSpacing = CalcSpacing(objInstance, settings.lineMode_lineSpacing);
 
-                            objToSpawn = settings.lineMode_altObj ? settings.lineMode_altObj : context.SelectedPrefab;
-                        }
-                    }
-                    else
-                    {
-                        objToSpawn = context.SelectedPrefab;
-                    }
-
-                    cachedObjects[i] = objToSpawn;
-                }
-
-                if (settings.linemode_ObjRndRotation)
-                {
-                    if (!cachedRotations.TryGetValue(i, out Vector3 cachedRot))
-                    {
-                        float xRot = settings.lineMode_rotateOnX ? UnityEngine.Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0;
-                        float yRot = settings.lineMode_rotateOnY ? UnityEngine.Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0;
-                        float zRot = settings.lineMode_rotateOnZ ? UnityEngine.Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0;
-
-                        cachedRot = new Vector3(xRot, yRot, zRot);
-                        cachedRotations[i] = cachedRot;
-                    }
-
-                    objRotation.eulerAngles += cachedRot;
-                }
-
-                // Calculate object-specific spacing
-                float objectSpacing = settings.lineMode_lineSpacing;
-                Renderer renderer = objToSpawn.GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    Bounds bounds = renderer.bounds;
-
-                    // Get the rotation-aware size vector
-                    Vector3 size = bounds.size;
-
-                    // Project size onto the line direction using the object's transform
-                    Vector3 localDir = objToSpawn.transform.InverseTransformDirection(dir.normalized);
-                    Vector3 extents = bounds.extents * 2f; // bounds.size is extents * 2, but we want to use directional info
-                    Vector3 worldSizeDir = objToSpawn.transform.TransformDirection(Vector3.Scale(extents, localDir.normalized));
-
-                    float projectedSize = Mathf.Abs(Vector3.Dot(worldSizeDir, dir.normalized));
-                    objectSpacing += projectedSize;
-                }
-
-
-                // If too far, break early
                 if (totalDist + objectSpacing > dist)
                     break;
-
-                Vector3 currentPoint = startPoint + dir * totalDist;
-                Handles.DrawSolidDisc(currentPoint, Vector3.up, 0.2f);
-
-                // Instantiate
-                var obj = GameObject.Instantiate(objToSpawn, spawnedObjParent.transform);
-                obj.transform.SetPositionAndRotation(currentPoint, objRotation);
-                previewObjects.Add(obj);
 
                 totalDist += objectSpacing;
                 i++;
@@ -205,6 +122,34 @@ namespace PrefabPalette
         }
         #endregion
 
+        private float CalcSpacing(GameObject obj, float userSpacing)
+        {
+            // Use bounds of the shared mesh on the filter instead of the renderer.
+            // Renderer.bounds was causing issues because it's in world space, where as Mesh.bounds is local.
+            var meshFilter = obj.GetComponent<MeshFilter>();
+            Vector3 size = meshFilter.sharedMesh.bounds.size;
+            float longestAxis = Mathf.Max(size.x, size.z);
+
+            return longestAxis + userSpacing; 
+        }
+
+        private GameObject SpawnAltObjectMaybe(ToolContext context, int currentIndex)
+        {
+            bool shouldSpawnAlt = settings.lineMode_randomAltObjs ? 
+                Random.value < settings.lineMode_altObjProbability : 
+                currentIndex % settings.lineMode_altObjInterval == 0;
+
+            if (!shouldSpawnAlt) return context.SelectedPrefab;
+
+            if (settings.lineMode_useCollection && settings.lineMode_altCollectionName != CollectionName.None)
+            {
+                var prefabList = settings.lineMode_altCollection.prefabList;
+                int prefabCount = prefabList.Count;
+                return prefabList[Random.Range(0, prefabCount)];
+            }
+            
+            return settings.lineMode_altObj ? settings.lineMode_altObj : context.SelectedPrefab;
+        }
 
         private void AddLineToUndoStack()
         {
@@ -367,7 +312,7 @@ namespace PrefabPalette
                 
                 if (settings.lineMode_useCollection)
                 {
-                    settings.lineMode_altObjsCollection = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection",settings.lineMode_altObjsCollection);
+                    settings.lineMode_altCollectionName = (CollectionName)EditorGUILayout.EnumPopup("Prefab Collection",settings.lineMode_altCollectionName);
                     GUILayout.Space(5);
                 }
                 else

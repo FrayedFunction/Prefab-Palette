@@ -17,8 +17,8 @@ namespace PrefabPalette
 
         public bool lineMode_useAltObjs;
         public bool lineMode_useCollection;
-        public CollectionName lineMode_altObjsCollection;
-        public PrefabCollection lineMode_altCollection => PrefabCollection.GetOrCreateCollection(lineMode_altObjsCollection);
+        public CollectionName lineMode_altCollectionName;
+        public PrefabCollection lineMode_altCollection => PrefabCollection.GetOrCreateCollection(lineMode_altCollectionName);
         public GameObject lineMode_altObj;
         public bool lineMode_randomAltObjs = true;
         public float lineMode_altObjProbability = 0.5f;

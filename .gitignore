@@ -4,3 +4,4 @@ Editor/Generated/CollectionName.cs
 
 # Ignore all .meta files within the 'Docs' folder and its subfolders:
 Docs/**/*.meta
+Editor/Generated/CollectionName.cs
