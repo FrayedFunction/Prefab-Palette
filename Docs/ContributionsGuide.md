@@ -86,7 +86,7 @@ Prefab Palette is distributed as a `.unitypackage` in the Releases section of th
 3. In the export dialog:
    - Deselect **Include dependencies**
    - Deselect **Include all scripts**
-   - Deselect `PrefabPalette/Docs` folder.
+   - Deselect both `PrefabPalette/Docs/Logo` & `PrefabPalette/Docs/ProgressImgs` folders.
 4. Click **Export**, then name your file:  
    `PrefabPalette_vX.Y.Z.unitypackage`
 
