@@ -171,7 +171,7 @@ This tool is licensed under the **MIT License**.
 ## **8\. FAQ**
 **Q: Can't find overlay**  
  A: Make sure the tool is imported correctly by ensuring the  `Window` toolbar menu has an option for `Prefab Palette`.
- If You're using Unity version: 
+ If you're using Unity version: 
  
  * between **2021.2** & **2022.3**: Overlays are hidden by default. Use the *backtick* key to open the overlay menu, and choose `Prefab Palette: Options` from the list.
 
