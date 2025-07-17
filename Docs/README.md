@@ -11,6 +11,8 @@
 **Description:**  
 *Prefab Palette is a self contained Unity Editor tool designed to simplify prefab placement in your scenes. Tired of manually dragging and dropping prefabs into the scene, I built this tool that lets you organise prefabs into collections, choose between different placement modes, and just click in the Scene View to place them.*
 
+⚠️ Note: No prefabs are included with this project! Example assets are from [Raygeas: Grasslands - Stylized Nature](https://assetstore.unity.com/packages/3d/environments/fantasy/grasslands-stylized-nature-287353).
+
 **Unity Compatibility:** Unity 2021.2+
 
 ![Tool Cover Img](imgs/PrefabPaletteTool.png)
