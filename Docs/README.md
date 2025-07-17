@@ -6,7 +6,7 @@
 * [ContributionsGuide](./ContributionsGuide.md) 
 ---
 
-## **1\. Overview**
+## **Overview**
 
 **Description:**  
 *Prefab Palette is a self contained Unity Editor tool designed to simplify prefab placement in your scenes. Tired of manually dragging and dropping prefabs into the scene, I built this tool that lets you organise prefabs into collections, choose between different placement modes, and just click in the Scene View to place them.*
@@ -19,7 +19,7 @@
 
 ---
 
-## **2\. Core Features**
+## **Core Features**
 
 * *Prefab Collections*:  
   Organise your prefabs into custom collections using the Collections Manager window, or even faster by selecting assets and folders in the Project Window and using the create collection option from the right-click context menu.
@@ -47,7 +47,7 @@
 
 ---
 
-## **3\. Installation**
+## **Installation**
 
 1. Download the latest package from the **Releases** section of the repo.
 
@@ -59,7 +59,7 @@
 
 ---
 
-## **4\. Quick Start**
+## **3\. Quick Start**
 Follow this guide to start using the tool straight away.
 
 ### **Create a Collection**
@@ -93,11 +93,12 @@ The palette can be opened through either:
 4. Click to place a prefab in the scene.  
 ---
 
-## **5\. Overlay & Modes** 
+## **Overlay** 
 The overlay is used to toggle common settings, switch between modes, and adjust mode specific options all from the scene view. Its size can be customised via the tool settings window, see section 6 for more info.  
 
-Open the tools overlay by either:
- * between **2021.2** & **2022.3**: Overlays are hidden by default. Use the *backtick* key to open the overlay menu, and choose `Prefab Palette: Options` from the list.
+### How to open
+Unity Version:
+ * **2021.2** <--> **2022.3**: Overlays are hidden by default. Use the *backtick* key to open the overlay menu, and choose `Prefab Palette: Options` from the list.
  * **2023.1+**: Open with the overlay toolbar icon ![Overlay Icon](imgs/OverlayToolbarIcon.png) 
 
 ### **Global Overlay Options**
@@ -108,6 +109,7 @@ These options are available across all placement modes.
 |  **Snapping** | Toggle snap to grid, use native grid system toolbar for dimensions. |
 | **Align with surface?** | Align the prefabs rotation with the normal of the surface it’s placed on. |
 
+## **Modes**
 ### **Single**
 Click to place a single selected prefab instance.
 
@@ -139,7 +141,7 @@ Use this mode to draw a line of prefabs and control how the line renders with th
 
 ---
 
-## **6\. Global Settings & Customisation**
+## **Global Settings & Customisation**
 
 ### Tool Settings
 Settings window can be opened via `Window > Prefab Palette > Settings`
@@ -164,13 +166,13 @@ Settings window can be opened via `Window > Prefab Palette > Settings`
 | **Auto Size?** | If true, will auto scale the overlay window to fit its contents with no scrolling. |
 | **Size** | Set a fixed width (x) and height (y) for the overlay. Scroll to reach cropped content.  |
 
-## **7\. License**
+## **License**
 This tool is licensed under the **MIT License**.  
  Feel free to use, modify, and distribute it with proper attribution.
 
 ---
 
-## **8\. FAQ**
+## **FAQ**
 **Q: Can't find overlay**  
  A: Make sure the tool is imported correctly by ensuring the  `Window` toolbar menu has an option for `Prefab Palette`.
  If you're using Unity version: 
@@ -194,12 +196,12 @@ This tool is licensed under the **MIT License**.
 
 ---
 
-## **9\. Support**
+## **Support**
 Use the GitHub issues page to ask questions, and submit bugs or feature requests. Alternatively, send an email to reach@frayedfunction.com
 
 ---
 
-## **10\. Changes & Planned Features**
+## **Changes & Planned Features**
 See [Changelog](./Changelog.md) for release history.
 
 Planned features can be found using the Issues page of the repo; Sort by the ‘enhancement’ label.
