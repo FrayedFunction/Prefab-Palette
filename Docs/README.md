@@ -108,6 +108,7 @@ These options are available across all placement modes.
 | :---- | :---- |
 |  **Snapping** | Toggle snap to grid, use native grid system toolbar for dimensions. |
 | **Align with surface?** | Align the prefabs rotation with the normal of the surface it’s placed on. |
+---
 
 ## **Modes**
 ### **Single**
