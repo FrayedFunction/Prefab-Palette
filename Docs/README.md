@@ -59,7 +59,7 @@
 
 ---
 
-## **3\. Quick Start**
+## **Quick Start**
 Follow this guide to start using the tool straight away.
 
 ### **Create a Collection**
