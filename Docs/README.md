@@ -171,9 +171,15 @@ Settings window can be opened via `Window > Prefab Palette > Settings`
 | **Size** | Set a fixed width (x) and height (y) for the overlay. Scroll to reach cropped content.  |
 
 ---
+## **Support the Project**   
+If you find the tool useful and want to support its development, donations are welcome!
+
+[![Donate on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/frayedfunction)
+
+---
 
 ## **License**
-See [License](./License.md).
+See [License](./License.md) file for terms of usage, redistribution, & modification etc.
 
 ---
 
