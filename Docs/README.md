@@ -209,7 +209,7 @@ See [License](./License.md) file for terms of usage, redistribution, & modificat
 
 ---
 
-## **Support**
+## **Help**
 Use the GitHub issues page to ask questions, and submit bugs or feature requests. Alternatively, send an email to reach@frayedfunction.com
 
 ---
