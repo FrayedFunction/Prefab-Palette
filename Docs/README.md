@@ -59,7 +59,7 @@
 
 ---
 
-## **3\. Quick Start**
+## **Quick Start**
 Follow this guide to start using the tool straight away.
 
 ### **Create a Collection**
@@ -91,6 +91,7 @@ The palette can be opened through either:
    ![Palette Selected](imgs/PaletteSelected.png)   
 3. A target reticle will appear in the scene view and follow the mouse.  
 4. Click to place a prefab in the scene.  
+
 ---
 
 ## **Overlay** 
@@ -101,16 +102,19 @@ Unity Version:
  * **2021.2** <--> **2022.3**: Overlays are hidden by default. Use the *backtick* key to open the overlay menu, and choose `Prefab Palette: Options` from the list.
  * **2023.1+**: Open with the overlay toolbar icon ![Overlay Icon](imgs/OverlayToolbarIcon.png) 
 
-### **Global Overlay Options**
+### Resizing the overlay
+See the *Overlay* options in the [Tool Settings & Customisation](#ToolSettings&Customisation) section.
+
+---
+
+## **Modes**
+### **Global Mode Options**
 These options are available across all placement modes.
 
 | *Option* | *Effect* |
 | :---- | :---- |
 |  **Snapping** | Toggle snap to grid, use native grid system toolbar for dimensions. |
 | **Align with surface?** | Align the prefabs rotation with the normal of the surface it’s placed on. |
----
-
-## **Modes**
 ### **Single**
 Click to place a single selected prefab instance.
 
@@ -142,9 +146,8 @@ Use this mode to draw a line of prefabs and control how the line renders with th
 
 ---
 
-## **Global Settings & Customisation**
+## **Tool Settings & Customisation**
 
-### Tool Settings
 Settings window can be opened via `Window > Prefab Palette > Settings`
 
 **Palette**
@@ -167,14 +170,21 @@ Settings window can be opened via `Window > Prefab Palette > Settings`
 | **Auto Size?** | If true, will auto scale the overlay window to fit its contents with no scrolling. |
 | **Size** | Set a fixed width (x) and height (y) for the overlay. Scroll to reach cropped content.  |
 
+---
+## **Support the Project**   
+If you find the tool useful and want to support its development, donations are welcome!
+
+[![Donate on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/frayedfunction)
+
+---
+
 ## **License**
-This tool is licensed under the **MIT License**.  
- Feel free to use, modify, and distribute it with proper attribution.
+See [License](./License.md) file for terms of usage, redistribution, & modification etc.
 
 ---
 
 ## **FAQ**
-**Q: Can't find overlay**  
+**Q: Can't find overlay?**  
  A: Make sure the tool is imported correctly by ensuring the  `Window` toolbar menu has an option for `Prefab Palette`.
  If you're using Unity version: 
  
@@ -182,12 +192,14 @@ This tool is licensed under the **MIT License**.
 
  * **2023.1+**: Open with the overlay toolbar icon ![Overlay Icon](imgs/OverlayToolbarIcon.png) 
 
-
-**Q: The tool doesn't show up in the Unity `Window` toolbar menu.**  
+**Q: The tool doesn't show up in the Unity `Window` toolbar menu?**  
  A: Make sure the tool is imported from the Unity Package correctly, all scripts are present, and you’re using a compatible Unity version.
 
-**Q: Objects aren’t placed correctly.**  
+**Q: Objects aren’t placed correctly?**  
  A: Check if your prefab has a root transform offset or collider.
+
+ **Q: Objects are glitching or stacking as they're being placed?**  
+ A: Check `ToolSettings > Placer > Include Layers` and deselect the physics layer your prefab is on. 
 
 **Q: Can I use this with terrain?**  
  A: Yes, the tool supports placement on Unity Terrain.
