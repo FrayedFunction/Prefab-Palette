@@ -179,7 +179,7 @@ If you find the tool useful and want to support its development, donations are w
 ---
 
 ## **License**
-See [License](./License.md) file for terms of usage, redistribution, & modification etc.
+See [License](./License.md) file for terms of use, redistribution, & modification etc.
 
 ---
 
