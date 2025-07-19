@@ -42,6 +42,7 @@ namespace PrefabPalette
             {
                 Settings.CurrentCollectionName = CollectionName.None;
                 EditorGUILayout.HelpBox("Collections Inspector window is open, close it when you're finished editing", MessageType.Warning);
+                GUILayout.EndScrollView();
                 return;
             }
      
@@ -69,12 +70,14 @@ namespace PrefabPalette
                      .Any(c => c != CollectionName.None))
             {
                 EditorGUILayout.HelpBox("You don't have any collections yet,\nAdd one by using the Manage Collections button", MessageType.Warning);
+                GUILayout.EndScrollView();
                 return;
             }
 
             if (Settings.CurrentCollectionName == CollectionName.None)
             {
                 EditorGUILayout.HelpBox("Choose a Collection to get Started", MessageType.Warning);
+                GUILayout.EndScrollView();
                 return;
             }
 
