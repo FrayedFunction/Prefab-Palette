@@ -13,6 +13,7 @@ namespace PrefabPalette
     {
         ToolSettings Settings => ToolContext.Instance.Settings;
         float buttonSpace = 5;
+        Vector2 scrollPos;
 
         /// <summary>
         /// Opens the Collections Manager window via the Window dropdown menu.
@@ -31,6 +32,8 @@ namespace PrefabPalette
 
         private void OnGUI()
         {
+            scrollPos = GUILayout.BeginScrollView(scrollPos);
+
             Helpers.DrawLogo();
             Helpers.TitleText("Collections Manager");
 
@@ -91,6 +94,8 @@ namespace PrefabPalette
 
             GUILayout.Space(buttonSpace);
             Helpers.DrawLine(Color.grey);
+            
+            GUILayout.EndScrollView();
         }
     }
 }

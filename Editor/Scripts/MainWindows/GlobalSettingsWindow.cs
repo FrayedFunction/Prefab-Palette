@@ -6,6 +6,7 @@ namespace PrefabPalette
     public class GlobalSettingsWindow : EditorWindow
     {
         ToolSettings Settings => ToolContext.Instance.Settings;
+        Vector2 scrollPos;
 
         [MenuItem("Window/Prefab Palette/Settings")]
         public static void OpenWindow()
@@ -21,6 +22,8 @@ namespace PrefabPalette
 
         private void OnGUI() 
         {
+            scrollPos = GUILayout.BeginScrollView(scrollPos);
+
             Helpers.TitleText("Prefab Palette: Settings");
             Helpers.DrawLine(Color.gray);
 
@@ -50,6 +53,9 @@ namespace PrefabPalette
             Settings.overlay_autoSize = EditorGUILayout.Toggle("Auto Size?", Settings.overlay_autoSize);
             Settings.overlay_size = Settings.overlay_autoSize ? Vector2.zero : EditorGUILayout.Vector2Field("Size", Settings.overlay_size);
             EditorGUI.indentLevel--;
+
+            GUILayout.Space(5f);
+            GUILayout.EndScrollView();
         }
 
         private LayerMask LayerMaskField(string label, LayerMask selected)
