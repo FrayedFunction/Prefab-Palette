@@ -20,8 +20,6 @@ namespace PrefabPalette
         static List<GameObject> spawnedObjects = new();
         static List<GameObject> previewObjects = new List<GameObject>();
         static GameObject spawnedObjParent;
-        static Dictionary<int, Vector3> cachedRotations = new();
-        static Dictionary<int, GameObject> cachedObjects = new();
 
         public LineDrawMode(PlacementModeSettings settings)
         {
@@ -85,16 +83,16 @@ namespace PrefabPalette
             float dist = line.magnitude;
             Vector3 dir = line.normalized;
 
-            // Obj rotation
-            Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
-            objRotation *= Quaternion.Euler(settings.lineMode_relativeRotation);
-
             float totalDist = 0f;
             int i = 0;
             while (totalDist < dist)
             {
-                var obj = settings.lineMode_useAltObjs ? SpawnAltObjectMaybe(context, i) : context.SelectedPrefab;
+                // Obj rotation
+                Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
+                var rot = settings.linemode_ObjRndRotation ? settings.lineMode_relativeRotation + RndObjRotation() : settings.lineMode_relativeRotation;
+                objRotation *= Quaternion.Euler(rot);
 
+                var obj = settings.lineMode_useAltObjs ? SpawnAltObjectMaybe(context, i) : context.SelectedPrefab;
                 // Spawn preview instance
                 var objInstance = GameObject.Instantiate(obj, spawnedObjParent.transform);
                 objInstance.transform.SetPositionAndRotation(startPoint + dir * totalDist, objRotation);
@@ -142,6 +140,15 @@ namespace PrefabPalette
             return longestAxis + userSpacing; 
         }
 
+        private Vector3 RndObjRotation()
+        {
+            return 
+                new Vector3(
+                settings.lineMode_rotateOnX ? Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0,
+                settings.lineMode_rotateOnY ? Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0,
+                settings.lineMode_rotateOnZ ? Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0);
+        }
+
         private GameObject SpawnAltObjectMaybe(ToolContext context, int currentIndex)
         {
             bool shouldSpawnAlt = settings.lineMode_randomAltObjs ? 
@@ -174,8 +181,6 @@ namespace PrefabPalette
         private void Reset()
         {
             AddLineToUndoStack();
-            cachedObjects.Clear();
-            cachedRotations.Clear();
             ClearPreviewObjects();
             spawnedObjects.Clear();
             linePoints.Clear();
@@ -206,9 +211,6 @@ namespace PrefabPalette
                         placed.transform.SetPositionAndRotation(preview.transform.position, preview.transform.rotation);
                         spawnedObjects.Add(placed);
                     }
-
-                    cachedRotations.Clear();
-                    cachedObjects.Clear();
                 }
 
                 if (!settings.lineMode_chainLines && linePoints.Count >= 2)
