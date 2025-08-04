@@ -127,6 +127,15 @@ namespace PrefabPalette
             // Use bounds of the shared mesh on the filter instead of the renderer.
             // Renderer.bounds was causing issues because it's in world space, where as Mesh.bounds is local.
             var meshFilter = obj.GetComponent<MeshFilter>();
+
+            // Fallback to user spacing if no mesh filter
+            if (!meshFilter) 
+            {
+                Debug.LogWarning($"Obj: {obj.name} has no mesh filter... Using user spacing as fallback.");
+                return userSpacing; 
+            }
+            
+            
             Vector3 size = meshFilter.sharedMesh.bounds.size;
             float longestAxis = Mathf.Max(size.x, size.z);
 
@@ -153,7 +162,9 @@ namespace PrefabPalette
 
         private void AddLineToUndoStack()
         {
-            Undo.RegisterCreatedObjectUndo(spawnedObjParent, "Create Line");
+            if (spawnedObjParent) 
+                Undo.RegisterCreatedObjectUndo(spawnedObjParent, "Create Line");
+
             foreach (var obj in spawnedObjects)
             {
                 Undo.RegisterCreatedObjectUndo(obj, "Create Line");
@@ -162,11 +173,13 @@ namespace PrefabPalette
 
         private void Reset()
         {
+            AddLineToUndoStack();
             cachedObjects.Clear();
             cachedRotations.Clear();
             ClearPreviewObjects();
             spawnedObjects.Clear();
             linePoints.Clear();
+            spawnedObjParent = null;
         }
 
         private void ClearPreviewObjects()
@@ -200,7 +213,6 @@ namespace PrefabPalette
 
                 if (!settings.lineMode_chainLines && linePoints.Count >= 2)
                 {
-                    spawnedObjParent = null;
                     Reset();
                 }
 
@@ -210,8 +222,6 @@ namespace PrefabPalette
             // Confirm with Enter
             if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Return)
             {
-                AddLineToUndoStack();
-                spawnedObjParent = null;
                 Reset();
 
                 e.Use();
