@@ -22,7 +22,7 @@
 ## **Core Features**
 
 * *Prefab Collections*:  
-  Organise your prefabs into custom collections using the Collections Manager window, or even faster by selecting assets and folders in the Project Window and using the create collection option from the right-click context menu.
+  Organise your prefabs into custom collections using either the Collections Manager window or by selecting folders/assets in the Project Window and using the create collection option from the right-click context menu.
 
 * *Palette Window*:  
   Dockable window to browse prefab collections and select prefabs via their thumbnails.
