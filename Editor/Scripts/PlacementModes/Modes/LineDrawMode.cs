@@ -145,7 +145,7 @@ namespace PrefabPalette
             {
                 var prefabList = settings.lineMode_altCollection.prefabList;
                 int prefabCount = prefabList.Count;
-                return prefabList[Random.Range(0, prefabCount)];
+                return prefabCount > 0 ? prefabList[Random.Range(0, prefabCount)] : context.SelectedPrefab;
             }
             
             return settings.lineMode_altObj ? settings.lineMode_altObj : context.SelectedPrefab;
