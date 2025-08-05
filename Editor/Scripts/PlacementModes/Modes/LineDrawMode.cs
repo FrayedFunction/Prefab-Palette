@@ -20,6 +20,7 @@ namespace PrefabPalette
         static List<GameObject> spawnedObjects = new();
         static List<GameObject> previewObjects = new List<GameObject>();
         static GameObject spawnedObjParent;
+        static Dictionary<int, Vector3> rotationCache = new();
 
         public LineDrawMode(PlacementModeSettings settings)
         {
@@ -89,7 +90,7 @@ namespace PrefabPalette
             {
                 // Obj rotation
                 Quaternion objRotation = Quaternion.LookRotation(dir, Vector3.up);
-                var rot = settings.linemode_ObjRndRotation ? settings.lineMode_relativeRotation + RndObjRotation() : settings.lineMode_relativeRotation;
+                var rot = ObjectRotation(i);
                 objRotation *= Quaternion.Euler(rot);
 
                 var obj = settings.lineMode_useAltObjs ? SpawnAltObjectMaybe(context, i) : context.SelectedPrefab;
@@ -140,10 +141,21 @@ namespace PrefabPalette
             return longestAxis + userSpacing; 
         }
 
+        private Vector3 ObjectRotation(int index)
+        {
+            if (rotationCache.ContainsKey(index))
+            {
+                return rotationCache[index];
+            }
+
+            var newRot = settings.linemode_ObjRndRotation ? settings.lineMode_relativeRotation + RndObjRotation() : settings.lineMode_relativeRotation;
+            rotationCache.Add(index, newRot);
+            return newRot;
+        }
+
         private Vector3 RndObjRotation()
         {
-            return 
-                new Vector3(
+            return new Vector3(
                 settings.lineMode_rotateOnX ? Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0,
                 settings.lineMode_rotateOnY ? Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0,
                 settings.lineMode_rotateOnZ ? Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0);
@@ -185,6 +197,7 @@ namespace PrefabPalette
             spawnedObjects.Clear();
             linePoints.Clear();
             spawnedObjParent = null;
+            rotationCache.Clear();
         }
 
         private void ClearPreviewObjects()
