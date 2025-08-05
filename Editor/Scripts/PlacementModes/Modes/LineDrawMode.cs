@@ -148,12 +148,12 @@ namespace PrefabPalette
                 return rotationCache[index];
             }
 
-            var newRot = settings.linemode_ObjRndRotation ? settings.lineMode_relativeRotation + RndObjRotation() : settings.lineMode_relativeRotation;
+            var newRot = settings.linemode_ObjRndRotation ? settings.lineMode_relativeRotation + CalcRotationVariation() : settings.lineMode_relativeRotation;
             rotationCache.Add(index, newRot);
             return newRot;
         }
 
-        private Vector3 RndObjRotation()
+        private Vector3 CalcRotationVariation()
         {
             return new Vector3(
                 settings.lineMode_rotateOnX ? Random.Range(settings.lineMode_ObjRndRotationMin, settings.lineMode_ObjRndRotationMax) : 0,
