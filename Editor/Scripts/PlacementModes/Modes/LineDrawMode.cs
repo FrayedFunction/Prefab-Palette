@@ -27,7 +27,7 @@ namespace PrefabPalette
             this.settings = (LineModeSettings)settings;
         }
 
-        #region Placement Mode interface
+        #region Placement Mode Lifecycle
         public void OnActive(ToolContext context)
         {
             Event e = Event.current;
