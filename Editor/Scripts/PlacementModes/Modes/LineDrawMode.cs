@@ -21,6 +21,7 @@ namespace PrefabPalette
         static List<GameObject> previewObjects = new List<GameObject>();
         static GameObject spawnedObjParent;
         static Dictionary<int, Vector3> rotationCache = new();
+        static Dictionary<int, GameObject> objectCache = new();
 
         public LineDrawMode(PlacementModeSettings settings)
         {
@@ -153,20 +154,34 @@ namespace PrefabPalette
 
         private GameObject SpawnAltObjectMaybe(ToolContext context, int currentIndex)
         {
-            bool shouldSpawnAlt = settings.lineMode_randomAltObjs ? 
-                Random.value < settings.lineMode_altObjProbability : 
-                currentIndex % settings.lineMode_altObjInterval == 0;
-
-            if (!shouldSpawnAlt) return context.SelectedPrefab;
-
-            if (settings.lineMode_useCollection && settings.lineMode_altCollectionName != CollectionName.None)
+            if (objectCache.ContainsKey(currentIndex))
             {
-                var prefabList = settings.lineMode_altCollection.prefabList;
-                int prefabCount = prefabList.Count;
-                return prefabCount > 0 ? prefabList[Random.Range(0, prefabCount)] : context.SelectedPrefab;
+                return objectCache[currentIndex];
             }
-            
-            return settings.lineMode_altObj ? settings.lineMode_altObj : context.SelectedPrefab;
+
+            bool shouldSpawnAlt = settings.lineMode_randomAltObjs
+                ? Random.value < settings.lineMode_altObjProbability
+                : currentIndex % settings.lineMode_altObjInterval == 0;
+
+            GameObject objToSpawn = context.SelectedPrefab;
+
+            if (shouldSpawnAlt)
+            {
+                if (settings.lineMode_useCollection && settings.lineMode_altCollectionName != CollectionName.None)
+                {
+                    Debug.Log("using collection...");
+                    var prefabList = settings.lineMode_altCollection.prefabList;
+                    int prefabCount = prefabList.Count;
+                    objToSpawn = prefabCount > 0 ? prefabList[Random.Range(0, prefabCount)] : default;
+                }
+                else
+                {
+                    objToSpawn = settings.lineMode_altObj ? settings.lineMode_altObj : default;
+                }
+            }
+
+            objectCache[currentIndex] = objToSpawn;
+            return objectCache[currentIndex];
         }
 
         private void AddLineToUndoStack()
@@ -193,6 +208,7 @@ namespace PrefabPalette
             linePoints.Clear();
             spawnedObjParent = null;
             rotationCache.Clear();
+            objectCache.Clear();
         }
 
         private void ClearPreviewObjects()
