@@ -190,9 +190,14 @@ namespace PrefabPalette
             }
         }
 
-        private void Reset()
+        private void PlaceLine()
         {
             AddLineToUndoStack();
+            Reset();
+        }
+
+        private void Reset()
+        {
             ClearPreviewObjects();
             spawnedObjects.Clear();
             linePoints.Clear();
@@ -208,8 +213,6 @@ namespace PrefabPalette
 
         private void HandleInput(ToolContext context, Event e)
         {
-             // Switch might be more appropriate here.
-            // Create line point with left mouse click
             if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
             {
                 // Add a point for the lines start position
@@ -228,28 +231,31 @@ namespace PrefabPalette
 
                 if (!settings.lineMode_chainLines && linePoints.Count >= 2)
                 {
-                    Reset();
+                    PlaceLine();
                 }
 
                 e.Use();
             }
 
-            // Confirm with Enter
-            if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Return)
+            if (e.type == EventType.KeyDown)
             {
-                Reset();
+                // Confirm with Enter
+                if (e.keyCode == KeyCode.Return)
+                {
+                    PlaceLine();
 
-                e.Use();
-            }
+                    e.Use();
+                }
 
-            // Cancel with Escape
-            if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape)
-            {
-                spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
-                GameObject.DestroyImmediate(spawnedObjParent);
-                Reset();
+                // Cancel with Escape
+                if (e.keyCode == KeyCode.Escape)
+                {
+                    spawnedObjects.ForEach(p => GameObject.DestroyImmediate(p, false));
+                    GameObject.DestroyImmediate(spawnedObjParent);
+                    Reset();
 
-                e.Use();
+                    e.Use();
+                }
             }
         }
 
