@@ -103,12 +103,13 @@ Prefab Palette is distributed as a zip containing a `.unitypackage` and a copy o
 The zipped folder should now resemble the following structure:
 
       |- PrefabPalette_vX.Y.Z.zip
-      |-- docs
-      |--- imgs
-      |--- Changelog.md
-      |--- License.md
-      |--- README.md
-      |-- PrefabPalette_vX.Y.Z.unitypackage
+      |-- PrefabPalette_vX.Y.Z
+      |--- docs
+      |---- imgs
+      |---- Changelog.md
+      |---- License.md
+      |---- README.md
+      |--- PrefabPalette_vX.Y.Z.unitypackage
 
 > Attach zip to a new github release with the same version tag.
 
