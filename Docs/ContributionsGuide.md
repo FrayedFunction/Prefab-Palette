@@ -28,17 +28,17 @@ To ensure smooth collaboration and maintainability, please follow the guidelines
 
 ### Code Style
 
-Please adhere to the existing code style within the project. Consistency helps maintain readability and helps simplify future maintenance.
+Adhere to the existing code style within the project. Consistency improves readability and simplifies maintenance.
 
 ### Editor Folder Structure
 
-When adding new files, please respect the established folder structure within the Editor directory.
+When adding new files, follow the established folder structure within the Editor directory.
 
 ### New Placement Modes
 
 If you’re creating a new placement mode, follow the steps outlined in the **Modes** section of the [Developers](./Developers.md) doc, this ensures your mode integrates seamlessly with the existing architecture.
 
-Please ensure the following is adhered to:
+Ensure the following:
 
 1. Both the Mode and Settings script are in the correct folders.  
 2. The modes settings asset is correctly generated/loaded in the appropriate subfolder within the `Generated` folder, using `PathDr` for path management.  
@@ -47,11 +47,11 @@ Please ensure the following is adhered to:
 
 ### Path Management
 
-The `PathDr` script manages valid paths to the *Generated*, *Collections*, and *Mode Settings* folder. When interacting with the tools file structure, please ensure you use the appropriate properties from `PathDr` to retrieve or construct paths.
+Use the `PathDr` script to access valid paths for the Generated, Collections, and Mode Settings folders.
 
 ### Documentation
 
-If your contribution introduces new features or changes existing behavior, please update the relevant sections of the docs to reflect the changes.
+If your contribution introduces new features or changes existing behavior, update the relevant sections of the docs to reflect changes.
 
 ### Versioning
 
@@ -71,25 +71,45 @@ Please update the version appropriately if your contribution changes behavior or
 
 ## Distribution
 
-Prefab Palette is distributed as a `.unitypackage` in the Releases section of the repo:
+Prefab Palette is distributed as a zip containing a `.unitypackage` and a copy of core docs at the time of release.
 
-### Prepare for Export
+### 1. Prepare for Export
 
-1. Empty the collections folder and reset the enum by removing all items from the list in the `PrefabCollectionsManager > Collections Inspector` window.
-2. Open `PrefabPalette/Editor/Generated`. 
+1. Open `Window > Prefab Palette > Collections Manager`, choose `Manage Collections` and remove all items from the list.
+2. Open `PrefabPalette/Editor/Generated` folder. 
 3. Delete everything except `CollectionName.cs`
-4. Ensure no prefabs or other assets are contained in the release.
+4. Ensure no prefabs or other third-party assets are contained in the package.
+5. Create an empty folder named `PrefabPalette_vX.Y.Z` to contain the release.
 
-### Export as `.unitypackage`
+### 2. Export `.unitypackage`
 1. In the **Project** window, select the `PrefabPalette` folder.
 2. Right-click the selection and choose **Export Package...**
 3. In the export dialog:
    - Deselect **Include dependencies**
    - Deselect **Include all scripts**
-   - Deselect `PrefabPalette/Docs/Logo` folder.
-4. Click **Export**, then name your file:  
+   - Deselect `PrefabPalette/Docs` folder.
+4. **Export** package to the empty folder created in step one, then name it:  
    `PrefabPalette_vX.Y.Z.unitypackage`
 
-> Attach this package to a new github release with the same version tag.
+### 3. Include Core Docs
+1. Create a new folder called `docs` in the same one as the unity package.
+2. Copy the following (⚠️ Exclude `.meta` files!):
+   * imgs
+   * README.md
+   * Changelog.md
+   * License.md
+
+### 4. Zip the contents
+The zipped folder should now resemble the following structure:
+
+      |- PrefabPalette_vX.Y.Z.zip
+      |-- docs
+      |--- imgs
+      |--- Changelog.md
+      |--- License.md
+      |--- README.md
+      |-- PrefabPalette_vX.Y.Z.unitypackage
+
+> Attach zip to a new github release with the same version tag.
 
 ⚠️ Note: Ensure no prefabs or other assets are contained in the release!
