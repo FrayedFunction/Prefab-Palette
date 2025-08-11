@@ -101,7 +101,7 @@ The class should iInherit from `IPlacementMode` and implement the following cont
 | :---- | :---- |
 | **public void OnEnter(ToolContext)** | Called when the mode is first selected from the overlay. |
 | **public void OnActive(ToolContext)** | Called while the mode is active, similar to Unity’s update method. |
-| **public void OnExit(ToolContext)** | Called when transitioning away from this mode to a new one. |
+| **public void OnExit(ToolContext)** | Called when transitioning away from this mode. |
 
 |**UI**||
 | :---- | :---- |
