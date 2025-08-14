@@ -48,8 +48,8 @@ namespace PrefabPalette
                     }
 
                     EditorUtility.DisplayDialog(
-                        "Successfully Created Colelction!",
-                        $"Collection '{sanitizedName}' was created successfully after reload!",
+                        "Created Colelction!",
+                        $"Collection - '{sanitizedName}': Created successfully after reload!",
                         "OK"
                     );
                 }
