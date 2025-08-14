@@ -28,8 +28,6 @@ namespace PrefabPalette
 
                 if (System.Enum.TryParse<CollectionName>(sanitizedName, out var enumValue))
                 {
-                    var collection = PrefabCollection.CreateNewCollection(enumValue);
-
                     if (EditorPrefs.HasKey("PendingPrefabList"))
                     {
                         string json = EditorPrefs.GetString("PendingPrefabList");
@@ -42,6 +40,17 @@ namespace PrefabPalette
                             .Where(go => go != null)
                             .ToList();
 
+                        if (prefabList.Count <= 0)
+                        {
+                            EditorUtility.DisplayDialog(
+                                $"Can't Create Collection {sanitizedName}!",
+                                $"Collection - {sanitizedName}: is empty, please check the folder contains prefabs and try again...",
+                                "OK"
+                            );
+                            return;
+                        }
+
+                        var collection = PrefabCollection.CreateNewCollection(enumValue);
                         collection.prefabList = prefabList;
                         EditorUtility.SetDirty(collection);
                         AssetDatabase.SaveAssets();
