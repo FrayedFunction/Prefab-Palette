@@ -20,53 +20,48 @@ namespace PrefabPalette
         }
 
         private static void CreateAndPopulateCollection()
-        {
-            if (EditorPrefs.HasKey("PendingPrefabCollectionName"))
+        {   
+            if (!EditorPrefs.HasKey("PendingPrefabCollectionName") || !EditorPrefs.HasKey("PendingPrefabList")) return;
+
+            string sanitizedName = EditorPrefs.GetString("PendingPrefabCollectionName");
+            EditorPrefs.DeleteKey("PendingPrefabCollectionName");
+
+            if (!System.Enum.TryParse<CollectionName>(sanitizedName, out var enumValue))
             {
-                string sanitizedName = EditorPrefs.GetString("PendingPrefabCollectionName");
-                EditorPrefs.DeleteKey("PendingPrefabCollectionName");
-
-                if (System.Enum.TryParse<CollectionName>(sanitizedName, out var enumValue))
-                {
-                    if (EditorPrefs.HasKey("PendingPrefabList"))
-                    {
-                        string json = EditorPrefs.GetString("PendingPrefabList");
-
-                        var wrapper = JsonUtility.FromJson<PrefabListWrapper>(json);
-                        EditorPrefs.DeleteKey("PendingPrefabList");
-
-                        List<GameObject> prefabList = wrapper.prefabPaths
-                            .Select(path => AssetDatabase.LoadAssetAtPath<GameObject>(path))
-                            .Where(go => go != null)
-                            .ToList();
-
-                        if (prefabList.Count <= 0)
-                        {
-                            EditorUtility.DisplayDialog(
-                                $"Can't Create Collection {sanitizedName}!",
-                                $"Collection - {sanitizedName}: is empty, please check the folder contains prefabs and try again...",
-                                "OK"
-                            );
-                            return;
-                        }
-
-                        var collection = PrefabCollection.CreateNewCollection(enumValue);
-                        collection.prefabList = prefabList;
-                        EditorUtility.SetDirty(collection);
-                        AssetDatabase.SaveAssets();
-                    }
-
-                    EditorUtility.DisplayDialog(
-                        "Created Colelction!",
-                        $"Collection - '{sanitizedName}': Created successfully after reload!",
-                        "OK"
-                    );
-                }
-                else
-                {
-                    Debug.LogError($"PrefabPalette: Could not parse '{sanitizedName}' after reload!");
-                }
+                Debug.LogError("PrefabPalette: New collection name was not added to enum!");
+                return;
             }
+
+            string json = EditorPrefs.GetString("PendingPrefabList");
+
+            var wrapper = JsonUtility.FromJson<PrefabListWrapper>(json);
+            EditorPrefs.DeleteKey("PendingPrefabList");
+
+            List<GameObject> prefabList = wrapper.prefabPaths
+                .Select(path => AssetDatabase.LoadAssetAtPath<GameObject>(path))
+                .Where(go => go != null)
+                .ToList();
+
+            if (prefabList.Count <= 0)
+            {
+                EditorUtility.DisplayDialog(
+                    $"Can't Create Collection {sanitizedName}!",
+                    $"Collection - {sanitizedName}: is empty, please check the folder contains prefabs and try again...",
+                    "OK"
+                );
+                return;
+            }
+
+            var collection = PrefabCollection.CreateNewCollection(enumValue);
+            collection.prefabList = prefabList;
+            EditorUtility.SetDirty(collection);
+            AssetDatabase.SaveAssets();
+
+            EditorUtility.DisplayDialog(
+                "Created Collection!",
+                $"Collection - '{sanitizedName}': Created successfully after reload!",
+                "OK"
+            );
         }
 
         [MenuItem("Assets/Create Prefab Collection", false, 2000)]
@@ -101,7 +96,6 @@ namespace PrefabPalette
                     }
                 }
             }
-            
 
             // prevent duplicate prefabs
             prefabPaths = prefabPaths.Distinct().ToList();
@@ -124,6 +118,7 @@ namespace PrefabPalette
             {
                 EditorPrefs.SetString("PendingPrefabCollectionName", collectionName);
 
+                // Adding the collection name to the list then recompliing
                 PrefabCollectionList.Instance.collectionNames.Add(collectionName);
                 EditorUtility.SetDirty(PrefabCollectionList.Instance);
                 AssetDatabase.SaveAssets();
