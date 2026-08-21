@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace PrefabPalette
 {
@@ -7,6 +8,7 @@ namespace PrefabPalette
     {
         Vector2 paletteScrollPosition;
         float dynamicPrefabIconSize = 50f;
+        readonly Dictionary<EntityId, Texture2D> previewCache = new();
 
         ToolSettings Settings => ToolContext.Instance.Settings;
 
@@ -130,7 +132,7 @@ namespace PrefabPalette
                 return;
             }
 
-            Texture2D preview = AssetPreview.GetAssetPreview(prefab);
+            Texture2D preview = GetStablePreview(prefab);
             float labelHeight = dynamicPrefabIconSize * 0.25f;
 
             Rect totalRect = GUILayoutUtility.GetRect(
@@ -170,6 +172,36 @@ namespace PrefabPalette
                 GUI.Label(labelRect, prefab.name,
                     new GUIStyle(EditorStyles.whiteLabel) { alignment = TextAnchor.MiddleCenter });
             }
+        }
+
+        private Texture2D GetStablePreview(GameObject prefab)
+        {
+            EntityId prefabId = prefab.GetEntityId();
+
+            // Once a preview is stable, do not ask AssetPreview for it again on
+            // every IMGUI repaint. Hovering causes frequent repaints and querying
+            // the async preview cache here can make Unity swap textures mid-frame.
+            if (previewCache.TryGetValue(prefabId, out Texture2D cachedPreview) && cachedPreview)
+                return cachedPreview;
+
+            // AssetPreview is asynchronous and can briefly return null while Unity
+            // refreshes an existing preview. Keep the last valid texture visible so
+            // that a transient refresh never causes a placeholder flash.
+            Texture2D generatedPreview = AssetPreview.GetAssetPreview(prefab);
+            if (generatedPreview && !AssetPreview.IsLoadingAssetPreview(prefabId))
+            {
+                // Unity owns and may invalidate the AssetPreview texture while
+                // repainting. Keep an independent copy for the palette instead.
+                Texture2D stablePreview = UnityEngine.Object.Instantiate(generatedPreview);
+                stablePreview.name = $"{prefab.name} Palette Preview";
+                stablePreview.hideFlags = HideFlags.HideAndDontSave;
+                previewCache[prefabId] = stablePreview;
+            }
+
+            if (previewCache.TryGetValue(prefabId, out cachedPreview) && cachedPreview)
+                return cachedPreview;
+
+            return EditorGUIUtility.IconContent("Prefab Icon").image as Texture2D;
         }
 
         private void DrawCollectionSelector()
