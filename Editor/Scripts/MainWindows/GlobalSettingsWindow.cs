@@ -24,7 +24,7 @@ namespace PrefabPalette
         private void OnGUI() 
         {
             scrollPos = GUILayout.BeginScrollView(scrollPos);
-            GUILayout.Label("v1.1.0", EditorStyles.miniLabel);
+            GUILayout.Label("v1.1.2", EditorStyles.miniLabel);
             
             Helpers.TitleText("Prefab Palette: Settings");
             Helpers.DrawLine(Color.gray);
