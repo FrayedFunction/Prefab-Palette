@@ -1,3 +1,7 @@
+# v1.1.2
+* Fix prefab thumbnail flickering issues.
+# v1.1.1
+* Fix hierarchy tool throwing errors because of calls to obsolete methods in Unitys API. 
 # v1.1.0
 * Adds support for 2D mode:
   * Control placement depth from the overlay
