@@ -176,14 +176,14 @@ namespace PrefabPalette
 
         private Texture2D GetStablePreview(GameObject prefab)
         {
-            // PrefabId is EntityId in editor v6.4+ and (int)InstanceID in previous versions.
-            var prefabId = Helpers.GetObjectId(prefab);
-
             // Once a preview is stable, do not ask AssetPreview for it again on
             // every IMGUI repaint. Hovering causes frequent repaints and querying
             // the async preview cache here can make Unity swap textures mid-frame.
             if (previewCache.TryGetValue(prefab, out Texture2D cachedPreview) && cachedPreview)
                 return cachedPreview;
+
+            // PrefabId is EntityId in editor v6.4+ and (int)InstanceID in previous versions.
+            var prefabId = Helpers.GetObjectId(prefab);
 
             // AssetPreview is asynchronous and can briefly return null while Unity
             // refreshes an existing preview. Keep the last valid texture visible so
