@@ -211,6 +211,24 @@ namespace PrefabPalette
 
             return name;
         }
+
+#if UNITY_6000_4_OR_NEWER
+        /// <summary>
+        /// Returns entity id of gameObject (Unity v6.4+)
+        /// </summary>
+        public static EntityId GetObjectId(GameObject gameObject)
+        {
+            return gameObject.GetEntityId();
+        }
+#else
+        /// <summary>
+        /// Returns the instance id of gameObject.
+        /// </summary>
+        public static int GetObjectId(GameObject gameObject)
+        {
+            return gameObject.GetInstanceID();
+        }
+#endif
     }
 }
 
