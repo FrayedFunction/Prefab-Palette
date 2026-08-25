@@ -9,10 +9,16 @@ namespace PrefabPalette
         Vector2 paletteScrollPosition;
         float dynamicPrefabIconSize = 50f;
         readonly Dictionary<GameObject, Texture2D> previewCache = new();
+        bool isDisposed = false;
 
         ToolSettings Settings => ToolContext.Instance.Settings;
 
         public float IconSize => dynamicPrefabIconSize;
+
+        public PaletteGUI()
+        {
+            EditorApplication.projectChanged += ClearPreviewCache;
+        }
 
         public void Draw(float availableWidth)
         {
@@ -43,6 +49,28 @@ namespace PrefabPalette
             GUILayout.EndVertical();
 
             DrawScaleSlider(scale);
+        }
+
+        public void Dispose()
+        {
+            if (isDisposed) 
+                return;
+            
+            isDisposed = true;
+
+            EditorApplication.projectChanged -= ClearPreviewCache;
+            ClearPreviewCache();
+        }
+
+        private void ClearPreviewCache()
+        {
+            foreach (Texture2D preview in previewCache.Values)
+            {
+                if (preview)
+                    UnityEngine.Object.DestroyImmediate(preview);
+            }
+
+            previewCache.Clear();
         }
 
         private void DrawScaleSlider(float currentScale)

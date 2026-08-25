@@ -35,6 +35,9 @@ namespace PrefabPalette
 
         private void OnDisable()
         {
+            paletteGUI?.Dispose();
+            paletteGUI = null;
+
             var context = ToolContext.Instance;
             context.OnDisable();
         }

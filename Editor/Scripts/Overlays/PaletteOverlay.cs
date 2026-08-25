@@ -37,6 +37,9 @@ namespace PrefabPalette
 
         public override void OnWillBeDestroyed()
         {
+            gui?.Dispose();
+            gui = null;
+
             var context = ToolContext.Instance;
             context.IsPaletteOverlayOpen = false;
             context.OnDisable();
