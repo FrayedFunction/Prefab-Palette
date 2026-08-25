@@ -8,7 +8,7 @@ namespace PrefabPalette
     {
         Vector2 paletteScrollPosition;
         float dynamicPrefabIconSize = 50f;
-        readonly Dictionary<EntityId, Texture2D> previewCache = new();
+        readonly Dictionary<GameObject, Texture2D> previewCache = new();
 
         ToolSettings Settings => ToolContext.Instance.Settings;
 
@@ -176,12 +176,13 @@ namespace PrefabPalette
 
         private Texture2D GetStablePreview(GameObject prefab)
         {
-            EntityId prefabId = prefab.GetEntityId();
+            // PrefabId is EntityId in editor v6.4+ and (int)InstanceID in previous versions.
+            var prefabId = Helpers.GetObjectId(prefab);
 
             // Once a preview is stable, do not ask AssetPreview for it again on
             // every IMGUI repaint. Hovering causes frequent repaints and querying
             // the async preview cache here can make Unity swap textures mid-frame.
-            if (previewCache.TryGetValue(prefabId, out Texture2D cachedPreview) && cachedPreview)
+            if (previewCache.TryGetValue(prefab, out Texture2D cachedPreview) && cachedPreview)
                 return cachedPreview;
 
             // AssetPreview is asynchronous and can briefly return null while Unity
@@ -195,10 +196,10 @@ namespace PrefabPalette
                 Texture2D stablePreview = UnityEngine.Object.Instantiate(generatedPreview);
                 stablePreview.name = $"{prefab.name} Palette Preview";
                 stablePreview.hideFlags = HideFlags.HideAndDontSave;
-                previewCache[prefabId] = stablePreview;
+                previewCache[prefab] = stablePreview;
             }
 
-            if (previewCache.TryGetValue(prefabId, out cachedPreview) && cachedPreview)
+            if (previewCache.TryGetValue(prefab, out cachedPreview) && cachedPreview)
                 return cachedPreview;
 
             return EditorGUIUtility.IconContent("Prefab Icon").image as Texture2D;
